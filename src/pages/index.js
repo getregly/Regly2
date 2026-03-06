@@ -1,26 +1,4 @@
-import { useState } from 'react'
-
 export default function Home() {
-  const [email, setEmail] = useState('')
-  const [submitted, setSubmitted] = useState(false)
-  const [loading, setLoading] = useState(false)
-
-  async function handleSubmit(e) {
-    e.preventDefault()
-    setLoading(true)
-    // Sends to Tally form in background — replace with your Tally form ID
-    try {
-      await fetch('https://tally.so/r/eqBLKE', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-        mode: 'no-cors',
-      })
-    } catch (_) {}
-    setSubmitted(true)
-    setLoading(false)
-  }
-
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 text-center relative overflow-hidden">
 
@@ -48,34 +26,14 @@ export default function Home() {
         Memberships for your neighborhood's best spots.
       </h2>
       <p className="text-muted text-lg max-w-md mb-12">
-        We're putting the finishing touches on something special. Drop your email and you'll be the first to know when we launch in Chicago.
+        We're putting the finishing touches on something special. Check back soon — launching in Chicago shortly.
       </p>
 
-      {/* Email capture */}
-      {!submitted ? (
-        <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 w-full max-w-md">
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            placeholder="your@email.com"
-            className="input flex-1"
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className="btn-gold px-8 py-3 shrink-0"
-          >
-            {loading ? '...' : 'Notify Me'}
-          </button>
-        </form>
-      ) : (
-        <div className="bg-mid border border-gold border-opacity-40 rounded-lg px-8 py-5 max-w-md">
-          <p className="text-gold font-serif text-xl font-bold mb-1">You're on the list ✦</p>
-          <p className="text-muted text-sm">We'll reach out as soon as Regly launches in your city.</p>
-        </div>
-      )}
+      {/* Coming Soon badge */}
+      <div className="bg-mid border border-gold border-opacity-40 rounded-lg px-8 py-5">
+        <p className="text-gold font-serif text-xl font-bold mb-1">Coming Soon ✦</p>
+        <p className="text-muted text-sm">Regly is launching in Chicago. Stay tuned.</p>
+      </div>
 
       {/* Stats */}
       <div className="flex gap-12 mt-16">
