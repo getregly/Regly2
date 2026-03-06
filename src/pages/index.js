@@ -49,14 +49,6 @@ export default function Home() {
         ))}
       </div>
 
-      {/* Footer */}
-      <p className="text-muted text-xs mt-16">
-        Are you a business?{' '}
-        <a href="/auth?role=business" className="text-gold hover:underline">
-          Get early access →
-        </a>
-      </p>
-
     </div>
   )
 }
