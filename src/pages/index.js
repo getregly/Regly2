@@ -469,7 +469,7 @@ export default function Home() {
       {/* FOOTER */}
       <footer className="py-12 px-8 border-t text-center" style={{borderColor:'rgba(201,168,76,0.1)'}}>
         <p className="font-display text-2xl font-bold mb-2"><span style={{color:'#F5F0E8'}}>REGL</span><span style={{color:'#C9A84C'}}>Y</span></p>
-        <p className="font-body text-xs" style={{color:'#8A7A6A', fontWeight:300}}>© 2025 Regly · Chicago, IL · hello@getregly.com</p>
+        <p className="font-body text-xs" style={{color:'#8A7A6A', fontWeight:300}}>© 2025 Regly · Chicago, IL · getregly@gmail.com</p>
       </footer>
     </div>
   )
