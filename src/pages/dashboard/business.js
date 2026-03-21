@@ -4,12 +4,13 @@ import { supabase } from '../../lib/supabase'
 
 export default function BusinessDashboard() {
   const router = useRouter()
-  const [restaurant, setRestaurant] = useState(null)
-  const [members, setMembers]       = useState([])
-  const [phone, setPhone]           = useState('')
-  const [lookup, setLookup]         = useState(null)
-  const [loading, setLoading]       = useState(true)
-  const [searching, setSearching]   = useState(false)
+  const [restaurant, setRestaurant]   = useState(null)
+  const [members, setMembers]         = useState([])
+  const [phone, setPhone]             = useState('')
+  const [lookup, setLookup]           = useState(null)
+  const [loading, setLoading]         = useState(true)
+  const [searching, setSearching]     = useState(false)
+  const [stats, setStats]             = useState({ revenue: 0, tierBreakdown: [] })
 
   useEffect(() => { init() }, [])
 
@@ -23,29 +24,38 @@ export default function BusinessDashboard() {
     setRestaurant(rest)
 
     if (rest) {
-      // Step 1: get all active subscriptions for this restaurant
       const { data: subs } = await supabase
         .from('subscriptions')
         .select('*, membership_tiers(name, price_monthly)')
         .eq('restaurant_id', rest.id)
         .eq('status', 'active')
+        .order('start_date', { ascending: false })
 
       if (subs && subs.length > 0) {
-        // Step 2: get all customer profile data separately
         const customerIds = subs.map(s => s.customer_id)
         const { data: profiles } = await supabase
           .from('profiles')
           .select('id, name, phone')
           .in('id', customerIds)
 
-        // Step 3: merge profiles into subscriptions manually
         const merged = subs.map(s => ({
           ...s,
           profile: profiles?.find(p => p.id === s.customer_id) || null
         }))
         setMembers(merged)
+
+        // Calculate stats
+        const revenue = subs.reduce((sum, s) => sum + (s.membership_tiers?.price_monthly || 0), 0)
+        const tierMap = {}
+        subs.forEach(s => {
+          const name = s.membership_tiers?.name || 'Unknown'
+          tierMap[name] = (tierMap[name] || 0) + 1
+        })
+        const tierBreakdown = Object.entries(tierMap).map(([name, count]) => ({ name, count }))
+        setStats({ revenue, tierBreakdown })
       } else {
         setMembers([])
+        setStats({ revenue: 0, tierBreakdown: [] })
       }
     }
     setLoading(false)
@@ -58,8 +68,6 @@ export default function BusinessDashboard() {
     setLookup(null)
 
     const cleaned = phone.replace(/\D/g, '')
-
-    // Step 1: find profile by phone number directly
     const { data: profiles } = await supabase
       .from('profiles')
       .select('id, name, phone')
@@ -75,7 +83,6 @@ export default function BusinessDashboard() {
       return
     }
 
-    // Step 2: find their subscription at this restaurant
     const { data: subs } = await supabase
       .from('subscriptions')
       .select('*, membership_tiers(name, price_monthly)')
@@ -105,6 +112,9 @@ export default function BusinessDashboard() {
     return <span className="text-muted">● {status}</span>
   }
 
+  const reglyFee = (stats.revenue * 0.15).toFixed(2)
+  const ownerRevenue = (stats.revenue * 0.85).toFixed(2)
+
   if (loading) return <div className="min-h-screen flex items-center justify-center text-gold">Loading...</div>
 
   return (
@@ -126,6 +136,49 @@ export default function BusinessDashboard() {
         </div>
       ) : (
         <div className="space-y-10">
+
+          {/* Stats Row */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="card text-center py-5">
+              <p className="font-serif text-3xl font-bold text-gold">{members.length}</p>
+              <p className="text-muted text-xs mt-1">Active Members</p>
+            </div>
+            <div className="card text-center py-5">
+              <p className="font-serif text-3xl font-bold text-gold">${stats.revenue}</p>
+              <p className="text-muted text-xs mt-1">Monthly Revenue</p>
+            </div>
+            <div className="card text-center py-5">
+              <p className="font-serif text-3xl font-bold text-gold">${ownerRevenue}</p>
+              <p className="text-muted text-xs mt-1">Your Earnings (85%)</p>
+            </div>
+            <div className="card text-center py-5">
+              <p className="font-serif text-3xl font-bold text-gold">${reglyFee}</p>
+              <p className="text-muted text-xs mt-1">Regly Fee (15%)</p>
+            </div>
+          </div>
+
+          {/* Tier Breakdown */}
+          {stats.tierBreakdown.length > 0 && (
+            <div className="card">
+              <h2 className="font-serif text-xl font-bold text-gold mb-4">Members by Tier</h2>
+              <div className="space-y-3">
+                {stats.tierBreakdown.map(t => {
+                  const pct = Math.round((t.count / members.length) * 100)
+                  return (
+                    <div key={t.name}>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-cream text-sm">{t.name}</span>
+                        <span className="text-muted text-xs">{t.count} member{t.count !== 1 ? 's' : ''} · {pct}%</span>
+                      </div>
+                      <div className="w-full h-1.5 rounded-full bg-dark overflow-hidden">
+                        <div className="h-full rounded-full bg-gold" style={{width:`${pct}%`}} />
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Phone Lookup */}
           <div className="card">
@@ -172,12 +225,12 @@ export default function BusinessDashboard() {
             )}
           </div>
 
-          {/* Member List */}
+          {/* Member List — newest first */}
           <div className="card">
             <h2 className="font-serif text-xl font-bold text-gold mb-1">
               Active Members <span className="text-muted font-normal text-base">({members.length})</span>
             </h2>
-            <p className="text-muted text-sm mb-5">All current Regly subscribers at {restaurant.name}.</p>
+            <p className="text-muted text-sm mb-5">Sorted by most recent. All current Regly subscribers at {restaurant.name}.</p>
 
             {members.length === 0 ? (
               <p className="text-muted text-center py-8">No active members yet. Share your Regly link to get started!</p>
