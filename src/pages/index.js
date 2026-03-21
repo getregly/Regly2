@@ -198,7 +198,7 @@ export default function Home() {
         </h1>
 
         <p className="fade-up-3 font-body text-lg max-w-lg mb-10 leading-relaxed relative z-10" style={{color:'#8A7A6A', fontWeight:300}}>
-          Regly is a monthly membership that gets you real, tangible perks at your favorite coffee shops, pizza spots, and restaurants — every single visit. Pay once a month. Get something every time you walk in.
+          Regly is a monthly membership that gets you real, tangible perks at your favorite coffee shops, pizza spots, and restaurants, every single visit. Pay once a month. Get something every time you walk in.
         </p>
 
         <div className="fade-up-4 flex flex-col sm:flex-row items-start sm:items-center gap-4 relative z-10">
@@ -250,7 +250,7 @@ export default function Home() {
               <span style={{color:'#C9A84C', fontStyle:'italic'}}>every visit.</span>
             </h2>
             <p className="font-body text-base leading-relaxed mb-6" style={{color:'#8A7A6A', fontWeight:300}}>
-              You already spend money at your favorite spots. Regly lets you pay a small monthly fee in exchange for real perks — free items, discounts, and bonuses — every time you go. No points to track. No apps to open. Just show up and give your phone number.
+              You already spend money at your favorite spots. Regly lets you pay a small monthly fee in exchange for real perks, free items, discounts, and bonuses — every time you go. No points to track. No apps to open. Just show up and give your phone number.
             </p>
             <p className="font-body text-base leading-relaxed mb-10" style={{color:'#8A7A6A', fontWeight:300}}>
               A $20/month Gold membership at a pizza place could get you free breadsticks every visit, two free deliveries, and 5% off every order. That's up to $40+ in value for $20. The math works in your favor.
