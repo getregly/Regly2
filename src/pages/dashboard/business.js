@@ -23,12 +23,30 @@ export default function BusinessDashboard() {
     setRestaurant(rest)
 
     if (rest) {
+      // Step 1: get all active subscriptions for this restaurant
       const { data: subs } = await supabase
         .from('subscriptions')
-        .select('*, profiles(name, phone), membership_tiers(name, price_monthly)')
+        .select('*, membership_tiers(name, price_monthly)')
         .eq('restaurant_id', rest.id)
         .eq('status', 'active')
-      setMembers(subs || [])
+
+      if (subs && subs.length > 0) {
+        // Step 2: get all customer profile data separately
+        const customerIds = subs.map(s => s.customer_id)
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, name, phone')
+          .in('id', customerIds)
+
+        // Step 3: merge profiles into subscriptions manually
+        const merged = subs.map(s => ({
+          ...s,
+          profile: profiles?.find(p => p.id === s.customer_id) || null
+        }))
+        setMembers(merged)
+      } else {
+        setMembers([])
+      }
     }
     setLoading(false)
   }
@@ -39,21 +57,40 @@ export default function BusinessDashboard() {
     setSearching(true)
     setLookup(null)
 
-    // Look up by joining profile phone number
+    const cleaned = phone.replace(/\D/g, '')
+
+    // Step 1: find profile by phone number directly
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('id, name, phone')
+      .eq('role', 'customer')
+
+    const matchedProfile = profiles?.find(p =>
+      (p.phone || '').replace(/\D/g, '') === cleaned
+    )
+
+    if (!matchedProfile) {
+      setLookup(false)
+      setSearching(false)
+      return
+    }
+
+    // Step 2: find their subscription at this restaurant
     const { data: subs } = await supabase
       .from('subscriptions')
-      .select('*, profiles(name, phone), membership_tiers(name, price_monthly)')
+      .select('*, membership_tiers(name, price_monthly)')
+      .eq('customer_id', matchedProfile.id)
       .eq('restaurant_id', restaurant.id)
-      .in('status', ['active', 'cancelled'])
+      .order('start_date', { ascending: false })
+      .limit(1)
 
-    // Filter by phone on client side to avoid join filter limitations
-    const cleaned = phone.replace(/\D/g, '')
-    const match = subs?.find(s => {
-      const memberPhone = (s.profiles?.phone || '').replace(/\D/g, '')
-      return memberPhone === cleaned
-    })
+    if (!subs || subs.length === 0) {
+      setLookup(false)
+      setSearching(false)
+      return
+    }
 
-    setLookup(match || false)
+    setLookup({ ...subs[0], profile: matchedProfile })
     setSearching(false)
   }
 
@@ -113,14 +150,16 @@ export default function BusinessDashboard() {
               </div>
             )}
 
-            {lookup && lookup.profiles && (
+            {lookup && lookup.profile && (
               <div className="mt-4 p-4 bg-dark rounded border border-gold border-opacity-40">
                 <p className="font-semibold text-lg mb-3">
-                  {lookup.status === 'active' ? <span className="text-gold">✓ Active Member</span> : <span className="text-red-400">✗ Cancelled Membership</span>}
+                  {lookup.status === 'active'
+                    ? <span className="text-gold">✓ Active Member</span>
+                    : <span className="text-red-400">✗ Cancelled Membership</span>}
                 </p>
                 <div className="space-y-1 text-cream text-sm">
-                  <p><span className="text-muted">Name:</span> {lookup.profiles.name}</p>
-                  <p><span className="text-muted">Phone:</span> {lookup.profiles.phone}</p>
+                  <p><span className="text-muted">Name:</span> {lookup.profile.name}</p>
+                  <p><span className="text-muted">Phone:</span> {lookup.profile.phone}</p>
                   <p><span className="text-muted">Tier:</span> {lookup.membership_tiers?.name}</p>
                   <p><span className="text-muted">Price:</span> ${lookup.membership_tiers?.price_monthly}/mo</p>
                   <p><span className="text-muted">Status:</span> {statusBadge(lookup.status)}</p>
@@ -157,8 +196,8 @@ export default function BusinessDashboard() {
                   <tbody className="divide-y divide-muted divide-opacity-20">
                     {members.map(m => (
                       <tr key={m.id}>
-                        <td className="py-3 pr-4 text-cream">{m.profiles?.name || '—'}</td>
-                        <td className="py-3 pr-4 text-cream">{m.profiles?.phone || '—'}</td>
+                        <td className="py-3 pr-4 text-cream">{m.profile?.name || '—'}</td>
+                        <td className="py-3 pr-4 text-cream">{m.profile?.phone || '—'}</td>
                         <td className="py-3 pr-4">
                           <span className="bg-gold bg-opacity-20 text-gold text-xs px-2 py-1 rounded">{m.membership_tiers?.name}</span>
                         </td>
