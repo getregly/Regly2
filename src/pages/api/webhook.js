@@ -1,7 +1,6 @@
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
 
-// Use service role key so webhook can write regardless of RLS
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -30,11 +29,7 @@ export default async function handler(req, res) {
 
   let event
   try {
-    event = stripe.webhooks.constructEvent(
-      rawBody,
-      sig,
-      process.env.STRIPE_WEBHOOK_SECRET
-    )
+    event = stripe.webhooks.constructEvent(rawBody, sig, process.env.STRIPE_WEBHOOK_SECRET)
   } catch (err) {
     console.error('Webhook signature error:', err.message)
     return res.status(400).send(`Webhook Error: ${err.message}`)
@@ -43,8 +38,6 @@ export default async function handler(req, res) {
   try {
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object
-
-      // Extract metadata we passed during checkout
       const { userId, tierId, restaurantId } = session.metadata || {}
 
       if (!userId || !tierId || !restaurantId) {
@@ -52,7 +45,14 @@ export default async function handler(req, res) {
         return res.status(200).json({ received: true })
       }
 
-      // Check if subscription already exists (avoid duplicates)
+      // Use the real subscription ID (sub_...), not the session ID (cs_...)
+      const stripeSubscriptionId = session.subscription
+
+      if (!stripeSubscriptionId) {
+        console.error('No subscription ID on session:', session.id)
+        return res.status(200).json({ received: true })
+      }
+
       const { data: existing } = await supabase
         .from('subscriptions')
         .select('id')
@@ -66,35 +66,31 @@ export default async function handler(req, res) {
           customer_id: userId,
           restaurant_id: restaurantId,
           tier_id: tierId,
-          stripe_subscription_id: session.subscription || session.id,
+          stripe_subscription_id: stripeSubscriptionId, // real sub_... ID
           stripe_customer_id: session.customer,
           status: 'active',
           start_date: new Date().toISOString(),
         })
-
-        if (error) {
-          console.error('Supabase insert error:', error)
-          return res.status(500).json({ error: error.message })
-        }
-
-        console.log(`✓ Subscription created for user ${userId} tier ${tierId}`)
+        if (error) console.error('Supabase insert error:', error)
+        else console.log(`✓ Subscription created: ${stripeSubscriptionId}`)
+      } else {
+        // Update existing record with correct subscription ID
+        await supabase
+          .from('subscriptions')
+          .update({ stripe_subscription_id: stripeSubscriptionId })
+          .eq('customer_id', userId)
+          .eq('tier_id', tierId)
       }
     }
 
     if (event.type === 'customer.subscription.deleted') {
       const subscription = event.data.object
-
       const { error } = await supabase
         .from('subscriptions')
         .update({ status: 'cancelled' })
         .eq('stripe_subscription_id', subscription.id)
-
-      if (error) {
-        console.error('Supabase cancel error:', error)
-        return res.status(500).json({ error: error.message })
-      }
-
-      console.log(`✓ Subscription cancelled: ${subscription.id}`)
+      if (error) console.error('Supabase cancel error:', error)
+      else console.log(`✓ Subscription cancelled: ${subscription.id}`)
     }
 
   } catch (err) {
