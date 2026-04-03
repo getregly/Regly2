@@ -6,6 +6,7 @@ export default function BusinessDashboard() {
   const router = useRouter()
   const [restaurant, setRestaurant]   = useState(null)
   const [members, setMembers]         = useState([])
+  const [stripeData, setStripeData]   = useState({})
   const [phone, setPhone]             = useState('')
   const [lookup, setLookup]           = useState(null)
   const [loading, setLoading]         = useState(true)
@@ -51,8 +52,23 @@ export default function BusinessDashboard() {
           const name = s.membership_tiers?.name || 'Unknown'
           tierMap[name] = (tierMap[name] || 0) + 1
         })
-        const tierBreakdown = Object.entries(tierMap).map(([name, count]) => ({ name, count }))
-        setStats({ revenue, tierBreakdown })
+        setStats({ revenue, tierBreakdown: Object.entries(tierMap).map(([name, count]) => ({ name, count })) })
+
+        // Fetch Stripe renewal/cancellation data
+        const stripeIds = subs.map(s => s.stripe_subscription_id).filter(Boolean)
+        if (stripeIds.length > 0) {
+          try {
+            const res = await fetch('/api/subscription-status', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ subscriptionIds: stripeIds }),
+            })
+            const data = await res.json()
+            setStripeData(data)
+          } catch (err) {
+            console.error('Stripe fetch error:', err)
+          }
+        }
       } else {
         setMembers([])
         setStats({ revenue: 0, tierBreakdown: [] })
@@ -97,7 +113,22 @@ export default function BusinessDashboard() {
       return
     }
 
-    setLookup({ ...subs[0], profile: matchedProfile })
+    // Fetch Stripe data for this subscription
+    let stripeInfo = null
+    const subId = subs[0].stripe_subscription_id
+    if (subId && !subId.startsWith('test_sub_')) {
+      try {
+        const res = await fetch('/api/subscription-status', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ subscriptionIds: [subId] }),
+        })
+        const data = await res.json()
+        stripeInfo = data[subId]
+      } catch (err) {}
+    }
+
+    setLookup({ ...subs[0], profile: matchedProfile, stripeInfo })
     setSearching(false)
   }
 
@@ -106,13 +137,21 @@ export default function BusinessDashboard() {
     router.push('/')
   }
 
-  function statusBadge(status) {
-    if (status === 'active') return <span className="text-green-400">● Active</span>
-    if (status === 'cancelled') return <span className="text-red-400">● Cancelled</span>
-    return <span className="text-muted">● {status}</span>
+  function formatDate(unix) {
+    if (!unix) return '—'
+    return new Date(unix * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
   }
 
-  const reglyFee = (stats.revenue * 0.15).toFixed(2)
+  function renewalInfo(sub) {
+    const stripe = stripeData[sub.stripe_subscription_id]
+    if (!stripe) return null
+    if (stripe.cancel_at_period_end) {
+      return { label: 'Cancels on', date: formatDate(stripe.current_period_end), color: 'text-red-400' }
+    }
+    return { label: 'Renews on', date: formatDate(stripe.current_period_end), color: 'text-green-400' }
+  }
+
+  const reglyFee    = (stats.revenue * 0.15).toFixed(2)
   const ownerRevenue = (stats.revenue * 0.85).toFixed(2)
 
   if (loading) return <div className="min-h-screen flex items-center justify-center text-gold">Loading...</div>
@@ -215,8 +254,17 @@ export default function BusinessDashboard() {
                   <p><span className="text-muted">Phone:</span> {lookup.profile.phone}</p>
                   <p><span className="text-muted">Tier:</span> {lookup.membership_tiers?.name}</p>
                   <p><span className="text-muted">Price:</span> ${lookup.membership_tiers?.price_monthly}/mo</p>
-                  <p><span className="text-muted">Status:</span> {statusBadge(lookup.status)}</p>
                   <p><span className="text-muted">Member since:</span> {new Date(lookup.start_date).toLocaleDateString()}</p>
+                  {lookup.stripeInfo && (
+                    <p>
+                      <span className="text-muted">
+                        {lookup.stripeInfo.cancel_at_period_end ? 'Cancels on:' : 'Renews on:'}
+                      </span>{' '}
+                      <span className={lookup.stripeInfo.cancel_at_period_end ? 'text-red-400' : 'text-green-400'}>
+                        {formatDate(lookup.stripeInfo.current_period_end)}
+                      </span>
+                    </p>
+                  )}
                   {lookup.status === 'cancelled' && (
                     <p className="text-red-300 mt-2 text-xs">⚠ This membership has been cancelled. Perks are no longer active.</p>
                   )}
@@ -225,7 +273,7 @@ export default function BusinessDashboard() {
             )}
           </div>
 
-          {/* Member List — newest first */}
+          {/* Member List */}
           <div className="card">
             <h2 className="font-serif text-xl font-bold text-gold mb-1">
               Active Members <span className="text-muted font-normal text-base">({members.length})</span>
@@ -243,21 +291,31 @@ export default function BusinessDashboard() {
                       <th className="text-left text-muted pb-3 pr-4">Phone</th>
                       <th className="text-left text-muted pb-3 pr-4">Tier</th>
                       <th className="text-left text-muted pb-3 pr-4">$/mo</th>
-                      <th className="text-left text-muted pb-3">Since</th>
+                      <th className="text-left text-muted pb-3 pr-4">Since</th>
+                      <th className="text-left text-muted pb-3">Renewal</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-muted divide-opacity-20">
-                    {members.map(m => (
-                      <tr key={m.id}>
-                        <td className="py-3 pr-4 text-cream">{m.profile?.name || '—'}</td>
-                        <td className="py-3 pr-4 text-cream">{m.profile?.phone || '—'}</td>
-                        <td className="py-3 pr-4">
-                          <span className="bg-gold bg-opacity-20 text-gold text-xs px-2 py-1 rounded">{m.membership_tiers?.name}</span>
-                        </td>
-                        <td className="py-3 pr-4 text-cream">${m.membership_tiers?.price_monthly}</td>
-                        <td className="py-3 text-muted">{new Date(m.start_date).toLocaleDateString()}</td>
-                      </tr>
-                    ))}
+                    {members.map(m => {
+                      const renewal = renewalInfo(m)
+                      return (
+                        <tr key={m.id}>
+                          <td className="py-3 pr-4 text-cream">{m.profile?.name || '—'}</td>
+                          <td className="py-3 pr-4 text-cream">{m.profile?.phone || '—'}</td>
+                          <td className="py-3 pr-4">
+                            <span className="bg-gold bg-opacity-20 text-gold text-xs px-2 py-1 rounded">{m.membership_tiers?.name}</span>
+                          </td>
+                          <td className="py-3 pr-4 text-cream">${m.membership_tiers?.price_monthly}</td>
+                          <td className="py-3 pr-4 text-muted">{new Date(m.start_date).toLocaleDateString()}</td>
+                          <td className="py-3">
+                            {renewal
+                              ? <span className={`text-xs ${renewal.color}`}>{renewal.label} {renewal.date}</span>
+                              : <span className="text-muted text-xs">—</span>
+                            }
+                          </td>
+                        </tr>
+                      )
+                    })}
                   </tbody>
                 </table>
               </div>
