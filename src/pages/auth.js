@@ -10,11 +10,10 @@ export default function Auth() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [businessSignedUp, setBusinessSignedUp] = useState(false)
+  const [focusedField, setFocusedField] = useState(null)
 
   const isB = role === 'business'
-  const label = isB ? 'Business Owner' : 'Customer'
-  const dash  = isB ? '/dashboard/business' : '/dashboard/customer'
-
+  const dash = isB ? '/dashboard/business' : '/dashboard/customer'
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
 
   async function handleSubmit(e) {
@@ -26,11 +25,7 @@ export default function Auth() {
         const { data, error: sErr } = await supabase.auth.signUp({ email: form.email, password: form.password })
         if (sErr) throw sErr
         await supabase.from('profiles').insert({ id: data.user.id, name: form.name, phone: form.phone, role })
-        if (isB) {
-          setBusinessSignedUp(true)
-          setLoading(false)
-          return
-        }
+        if (isB) { setBusinessSignedUp(true); setLoading(false); return }
         router.push(dash)
       } else {
         const { data, error: lErr } = await supabase.auth.signInWithPassword({ email: form.email, password: form.password })
@@ -38,7 +33,7 @@ export default function Auth() {
         const { data: profile } = await supabase.from('profiles').select('role').eq('id', data.user.id).single()
         if (profile?.role !== role) {
           await supabase.auth.signOut()
-          throw new Error(`This account is not registered as a ${label}.`)
+          throw new Error(`This account is not registered as a ${isB ? 'business' : 'customer'}.`)
         }
         router.push(dash)
       }
@@ -49,19 +44,33 @@ export default function Auth() {
     }
   }
 
+  const inputStyle = (field) => ({
+    width: '100%',
+    padding: '14px 16px',
+    background: '#fff',
+    border: `1.5px solid ${focusedField === field ? '#C9A84C' : '#E5E7EB'}`,
+    borderRadius: 10,
+    fontSize: 15,
+    color: '#111827',
+    outline: 'none',
+    transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+    boxShadow: focusedField === field ? '0 0 0 3px rgba(201,168,76,0.12)' : 'none',
+    fontFamily: 'inherit',
+  })
+
   if (businessSignedUp) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-6 text-center">
-        <div className="fixed left-0 top-0 w-1.5 h-full bg-gold" />
-        <div className="max-w-md w-full card">
-          <div className="text-5xl mb-4">✦</div>
-          <h2 className="font-serif text-2xl font-bold text-gold mb-3">Welcome to Regly!</h2>
-          <p className="text-cream mb-2">Your account has been created.</p>
-          <p className="text-muted text-sm mb-6 leading-relaxed">
-            Our team will be in touch shortly to get your restaurant set up. You can reach us anytime at{' '}
-            <span className="text-gold">getregly@gmail.com</span>
-          </p>
-          <button onClick={() => router.push('/dashboard/business')} className="btn-gold w-full">
+      <div style={{minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'#F9FAFB', padding:'24px', fontFamily:'system-ui, sans-serif'}}>
+        <div style={{background:'white', borderRadius:20, padding:'48px 40px', maxWidth:440, width:'100%', textAlign:'center', boxShadow:'0 4px 32px rgba(0,0,0,0.08)'}}>
+          <div style={{width:64, height:64, background:'rgba(201,168,76,0.1)', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 24px'}}>
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <path d="M5 14L11 20L23 8" stroke="#C9A84C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <h2 style={{fontSize:24, fontWeight:700, color:'#111827', marginBottom:8, fontFamily:'Georgia, serif'}}>Welcome to Regly</h2>
+          <p style={{color:'#6B7280', fontSize:15, lineHeight:1.6, marginBottom:24}}>Your account has been created. Our team will reach out shortly to get your business set up.</p>
+          <p style={{color:'#9CA3AF', fontSize:13, marginBottom:32}}>Questions? <span style={{color:'#C9A84C'}}>getregly@gmail.com</span></p>
+          <button onClick={() => router.push('/dashboard/business')} style={{width:'100%', padding:'14px', background:'#C9A84C', color:'#0A0906', border:'none', borderRadius:10, fontSize:14, fontWeight:700, cursor:'pointer', letterSpacing:'0.05em', textTransform:'uppercase'}}>
             Go to My Dashboard
           </button>
         </div>
@@ -70,49 +79,186 @@ export default function Auth() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6">
-      <div className="fixed left-0 top-0 w-1.5 h-full bg-gold" />
-      <div className="w-full max-w-md">
-        <div className="mb-8 text-center">
-          <button onClick={() => router.push('/')} className="text-muted text-sm mb-6 block hover:text-gold">← Back</button>
-          <h1 className="font-serif text-3xl font-bold text-cream">{mode === 'login' ? 'Welcome back' : 'Join Regly'}</h1>
-          <p className="text-muted mt-2">{mode === 'login' ? `${label} login` : `Create your ${label} account`}</p>
+    <div style={{minHeight:'100vh', display:'grid', gridTemplateColumns: 'auto', fontFamily:'system-ui, -apple-system, sans-serif', background:'#F9FAFB'}}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600&display=swap');
+        * { box-sizing: border-box; }
+        .auth-input::placeholder { color: #9CA3AF; }
+        .auth-btn:hover { opacity: 0.92; transform: translateY(-1px); }
+        .auth-btn { transition: all 0.2s ease; }
+        .toggle-btn:hover { color: #8A6A20; }
+        .back-btn:hover { color: #374151; }
+        @media (min-width: 768px) {
+          .auth-grid { grid-template-columns: 1fr 1fr !important; }
+        }
+      `}</style>
+
+      <div className="auth-grid" style={{display:'grid', gridTemplateColumns:'1fr', minHeight:'100vh'}}>
+
+        {/* LEFT — Photo panel (hidden on mobile) */}
+        <div style={{position:'relative', overflow:'hidden', display:'none', background:'#0A0906'}} className="md-photo-panel"
+          ref={el => { if (el) { el.style.display = window.innerWidth >= 768 ? 'block' : 'none' } }}>
+          <img
+            src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&q=85&fit=crop"
+            alt="Restaurant"
+            style={{width:'100%', height:'100%', objectFit:'cover', objectPosition:'center', position:'absolute', inset:0}}
+          />
+          <div style={{position:'absolute', inset:0, background:'linear-gradient(135deg, rgba(10,9,6,0.7) 0%, rgba(10,9,6,0.4) 100%)'}} />
+          <div style={{position:'absolute', inset:0, display:'flex', flexDirection:'column', justifyContent:'space-between', padding:'40px'}}>
+            <button onClick={() => router.push('/')} style={{display:'inline-flex', alignItems:'center', gap:8, color:'rgba(245,240,232,0.8)', background:'none', border:'none', cursor:'pointer', fontSize:14, fontFamily:'Georgia, serif', fontWeight:700, letterSpacing:2}}>
+              <span style={{color:'#C9A84C', fontSize:20}}>✦</span> REGLY
+            </button>
+            <div>
+              <p style={{color:'rgba(201,168,76,0.8)', fontSize:11, letterSpacing:'0.3em', textTransform:'uppercase', marginBottom:16, fontFamily:'system-ui, sans-serif', fontWeight:600}}>
+                {mode === 'login' ? 'Welcome back' : 'Join Regly'}
+              </p>
+              <p style={{color:'#F5F0E8', fontSize:36, fontFamily:'Georgia, serif', fontStyle:'italic', fontWeight:400, lineHeight:1.2, maxWidth:320}}>
+                "Become a member at your favorite places."
+              </p>
+            </div>
+          </div>
         </div>
-        <div className="card">
-          {error && <div className="bg-red-900 bg-opacity-40 border border-red-500 text-red-300 rounded px-4 py-3 mb-5 text-sm">{error}</div>}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {mode === 'signup' && (
-              <>
-                <div>
-                  <label className="label">{isB ? 'Business / Contact Name' : 'Full Name'}</label>
-                  <input className="input" value={form.name} onChange={e => set('name', e.target.value)} required placeholder="Your name" />
-                </div>
-                <div>
-                  <label className="label">Phone Number</label>
-                  <input className="input" value={form.phone} onChange={e => set('phone', e.target.value)} required placeholder="(312) 555-0000" />
-                </div>
-              </>
+
+        {/* RIGHT — Form panel */}
+        <div style={{display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center', padding:'40px 24px', background:'white', minHeight:'100vh'}}>
+          <div style={{width:'100%', maxWidth:400}}>
+
+            {/* Back button */}
+            <button onClick={() => router.push('/')} className="back-btn"
+              style={{display:'flex', alignItems:'center', gap:6, color:'#9CA3AF', background:'none', border:'none', cursor:'pointer', fontSize:14, marginBottom:40, padding:0, transition:'color 0.2s'}}>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              Back
+            </button>
+
+            {/* Logo — mobile only */}
+            <div style={{marginBottom:32}}>
+              <p style={{fontSize:28, fontFamily:'Georgia, serif', fontWeight:700, color:'#111827', marginBottom:4}}>
+                {mode === 'login' ? 'Welcome back' : 'Create account'}
+              </p>
+              <p style={{color:'#6B7280', fontSize:15}}>
+                {mode === 'login'
+                  ? `Sign in to your ${isB ? 'business' : ''} Regly account`
+                  : `Join Regly as a ${isB ? 'business owner' : 'member'}`}
+              </p>
+            </div>
+
+            {/* Error */}
+            {error && (
+              <div style={{background:'#FEF2F2', border:'1px solid #FECACA', borderRadius:10, padding:'12px 16px', marginBottom:20, display:'flex', alignItems:'center', gap:10}}>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{shrink:0}}>
+                  <circle cx="8" cy="8" r="7" stroke="#EF4444" strokeWidth="1.5"/>
+                  <path d="M8 5V8M8 11H8.01" stroke="#EF4444" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+                <p style={{color:'#DC2626', fontSize:14, margin:0}}>{error}</p>
+              </div>
             )}
-            <div>
-              <label className="label">Email</label>
-              <input className="input" type="email" value={form.email} onChange={e => set('email', e.target.value)} required placeholder="you@email.com" />
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} style={{display:'flex', flexDirection:'column', gap:16}}>
+              {mode === 'signup' && (
+                <>
+                  <div>
+                    <label style={{display:'block', fontSize:13, fontWeight:500, color:'#374151', marginBottom:6}}>
+                      {isB ? 'Business / Contact Name' : 'Full Name'}
+                    </label>
+                    <input
+                      className="auth-input"
+                      style={inputStyle('name')}
+                      value={form.name}
+                      onChange={e => set('name', e.target.value)}
+                      onFocus={() => setFocusedField('name')}
+                      onBlur={() => setFocusedField(null)}
+                      required
+                      placeholder="Your name"
+                    />
+                  </div>
+                  <div>
+                    <label style={{display:'block', fontSize:13, fontWeight:500, color:'#374151', marginBottom:6}}>Phone Number</label>
+                    <input
+                      className="auth-input"
+                      style={inputStyle('phone')}
+                      value={form.phone}
+                      onChange={e => set('phone', e.target.value)}
+                      onFocus={() => setFocusedField('phone')}
+                      onBlur={() => setFocusedField(null)}
+                      required
+                      placeholder="(312) 555-0000"
+                    />
+                  </div>
+                </>
+              )}
+
+              <div>
+                <label style={{display:'block', fontSize:13, fontWeight:500, color:'#374151', marginBottom:6}}>Email address</label>
+                <input
+                  className="auth-input"
+                  style={inputStyle('email')}
+                  type="email"
+                  value={form.email}
+                  onChange={e => set('email', e.target.value)}
+                  onFocus={() => setFocusedField('email')}
+                  onBlur={() => setFocusedField(null)}
+                  required
+                  placeholder="you@email.com"
+                />
+              </div>
+
+              <div>
+                <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:6}}>
+                  <label style={{fontSize:13, fontWeight:500, color:'#374151'}}>Password</label>
+                </div>
+                <input
+                  className="auth-input"
+                  style={inputStyle('password')}
+                  type="password"
+                  value={form.password}
+                  onChange={e => set('password', e.target.value)}
+                  onFocus={() => setFocusedField('password')}
+                  onBlur={() => setFocusedField(null)}
+                  required
+                  placeholder="••••••••"
+                />
+              </div>
+
+              <button type="submit" disabled={loading} className="auth-btn"
+                style={{width:'100%', padding:'15px', background: loading ? '#D4B896' : '#C9A84C', color:'#0A0906', border:'none', borderRadius:10, fontSize:15, fontWeight:700, cursor: loading ? 'not-allowed' : 'pointer', marginTop:4, letterSpacing:'0.02em'}}>
+                {loading ? 'Please wait...' : mode === 'login' ? 'Sign In' : 'Create Account'}
+              </button>
+            </form>
+
+            {/* Divider */}
+            <div style={{display:'flex', alignItems:'center', gap:12, margin:'24px 0'}}>
+              <div style={{flex:1, height:1, background:'#F3F4F6'}} />
+              <span style={{color:'#9CA3AF', fontSize:13}}>or</span>
+              <div style={{flex:1, height:1, background:'#F3F4F6'}} />
             </div>
-            <div>
-              <label className="label">Password</label>
-              <input className="input" type="password" value={form.password} onChange={e => set('password', e.target.value)} required placeholder="••••••••" />
-            </div>
-            <button type="submit" disabled={loading} className="btn-gold w-full mt-2">
-              {loading ? 'Please wait...' : mode === 'login' ? 'Log In' : 'Create Account'}
-            </button>
-          </form>
-          <p className="text-center text-muted text-sm mt-6">
-            {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
-            <button onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError('') }} className="text-gold hover:underline">
-              {mode === 'login' ? 'Sign up' : 'Log in'}
-            </button>
-          </p>
+
+            {/* Toggle */}
+            <p style={{textAlign:'center', color:'#6B7280', fontSize:14}}>
+              {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
+              <button onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError('') }} className="toggle-btn"
+                style={{color:'#C9A84C', background:'none', border:'none', cursor:'pointer', fontSize:14, fontWeight:600, padding:0, transition:'color 0.2s'}}>
+                {mode === 'login' ? 'Sign up' : 'Sign in'}
+              </button>
+            </p>
+
+            {/* Footer note */}
+            <p style={{textAlign:'center', color:'#D1D5DB', fontSize:12, marginTop:32}}>
+              By continuing you agree to Regly's terms of service.
+            </p>
+          </div>
         </div>
       </div>
+
+      {/* Responsive: show photo panel on desktop */}
+      <style>{`
+        @media (min-width: 768px) {
+          .auth-grid { grid-template-columns: 1fr 1fr !important; }
+          .md-photo-panel { display: block !important; }
+        }
+      `}</style>
     </div>
   )
 }
