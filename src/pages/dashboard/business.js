@@ -174,24 +174,85 @@ export default function BusinessDashboard() {
 
       {/* Pending state */}
       {isPending && (
-        <div className="card text-center py-12 mb-8">
-          <div className="text-4xl mb-4">⏳</div>
-          <h2 className="font-serif text-xl font-bold text-gold mb-2">Application Under Review</h2>
-          <p className="text-muted mb-1">We've received your submission for <span className="text-cream">{submission.business_name}</span>.</p>
-          <p className="text-muted text-sm">Our team will review your details and reach out within 1–2 business days.</p>
-          <p className="text-muted text-sm mt-3">Questions? <span className="text-gold">getregly@gmail.com</span></p>
+        <div className="relative overflow-hidden rounded-2xl border border-gold border-opacity-30 px-8 py-14 text-center mb-8"
+          style={{background:'linear-gradient(135deg, #1A1410 0%, #0F0D0A 60%, #1A1410 100%)'}}>
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
+            <span className="font-serif font-black text-gold opacity-5" style={{fontSize:'18rem',lineHeight:1}}>R</span>
+          </div>
+          <div className="absolute top-0 left-0 w-12 h-12 border-t-2 border-l-2 border-gold border-opacity-40 rounded-tl-2xl" />
+          <div className="absolute top-0 right-0 w-12 h-12 border-t-2 border-r-2 border-gold border-opacity-40 rounded-tr-2xl" />
+          <div className="absolute bottom-0 left-0 w-12 h-12 border-b-2 border-l-2 border-gold border-opacity-40 rounded-bl-2xl" />
+          <div className="absolute bottom-0 right-0 w-12 h-12 border-b-2 border-r-2 border-gold border-opacity-40 rounded-br-2xl" />
+          <div className="relative z-10">
+            <div className="flex justify-center mb-6">
+              <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+                <circle cx="32" cy="32" r="28" stroke="#C9A84C" strokeWidth="1.5" strokeOpacity="0.4"/>
+                <circle cx="32" cy="32" r="20" stroke="#C9A84C" strokeWidth="1" strokeOpacity="0.2"/>
+                <circle cx="32" cy="32" r="2.5" fill="#C9A84C"/>
+                <path d="M32 20V32" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/>
+                <path d="M32 32L40 38" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/>
+                <path d="M32 8V12M32 52V56M8 32H12M52 32H56" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.5"/>
+                <path d="M52 12L53.5 14.5L52 17L50.5 14.5L52 12Z" fill="#C9A84C" fillOpacity="0.6"/>
+              </svg>
+            </div>
+            <div className="flex items-center justify-center gap-3 mb-6">
+              <div className="h-px w-12 bg-gold opacity-30" />
+              <span className="text-gold text-xs tracking-widest uppercase font-semibold">Under Review</span>
+              <div className="h-px w-12 bg-gold opacity-30" />
+            </div>
+            <h2 className="font-serif text-3xl font-bold text-cream mb-3">Application Received</h2>
+            <p className="text-cream text-lg mb-1">
+              <span className="text-gold font-semibold">{submission.business_name}</span>
+            </p>
+            <p className="text-muted text-sm leading-relaxed max-w-md mx-auto mb-6">
+              Our team is reviewing your details. We'll reach out within 1–2 business days to get you live on Regly.
+            </p>
+            <div className="inline-flex items-center gap-2 border border-gold border-opacity-20 rounded-full px-5 py-2 text-muted text-xs">
+              Questions?&nbsp;<span className="text-gold">getregly@gmail.com</span>
+            </div>
+          </div>
         </div>
       )}
 
       {/* New — no submission yet */}
       {isNew && (
-        <div className="card text-center py-12">
-          <div className="text-4xl mb-4">✦</div>
-          <h2 className="font-serif text-xl font-bold text-gold mb-2">Welcome to Regly</h2>
-          <p className="text-muted mb-6">Complete your business setup to go live and start earning from your regulars.</p>
-          <button onClick={() => router.push('/onboard')} className="btn-gold px-8 py-3">
-            Set Up My Business →
-          </button>
+        <div className="relative overflow-hidden rounded-2xl border border-gold border-opacity-30 px-8 py-14 text-center"
+          style={{background:'linear-gradient(135deg, #1A1410 0%, #0F0D0A 60%, #1A1410 100%)'}}>
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
+            <span className="font-serif font-black text-gold opacity-5" style={{fontSize:'18rem',lineHeight:1}}>R</span>
+          </div>
+          <div className="absolute top-0 left-0 w-12 h-12 border-t-2 border-l-2 border-gold border-opacity-40 rounded-tl-2xl" />
+          <div className="absolute top-0 right-0 w-12 h-12 border-t-2 border-r-2 border-gold border-opacity-40 rounded-tr-2xl" />
+          <div className="absolute bottom-0 left-0 w-12 h-12 border-b-2 border-l-2 border-gold border-opacity-40 rounded-bl-2xl" />
+          <div className="absolute bottom-0 right-0 w-12 h-12 border-b-2 border-r-2 border-gold border-opacity-40 rounded-br-2xl" />
+          <div className="relative z-10">
+            <div className="flex justify-center mb-6">
+              <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+                <circle cx="32" cy="32" r="28" stroke="#C9A84C" strokeWidth="1.5" strokeOpacity="0.4"/>
+                <path d="M32 16V32L42 42" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M20 48H44" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/>
+                <path d="M44 20L46 16L48 20L46 24L44 20Z" fill="#C9A84C" fillOpacity="0.6"/>
+                <path d="M16 20L18 16L20 20L18 24L16 20Z" fill="#C9A84C" fillOpacity="0.3"/>
+                <circle cx="32" cy="32" r="2.5" fill="#C9A84C"/>
+              </svg>
+            </div>
+            <div className="flex items-center justify-center gap-3 mb-6">
+              <div className="h-px w-12 bg-gold opacity-30" />
+              <span className="text-gold text-xs tracking-widest uppercase font-semibold">Get Started</span>
+              <div className="h-px w-12 bg-gold opacity-30" />
+            </div>
+            <h2 className="font-serif text-3xl font-bold text-cream mb-3">Welcome to Regly</h2>
+            <p className="text-muted text-sm leading-relaxed max-w-md mx-auto mb-8">
+              Set up your membership program in minutes. Define your tiers, set your perks, and start earning from your regulars.
+            </p>
+            <button onClick={() => router.push('/onboard')}
+              className="inline-flex items-center gap-3 btn-gold px-10 py-4 text-sm tracking-widest uppercase">
+              Set Up My Business
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          </div>
         </div>
       )}
 
