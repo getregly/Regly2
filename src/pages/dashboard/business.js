@@ -171,7 +171,8 @@ export default function BusinessDashboard() {
       {!restaurant ? (
         <div className="card text-center py-12">
           <p className="text-muted text-lg">Your restaurant is not set up yet.</p>
-          <p className="text-muted mt-2">Contact <span className="text-gold">getregly@gmail.com</span> to get onboarded.</p>
+          <p className="text-muted mt-2 mb-6">Complete your business setup to go live on Regly.</p>
+          <button onClick={() => router.push('/onboard')} className="btn-gold px-8 py-3">Set Up My Business →</button>
         </div>
       ) : (
         <div className="space-y-10">
