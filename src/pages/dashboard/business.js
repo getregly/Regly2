@@ -4,14 +4,15 @@ import { supabase } from '../../lib/supabase'
 
 export default function BusinessDashboard() {
   const router = useRouter()
-  const [restaurant, setRestaurant]   = useState(null)
-  const [members, setMembers]         = useState([])
-  const [stripeData, setStripeData]   = useState({})
-  const [phone, setPhone]             = useState('')
-  const [lookup, setLookup]           = useState(null)
-  const [loading, setLoading]         = useState(true)
-  const [searching, setSearching]     = useState(false)
-  const [stats, setStats]             = useState({ revenue: 0, tierBreakdown: [] })
+  const [restaurant, setRestaurant]     = useState(null)
+  const [submission, setSubmission]     = useState(null)
+  const [members, setMembers]           = useState([])
+  const [stripeData, setStripeData]     = useState({})
+  const [phone, setPhone]               = useState('')
+  const [lookup, setLookup]             = useState(null)
+  const [loading, setLoading]           = useState(true)
+  const [searching, setSearching]       = useState(false)
+  const [stats, setStats]               = useState({ revenue: 0, tierBreakdown: [] })
 
   useEffect(() => { init() }, [])
 
@@ -21,8 +22,17 @@ export default function BusinessDashboard() {
     const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
     if (profile?.role !== 'business') { router.push('/'); return }
 
+    // Check for approved restaurant
     const { data: rest } = await supabase.from('restaurants').select('*').eq('owner_id', user.id).single()
     setRestaurant(rest)
+
+    // Always check for onboarding submission (for name fallback + pending state)
+    const { data: sub } = await supabase
+      .from('onboarding_submissions')
+      .select('*')
+      .eq('user_id', user.id)
+      .single()
+    setSubmission(sub)
 
     if (rest) {
       const { data: subs } = await supabase
@@ -45,7 +55,6 @@ export default function BusinessDashboard() {
         }))
         setMembers(merged)
 
-        // Calculate stats
         const revenue = subs.reduce((sum, s) => sum + (s.membership_tiers?.price_monthly || 0), 0)
         const tierMap = {}
         subs.forEach(s => {
@@ -54,7 +63,6 @@ export default function BusinessDashboard() {
         })
         setStats({ revenue, tierBreakdown: Object.entries(tierMap).map(([name, count]) => ({ name, count })) })
 
-        // Fetch Stripe renewal/cancellation data
         const stripeIds = subs.map(s => s.stripe_subscription_id).filter(Boolean)
         if (stripeIds.length > 0) {
           try {
@@ -93,11 +101,7 @@ export default function BusinessDashboard() {
       (p.phone || '').replace(/\D/g, '') === cleaned
     )
 
-    if (!matchedProfile) {
-      setLookup(false)
-      setSearching(false)
-      return
-    }
+    if (!matchedProfile) { setLookup(false); setSearching(false); return }
 
     const { data: subs } = await supabase
       .from('subscriptions')
@@ -107,16 +111,11 @@ export default function BusinessDashboard() {
       .order('start_date', { ascending: false })
       .limit(1)
 
-    if (!subs || subs.length === 0) {
-      setLookup(false)
-      setSearching(false)
-      return
-    }
+    if (!subs || subs.length === 0) { setLookup(false); setSearching(false); return }
 
-    // Fetch Stripe data for this subscription
     let stripeInfo = null
     const subId = subs[0].stripe_subscription_id
-    if (subId && !subId.startsWith('test_sub_')) {
+    if (subId && subId.startsWith('sub_')) {
       try {
         const res = await fetch('/api/subscription-status', {
           method: 'POST',
@@ -151,7 +150,12 @@ export default function BusinessDashboard() {
     return { label: 'Renews on', date: formatDate(stripe.current_period_end), color: 'text-green-400' }
   }
 
-  const reglyFee    = (stats.revenue * 0.15).toFixed(2)
+  // Display name: approved restaurant > pending submission > fallback
+  const displayName = restaurant?.name || submission?.business_name || 'Your Business'
+  const isPending   = !restaurant && submission?.status === 'pending'
+  const isNew       = !restaurant && !submission
+
+  const reglyFee     = (stats.revenue * 0.15).toFixed(2)
   const ownerRevenue = (stats.revenue * 0.85).toFixed(2)
 
   if (loading) return <div className="min-h-screen flex items-center justify-center text-gold">Loading...</div>
@@ -163,21 +167,39 @@ export default function BusinessDashboard() {
       <div className="flex items-center justify-between mb-10">
         <div>
           <h1 className="font-serif text-3xl font-bold text-cream"><span className="text-gold">✦</span> Business Dashboard</h1>
-          <p className="text-muted mt-1">{restaurant?.name || 'Your Restaurant'}</p>
+          <p className="text-muted mt-1">{displayName}</p>
         </div>
         <button onClick={logout} className="btn-outline text-sm py-2 px-4">Log Out</button>
       </div>
 
-      {!restaurant ? (
-        <div className="card text-center py-12">
-          <p className="text-muted text-lg">Your restaurant is not set up yet.</p>
-          <p className="text-muted mt-2 mb-6">Complete your business setup to go live on Regly.</p>
-          <button onClick={() => router.push('/onboard')} className="btn-gold px-8 py-3">Set Up My Business →</button>
+      {/* Pending state */}
+      {isPending && (
+        <div className="card text-center py-12 mb-8">
+          <div className="text-4xl mb-4">⏳</div>
+          <h2 className="font-serif text-xl font-bold text-gold mb-2">Application Under Review</h2>
+          <p className="text-muted mb-1">We've received your submission for <span className="text-cream">{submission.business_name}</span>.</p>
+          <p className="text-muted text-sm">Our team will review your details and reach out within 1–2 business days.</p>
+          <p className="text-muted text-sm mt-3">Questions? <span className="text-gold">getregly@gmail.com</span></p>
         </div>
-      ) : (
+      )}
+
+      {/* New — no submission yet */}
+      {isNew && (
+        <div className="card text-center py-12">
+          <div className="text-4xl mb-4">✦</div>
+          <h2 className="font-serif text-xl font-bold text-gold mb-2">Welcome to Regly</h2>
+          <p className="text-muted mb-6">Complete your business setup to go live and start earning from your regulars.</p>
+          <button onClick={() => router.push('/onboard')} className="btn-gold px-8 py-3">
+            Set Up My Business →
+          </button>
+        </div>
+      )}
+
+      {/* Approved — full dashboard */}
+      {restaurant && (
         <div className="space-y-10">
 
-          {/* Stats Row */}
+          {/* Stats */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div className="card text-center py-5">
               <p className="font-serif text-3xl font-bold text-gold">{members.length}</p>
@@ -225,13 +247,8 @@ export default function BusinessDashboard() {
             <h2 className="font-serif text-xl font-bold text-gold mb-1">Member Lookup</h2>
             <p className="text-muted text-sm mb-5">Enter a customer's phone number to verify their membership.</p>
             <form onSubmit={handlePhoneLookup} className="flex gap-3">
-              <input
-                className="input flex-1"
-                placeholder="(312) 555-0000"
-                value={phone}
-                onChange={e => setPhone(e.target.value)}
-                required
-              />
+              <input className="input flex-1" placeholder="(312) 555-0000"
+                value={phone} onChange={e => setPhone(e.target.value)} required />
               <button type="submit" disabled={searching} className="btn-gold px-6">
                 {searching ? '...' : 'Search'}
               </button>
@@ -258,9 +275,7 @@ export default function BusinessDashboard() {
                   <p><span className="text-muted">Member since:</span> {new Date(lookup.start_date).toLocaleDateString()}</p>
                   {lookup.stripeInfo && (
                     <p>
-                      <span className="text-muted">
-                        {lookup.stripeInfo.cancel_at_period_end ? 'Cancels on:' : 'Renews on:'}
-                      </span>{' '}
+                      <span className="text-muted">{lookup.stripeInfo.cancel_at_period_end ? 'Cancels on:' : 'Renews on:'}</span>{' '}
                       <span className={lookup.stripeInfo.cancel_at_period_end ? 'text-red-400' : 'text-green-400'}>
                         {formatDate(lookup.stripeInfo.current_period_end)}
                       </span>
@@ -311,8 +326,7 @@ export default function BusinessDashboard() {
                           <td className="py-3">
                             {renewal
                               ? <span className={`text-xs ${renewal.color}`}>{renewal.label} {renewal.date}</span>
-                              : <span className="text-muted text-xs">—</span>
-                            }
+                              : <span className="text-muted text-xs">—</span>}
                           </td>
                         </tr>
                       )
