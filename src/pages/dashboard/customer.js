@@ -313,33 +313,33 @@ export default function CustomerDashboard() {
 
                 return (
                   <div key={tier.id} className="tier-card-new"
-                    style={{background: isPopular ? '#0A0906' : 'white', borderRadius:20, padding:'28px', border:`2px solid ${isThisTierActive ? '#059669' : isPopular ? '#C9A84C' : '#F3F4F6'}`, boxShadow:'0 4px 24px rgba(0,0,0,0.08)', position:'relative', display:'flex', flexDirection:'column'}}>
+                    style={{background: 'white', borderRadius:20, padding:'28px', border:`2px solid ${isThisTierActive ? '#059669' : isPopular ? '#C9A84C' : '#F3F4F6'}`, boxShadow:'0 4px 24px rgba(0,0,0,0.08)', position:'relative', display:'flex', flexDirection:'column'}}>
 
                     {isPopular && (
-                      <div style={{position:'absolute', top:-12, left:'50%', transform:'translateX(-50%)', background:'#C9A84C', color:'#0A0906', fontSize:11, fontWeight:700, padding:'4px 14px', borderRadius:20, letterSpacing:'0.1em', textTransform:'uppercase', whiteSpace:'nowrap'}}>
+                      <div style={{position:'absolute', top:-13, left:'50%', transform:'translateX(-50%)', background:'linear-gradient(135deg, #C9A84C, #8A6A20)', color:'white', fontSize:10, fontWeight:700, padding:'5px 14px', borderRadius:20, letterSpacing:'0.12em', textTransform:'uppercase', whiteSpace:'nowrap', boxShadow:'0 4px 12px rgba(201,168,76,0.4)'}}>
                         Most Popular
                       </div>
                     )}
 
                     <div style={{marginBottom:20}}>
-                      <p style={{color: isPopular ? 'rgba(201,168,76,0.7)' : '#9CA3AF', fontSize:11, fontWeight:600, letterSpacing:'0.1em', textTransform:'uppercase', marginBottom:8}}>
+                      <p style={{color: '#9CA3AF', fontSize:11, fontWeight:600, letterSpacing:'0.1em', textTransform:'uppercase', marginBottom:8}}>
                         {tier.name}
                       </p>
                       <div style={{display:'flex', alignItems:'baseline', gap:4, marginBottom:4}}>
-                        <span style={{fontFamily:'Georgia, serif', fontSize:40, fontWeight:900, color: isPopular ? '#C9A84C' : '#111827', lineHeight:1}}>${tier.price_monthly}</span>
-                        <span style={{color: isPopular ? 'rgba(245,240,232,0.4)' : '#9CA3AF', fontSize:14}}>/month</span>
+                        <span style={{fontFamily:'Georgia, serif', fontSize:40, fontWeight:900, color: '#111827', lineHeight:1}}>${tier.price_monthly}</span>
+                        <span style={{color: '#9CA3AF', fontSize:14}}>/month</span>
                       </div>
-                      <p style={{color: isPopular ? 'rgba(245,240,232,0.4)' : '#9CA3AF', fontSize:12}}>Cancel anytime</p>
+                      <p style={{color: '#9CA3AF', fontSize:12}}>Cancel anytime</p>
                     </div>
 
                     <div style={{flex:1, marginBottom:24}}>
                       {perksArr.map((perk, pi) => (
                         <div key={pi} style={{display:'flex', alignItems:'flex-start', gap:10, marginBottom:10}}>
                           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{marginTop:2, flexShrink:0}}>
-                            <circle cx="8" cy="8" r="7" fill={isPopular ? 'rgba(201,168,76,0.2)' : '#F0FDF4'}/>
-                            <path d="M5 8L7 10L11 6" stroke={isPopular ? '#C9A84C' : '#059669'} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <circle cx="8" cy="8" r="7" fill='#F0FDF4'/>
+                            <path d="M5 8L7 10L11 6" stroke='#059669' strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                           </svg>
-                          <span style={{color: isPopular ? 'rgba(245,240,232,0.8)' : '#374151', fontSize:14, lineHeight:1.4, fontWeight:300}}>{perk}</span>
+                          <span style={{color: '#374151', fontSize:14, lineHeight:1.4, fontWeight:300}}>{perk}</span>
                         </div>
                       ))}
                     </div>
@@ -351,7 +351,7 @@ export default function CustomerDashboard() {
                       style={{
                         width:'100%', padding:'14px', borderRadius:12, fontSize:14, fontWeight:700, cursor: isThisTierActive ? 'default' : 'pointer', border:'none', letterSpacing:'0.02em', fontFamily:'inherit',
                         background: isThisTierActive ? '#D1FAE5' : isPopular ? '#C9A84C' : '#111827',
-                        color: isThisTierActive ? '#059669' : isPopular ? '#0A0906' : '#F9FAFB',
+                        color: isThisTierActive ? '#059669' : isPopular ? '#111827' : '#F9FAFB',
                       }}>
                       {isThisTierActive ? '✓ Current Plan' : hasOtherActive ? 'Switch Plan' : subscribing === tier.id ? 'Redirecting...' : 'Get Started'}
                     </button>
