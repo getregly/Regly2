@@ -182,7 +182,7 @@ export default function Home() {
         {/* Hero background photo editorial overhead restaurant */}
         <div className="absolute inset-0">
           <img
-            src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=1800&q=85&fit=crop"
+            src="https://images.unsplash.com/photo-1590947132387-155cc02f3212?w=1800&q=85&fit=crop"
             alt="Restaurant"
             className="w-full h-full object-cover"
             style={{objectPosition:'center 40%'}}
