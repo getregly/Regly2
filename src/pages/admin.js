@@ -4,6 +4,16 @@ import { supabase } from '../lib/supabase'
 
 const ADMIN_EMAIL = 'sarrafian.josh@gmail.com'
 
+const S = {
+  page:    { minHeight:'100vh', background:'#F9FAFB', fontFamily:"'Inter', system-ui, sans-serif" },
+  nav:     { background:'white', borderBottom:'1px solid #F3F4F6', padding:'0 24px' },
+  navInner:{ maxWidth:900, margin:'0 auto', display:'flex', alignItems:'center', justifyContent:'space-between', height:64 },
+  logo:    { fontFamily:'Georgia, serif', fontSize:22, fontWeight:700, color:'#111827' },
+  card:    { background:'white', borderRadius:20, padding:'28px', boxShadow:'0 2px 12px rgba(0,0,0,0.06)', marginBottom:16 },
+  label:   { fontSize:11, letterSpacing:'0.2em', textTransform:'uppercase', fontWeight:600 },
+  btn:     { border:'none', borderRadius:10, fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:'inherit', padding:'12px 24px', transition:'all 0.2s ease' },
+}
+
 export default function Admin() {
   const router = useRouter()
   const [authorized, setAuthorized]   = useState(false)
@@ -11,260 +21,253 @@ export default function Admin() {
   const [submissions, setSubmissions] = useState([])
   const [expanded, setExpanded]       = useState(null)
   const [approving, setApproving]     = useState(null)
-  const [message, setMessage]         = useState('')
+  const [message, setMessage]         = useState(null)
 
   useEffect(() => { init() }, [])
 
   async function init() {
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user || user.email !== ADMIN_EMAIL) {
-      router.push('/')
-      return
-    }
+    if (!user || user.email !== ADMIN_EMAIL) { router.push('/'); return }
     setAuthorized(true)
     await loadSubmissions()
     setLoading(false)
   }
 
   async function loadSubmissions() {
-    const { data } = await supabase
-      .from('onboarding_submissions')
-      .select('*')
-      .order('created_at', { ascending: false })
+    const { data } = await supabase.from('onboarding_submissions').select('*').order('created_at', { ascending: false })
     setSubmissions(data || [])
   }
 
   async function handleApprove(sub) {
     setApproving(sub.id)
-    setMessage('')
-
+    setMessage(null)
     try {
-      // 1. Get the business owner's profile
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('id', sub.user_id)
-        .single()
-
-      if (!profile) throw new Error('Could not find business owner profile')
-
-      // 2. Create the restaurant row
-      const { data: restaurant, error: restErr } = await supabase
-        .from('restaurants')
-        .insert({
-          name:        sub.business_name,
-          description: sub.description,
-          address:     sub.address,
-          city:        sub.city,
-          owner_id:    sub.user_id,
-        })
-        .select()
-        .single()
-
+      const { data: restaurant, error: restErr } = await supabase.from('restaurants').insert({
+        name: sub.business_name, description: sub.description,
+        address: sub.address, city: sub.city, owner_id: sub.user_id,
+      }).select().single()
       if (restErr) throw restErr
 
-      // 3. Create membership tier rows (stripe_price_id left blank for manual Stripe setup)
       const tiers = JSON.parse(sub.tiers)
       const tierRows = tiers.map(t => ({
-        restaurant_id:   restaurant.id,
-        name:            `${sub.business_name} - ${t.name}`,
-        price_monthly:   Number(t.price),
-        perks:           Array.isArray(t.perks) ? t.perks.join(' | ') : t.perks,
+        restaurant_id: restaurant.id,
+        name: `${sub.business_name} - ${t.name}`,
+        price_monthly: Number(t.price),
+        perks: Array.isArray(t.perks) ? t.perks.join(' | ') : t.perks,
         stripe_price_id: '',
       }))
-
-      const { error: tierErr } = await supabase
-        .from('membership_tiers')
-        .insert(tierRows)
-
+      const { error: tierErr } = await supabase.from('membership_tiers').insert(tierRows)
       if (tierErr) throw tierErr
 
-      // 4. Mark submission as approved
-      await supabase
-        .from('onboarding_submissions')
-        .update({ status: 'approved' })
-        .eq('id', sub.id)
-
-      setMessage(`✓ ${sub.business_name} approved and live on Regly. Don't forget to add Stripe price IDs for their tiers.`)
+      await supabase.from('onboarding_submissions').update({ status: 'approved' }).eq('id', sub.id)
+      setMessage({ type:'success', text:`${sub.business_name} is now live on Regly. Remember to add Stripe price IDs to their tiers.` })
       await loadSubmissions()
-
     } catch (err) {
-      setMessage(`❌ Error: ${err.message}`)
+      setMessage({ type:'error', text: err.message })
     } finally {
       setApproving(null)
     }
   }
 
   async function handleReject(sub) {
-    if (!confirm(`Reject ${sub.business_name}? This will update their status to rejected.`)) return
-    await supabase
-      .from('onboarding_submissions')
-      .update({ status: 'rejected' })
-      .eq('id', sub.id)
+    if (!confirm(`Reject ${sub.business_name}?`)) return
+    await supabase.from('onboarding_submissions').update({ status: 'rejected' }).eq('id', sub.id)
     await loadSubmissions()
   }
 
-  async function logout() {
-    await supabase.auth.signOut()
-    router.push('/')
-  }
+  async function logout() { await supabase.auth.signOut(); router.push('/') }
 
-  function parseTiers(sub) {
-    try { return JSON.parse(sub.tiers) } catch { return [] }
-  }
+  function parseTiers(sub) { try { return JSON.parse(sub.tiers) } catch { return [] } }
 
-  function statusColor(status) {
-    if (status === 'pending')  return 'text-yellow-400 bg-yellow-900 bg-opacity-30'
-    if (status === 'approved') return 'text-green-400 bg-green-900 bg-opacity-30'
-    if (status === 'rejected') return 'text-red-400 bg-red-900 bg-opacity-30'
-    return 'text-muted'
+  function statusChip(status) {
+    const map = {
+      pending:  { bg:'#FEF9EC', color:'#92400E', label:'Pending' },
+      approved: { bg:'#D1FAE5', color:'#065F46', label:'Approved' },
+      rejected: { bg:'#FEE2E2', color:'#991B1B', label:'Rejected' },
+    }
+    const s = map[status] || map.pending
+    return (
+      <span style={{background:s.bg, color:s.color, fontSize:11, fontWeight:600, padding:'4px 10px', borderRadius:20, letterSpacing:'0.08em', textTransform:'uppercase'}}>
+        {s.label}
+      </span>
+    )
   }
 
   const pending  = submissions.filter(s => s.status === 'pending')
   const reviewed = submissions.filter(s => s.status !== 'pending')
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center text-gold">Loading...</div>
+  if (loading) return (
+    <div style={{...S.page, display:'flex', alignItems:'center', justifyContent:'center'}}>
+      <p style={{color:'#9CA3AF'}}>Loading...</p>
+    </div>
+  )
   if (!authorized) return null
 
   return (
-    <div className="min-h-screen px-6 py-8 max-w-4xl mx-auto">
-      <div className="fixed left-0 top-0 w-1.5 h-full bg-gold" />
+    <div style={S.page}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap'); *{box-sizing:border-box;} .hover-row:hover{background:#F9FAFB;}`}</style>
 
-      <div className="flex items-center justify-between mb-10">
-        <div>
-          <h1 className="font-serif text-3xl font-bold text-cream"><span className="text-gold">✦</span> Regly Admin</h1>
-          <p className="text-muted mt-1">Business onboarding queue</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <button onClick={() => router.push('/dashboard/business')} className="text-muted text-sm hover:text-gold">My Dashboard</button>
-          <button onClick={logout} className="btn-outline text-sm py-2 px-4">Log Out</button>
-        </div>
-      </div>
-
-      {message && (
-        <div className={`rounded-lg px-4 py-3 text-sm mb-6 ${message.startsWith('✓') ? 'bg-green-900 bg-opacity-40 border border-green-500 text-green-300' : 'bg-red-900 bg-opacity-40 border border-red-500 text-red-300'}`}>
-          {message}
-        </div>
-      )}
-
-      {/* Pending submissions */}
-      <div className="mb-10">
-        <h2 className="font-serif text-xl font-bold text-gold mb-4">
-          Pending Review <span className="text-muted font-normal text-base">({pending.length})</span>
-        </h2>
-
-        {pending.length === 0 ? (
-          <div className="card text-center py-10">
-            <p className="text-muted">No pending submissions. You're all caught up.</p>
+      {/* Nav */}
+      <nav style={S.nav}>
+        <div style={S.navInner}>
+          <p style={S.logo}>REGL<span style={{color:'#C9A84C'}}>Y</span> <span style={{fontSize:13, color:'#9CA3AF', fontFamily:'system-ui', fontWeight:400}}>Admin</span></p>
+          <div style={{display:'flex', gap:12, alignItems:'center'}}>
+            <button onClick={() => router.push('/dashboard/business')}
+              style={{...S.btn, background:'none', color:'#6B7280', border:'1px solid #E5E7EB', padding:'8px 16px', fontSize:13}}>
+              My Dashboard
+            </button>
+            <button onClick={logout}
+              style={{...S.btn, background:'none', color:'#9CA3AF', border:'none', padding:'8px 12px', fontSize:13}}>
+              Sign Out
+            </button>
           </div>
-        ) : (
-          <div className="space-y-4">
-            {pending.map(sub => {
-              const tiers = parseTiers(sub)
-              const isOpen = expanded === sub.id
-              return (
-                <div key={sub.id} className="card">
-                  {/* Header row */}
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <div className="flex items-center gap-3 mb-1">
-                        <h3 className="font-serif text-xl font-bold text-cream">{sub.business_name}</h3>
-                        <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${statusColor(sub.status)}`}>
-                          {sub.status}
-                        </span>
-                      </div>
-                      <p className="text-muted text-sm">{sub.address}, {sub.city}</p>
-                      <p className="text-muted text-xs mt-1">Submitted {new Date(sub.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</p>
-                    </div>
-                    <button
-                      onClick={() => setExpanded(isOpen ? null : sub.id)}
-                      className="text-gold text-sm hover:underline shrink-0 ml-4">
-                      {isOpen ? 'Hide details' : 'View details'}
-                    </button>
-                  </div>
+        </div>
+      </nav>
 
-                  {/* Expanded details */}
-                  {isOpen && (
-                    <div className="mt-6 pt-6 border-t border-muted border-opacity-20 space-y-6">
+      <div style={{maxWidth:900, margin:'0 auto', padding:'40px 24px'}}>
 
-                      <div>
-                        <p className="text-muted text-xs tracking-widest uppercase mb-1">Description</p>
-                        <p className="text-cream text-sm">{sub.description}</p>
-                      </div>
+        {/* Header */}
+        <div style={{marginBottom:32}}>
+          <p style={{...S.label, color:'#C9A84C', marginBottom:6}}>Business Onboarding</p>
+          <h1 style={{fontFamily:'Georgia, serif', fontSize:28, fontWeight:700, color:'#111827', marginBottom:4}}>Review Queue</h1>
+          <p style={{color:'#9CA3AF', fontSize:14}}>{pending.length} pending review</p>
+        </div>
 
-                      <div>
-                        <p className="text-muted text-xs tracking-widest uppercase mb-3">Membership Tiers</p>
-                        <div className="space-y-4">
-                          {tiers.map((tier, i) => (
-                            <div key={i} className="bg-dark rounded-lg p-4 border border-muted border-opacity-20">
-                              <div className="flex items-center justify-between mb-2">
-                                <p className="text-cream font-semibold">{tier.name}</p>
-                                <p className="text-gold font-bold">${tier.price}/mo</p>
-                              </div>
-                              <ul className="space-y-1">
-                                {(Array.isArray(tier.perks) ? tier.perks : [tier.perks]).map((perk, j) => (
-                                  <li key={j} className="flex items-start gap-2 text-muted text-sm">
-                                    <span className="text-gold mt-0.5">·</span> {perk}
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          ))}
+        {/* Message */}
+        {message && (
+          <div style={{background: message.type==='success' ? '#D1FAE5' : '#FEE2E2', border:`1px solid ${message.type==='success' ? '#6EE7B7' : '#FECACA'}`, borderRadius:12, padding:'14px 18px', marginBottom:24, display:'flex', gap:10, alignItems:'flex-start'}}>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{marginTop:1, flexShrink:0}}>
+              {message.type==='success'
+                ? <><circle cx="8" cy="8" r="7" fill="#059669"/><path d="M5 8L7 10L11 6" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></>
+                : <><circle cx="8" cy="8" r="7" stroke="#EF4444" strokeWidth="1.5"/><path d="M8 5V8M8 11H8.01" stroke="#EF4444" strokeWidth="1.5" strokeLinecap="round"/></>}
+            </svg>
+            <p style={{fontSize:14, color: message.type==='success' ? '#065F46' : '#991B1B', margin:0}}>{message.text}</p>
+          </div>
+        )}
+
+        {/* Pending */}
+        <div style={{marginBottom:40}}>
+          <h2 style={{fontFamily:'Georgia, serif', fontSize:20, fontWeight:700, color:'#111827', marginBottom:16}}>
+            Pending Review <span style={{fontSize:15, fontWeight:400, color:'#9CA3AF'}}>({pending.length})</span>
+          </h2>
+
+          {pending.length === 0 ? (
+            <div style={{...S.card, textAlign:'center', padding:'48px'}}>
+              <div style={{width:48, height:48, background:'#F3F4F6', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 16px'}}>
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M10 2C5.58 2 2 5.58 2 10s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm0 12c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm1-4H9V6h2v4z" fill="#9CA3AF"/>
+                </svg>
+              </div>
+              <p style={{color:'#6B7280', fontSize:15, fontWeight:500, marginBottom:4}}>All caught up</p>
+              <p style={{color:'#9CA3AF', fontSize:13}}>No pending submissions right now.</p>
+            </div>
+          ) : (
+            <div>
+              {pending.map(sub => {
+                const tiers = parseTiers(sub)
+                const isOpen = expanded === sub.id
+                return (
+                  <div key={sub.id} style={S.card}>
+                    {/* Summary row */}
+                    <div style={{display:'flex', alignItems:'flex-start', justifyContent:'space-between'}}>
+                      <div style={{flex:1}}>
+                        <div style={{display:'flex', alignItems:'center', gap:10, marginBottom:6}}>
+                          <h3 style={{fontFamily:'Georgia, serif', fontSize:20, fontWeight:700, color:'#111827', margin:0}}>{sub.business_name}</h3>
+                          {statusChip(sub.status)}
                         </div>
-                      </div>
-
-                      {/* Stripe reminder */}
-                      <div className="bg-yellow-900 bg-opacity-20 border border-yellow-600 border-opacity-30 rounded-lg p-4">
-                        <p className="text-yellow-300 text-xs font-semibold mb-1">⚠ After approving — add Stripe price IDs</p>
-                        <p className="text-yellow-200 text-xs opacity-80">
-                          Go to stripe.com → Products → create one product per tier with recurring monthly pricing → copy each price_... ID → paste into Supabase membership_tiers table for this business.
+                        <p style={{color:'#6B7280', fontSize:14, marginBottom:2}}>{sub.address}, {sub.city}</p>
+                        <p style={{color:'#9CA3AF', fontSize:12}}>
+                          Submitted {new Date(sub.created_at).toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'})}
                         </p>
                       </div>
-
-                      {/* Action buttons */}
-                      <div className="flex gap-3">
-                        <button
-                          onClick={() => handleApprove(sub)}
-                          disabled={approving === sub.id}
-                          className="btn-gold px-8 py-3 flex-1">
-                          {approving === sub.id ? 'Approving...' : '✓ Approve & Go Live'}
-                        </button>
-                        <button
-                          onClick={() => handleReject(sub)}
-                          className="btn-outline px-6 py-3 text-sm hover:border-red-400 hover:text-red-400">
-                          Reject
-                        </button>
-                      </div>
+                      <button onClick={() => setExpanded(isOpen ? null : sub.id)}
+                        style={{...S.btn, background:'#F9FAFB', color:'#374151', border:'1px solid #E5E7EB', padding:'8px 16px', fontSize:13, marginLeft:16, flexShrink:0}}>
+                        {isOpen ? 'Hide' : 'Review'}
+                      </button>
                     </div>
-                  )}
+
+                    {/* Expanded */}
+                    {isOpen && (
+                      <div style={{marginTop:24, paddingTop:24, borderTop:'1px solid #F3F4F6'}}>
+                        <div style={{marginBottom:20}}>
+                          <p style={{...S.label, color:'#9CA3AF', marginBottom:6}}>Description</p>
+                          <p style={{color:'#374151', fontSize:14, lineHeight:1.6}}>{sub.description}</p>
+                        </div>
+
+                        <div style={{marginBottom:24}}>
+                          <p style={{...S.label, color:'#9CA3AF', marginBottom:12}}>Membership Tiers</p>
+                          <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(220px, 1fr))', gap:12}}>
+                            {tiers.map((tier, i) => (
+                              <div key={i} style={{background:'#F9FAFB', borderRadius:14, padding:'16px', border:'1px solid #F3F4F6'}}>
+                                <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:10}}>
+                                  <p style={{fontSize:15, fontWeight:600, color:'#111827', margin:0}}>{tier.name}</p>
+                                  <span style={{fontFamily:'Georgia, serif', fontSize:18, fontWeight:700, color:'#C9A84C'}}>${tier.price}<span style={{fontSize:11, color:'#9CA3AF', fontWeight:400}}>/mo</span></span>
+                                </div>
+                                {(Array.isArray(tier.perks) ? tier.perks : [tier.perks]).map((perk, j) => (
+                                  <div key={j} style={{display:'flex', gap:8, marginBottom:6}}>
+                                    <div style={{width:16, height:16, background:'#D1FAE5', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginTop:1}}>
+                                      <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+                                        <path d="M1.5 4L3 5.5L6.5 2" stroke="#059669" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                                      </svg>
+                                    </div>
+                                    <span style={{fontSize:13, color:'#6B7280', lineHeight:1.4}}>{perk}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Stripe reminder */}
+                        <div style={{background:'#FFFBEB', border:'1px solid #FCD34D', borderRadius:12, padding:'14px 16px', marginBottom:20, display:'flex', gap:10}}>
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{flexShrink:0, marginTop:1}}>
+                            <circle cx="8" cy="8" r="7" fill="#F59E0B"/>
+                            <path d="M8 5V8M8 11H8.01" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                          </svg>
+                          <p style={{fontSize:13, color:'#92400E', margin:0, lineHeight:1.5}}>
+                            After approving, go to Stripe and create products for each tier. Copy the <code style={{background:'#FEF3C7', padding:'1px 4px', borderRadius:4}}>price_...</code> IDs into the Supabase membership_tiers table.
+                          </p>
+                        </div>
+
+                        <div style={{display:'flex', gap:12}}>
+                          <button onClick={() => handleApprove(sub)} disabled={approving===sub.id}
+                            style={{...S.btn, background: approving===sub.id ? '#D1D5DB' : '#111827', color:'white', flex:1}}>
+                            {approving===sub.id ? 'Approving...' : 'Approve and Go Live'}
+                          </button>
+                          <button onClick={() => handleReject(sub)}
+                            style={{...S.btn, background:'white', color:'#EF4444', border:'1px solid #FECACA'}}>
+                            Reject
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Reviewed */}
+        {reviewed.length > 0 && (
+          <div>
+            <h2 style={{fontFamily:'Georgia, serif', fontSize:20, fontWeight:700, color:'#111827', marginBottom:16}}>
+              Previously Reviewed <span style={{fontSize:15, fontWeight:400, color:'#9CA3AF'}}>({reviewed.length})</span>
+            </h2>
+            <div style={{background:'white', borderRadius:20, overflow:'hidden', boxShadow:'0 2px 12px rgba(0,0,0,0.06)'}}>
+              {reviewed.map((sub, i) => (
+                <div key={sub.id} className="hover-row" style={{display:'flex', alignItems:'center', justifyContent:'space-between', padding:'18px 24px', borderBottom: i<reviewed.length-1 ? '1px solid #F9FAFB' : 'none'}}>
+                  <div>
+                    <p style={{fontSize:15, fontWeight:600, color:'#111827', marginBottom:2}}>{sub.business_name}</p>
+                    <p style={{fontSize:13, color:'#9CA3AF'}}>{sub.address}, {sub.city}</p>
+                  </div>
+                  {statusChip(sub.status)}
                 </div>
-              )
-            })}
+              ))}
+            </div>
           </div>
         )}
       </div>
-
-      {/* Reviewed submissions */}
-      {reviewed.length > 0 && (
-        <div>
-          <h2 className="font-serif text-xl font-bold text-gold mb-4">
-            Previously Reviewed <span className="text-muted font-normal text-base">({reviewed.length})</span>
-          </h2>
-          <div className="space-y-3">
-            {reviewed.map(sub => (
-              <div key={sub.id} className="card flex items-center justify-between py-4">
-                <div>
-                  <p className="text-cream font-semibold">{sub.business_name}</p>
-                  <p className="text-muted text-xs">{sub.address}, {sub.city}</p>
-                </div>
-                <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${statusColor(sub.status)}`}>
-                  {sub.status}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   )
 }
