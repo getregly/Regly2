@@ -12,11 +12,9 @@ const IconStar = () => (
 )
 const IconMembership = () => (
   <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-    <rect x="4" y="12" width="40" height="26" rx="3" stroke="#C9A84C" strokeWidth="1.5"/>
-    <path d="M4 20H44" stroke="#C9A84C" strokeWidth="1.5"/>
-    <circle cx="14" cy="31" r="3" stroke="#C9A84C" strokeWidth="1.5"/>
-    <path d="M20 29H36M20 33H30" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/>
-    <path d="M24 12V8M28 12V6M20 12V8" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/>
+    <path d="M24 4C17.373 4 12 9.373 12 16C12 25 24 44 24 44C24 44 36 25 36 16C36 9.373 30.627 4 24 4Z" stroke="#C9A84C" strokeWidth="1.5" strokeLinejoin="round"/>
+    <circle cx="24" cy="16" r="5" stroke="#C9A84C" strokeWidth="1.5"/>
+    <path d="M16 40C12 41 8 43 8 45H40C40 43 36 41 32 40" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/>
   </svg>
 )
 const IconPerks = () => (
@@ -179,12 +177,12 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* ── HERO — full bleed photo ───────────────────────────────── */}
+      {/* ── HERO full bleed photo ───────────────────────────────── */}
       <section className="relative min-h-screen flex flex-col justify-end overflow-hidden">
-        {/* Hero background photo — editorial overhead restaurant */}
+        {/* Hero background photo editorial overhead restaurant */}
         <div className="absolute inset-0">
           <img
-            src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1800&q=85&fit=crop"
+            src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=1800&q=85&fit=crop"
             alt="Restaurant"
             className="w-full h-full object-cover"
             style={{objectPosition:'center 40%'}}
@@ -209,7 +207,7 @@ export default function Home() {
           </h1>
 
           <p className="fade-up-3 font-body text-lg max-w-xl mb-10 leading-relaxed" style={{color:'rgba(245,240,232,0.75)', fontWeight:300}}>
-            Regly is a monthly membership that gets you real, tangible perks at your favorite coffee shops, pizza spots, and restaurants — every single visit.
+            Regly is a monthly membership that gets you real, tangible perks at your favorite coffee shops, pizza spots, and restaurants every single visit.
           </p>
 
           <div className="fade-up-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
@@ -234,7 +232,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── TRUST BAR — light section ─────────────────────────────── */}
+      {/* ── TRUST BAR light section ─────────────────────────────── */}
       <section className="light-section py-16 border-y" style={{borderColor:'rgba(201,168,76,0.2)'}}>
         <div className="max-w-4xl mx-auto px-8 grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
           {[
@@ -251,7 +249,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── WHAT IS REGLY — dark, split layout with photo ─────────── */}
+      {/* ── WHAT IS REGLY dark, split layout with photo ─────────── */}
       <section id="how" className="py-32 px-8 max-w-6xl mx-auto">
         <div className="grid sm:grid-cols-2 gap-20 items-center">
           <div>
@@ -261,7 +259,7 @@ export default function Home() {
               <span style={{color:'#C9A84C', fontStyle:'italic'}}>every visit.</span>
             </h2>
             <p className="font-body text-base leading-relaxed mb-6" style={{color:'#8A7A6A', fontWeight:300}}>
-              You already spend money at your favorite spots. Regly lets you pay a small monthly fee in exchange for real perks — free items, discounts, and bonuses — every time you go.
+              You already spend money at your favorite spots. Regly lets you pay a small monthly fee in exchange for real perks free items, discounts, and bonuses every time you go.
             </p>
             <p className="font-body text-base leading-relaxed mb-10" style={{color:'#8A7A6A', fontWeight:300}}>
               No points to track. No apps to open. Just show up and give your phone number. Your perks are already waiting.
@@ -311,7 +309,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── HOW IT WORKS — light section ─────────────────────────── */}
+      {/* ── HOW IT WORKS light section ─────────────────────────── */}
       <section className="light-section py-32 px-8">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-20">
@@ -323,8 +321,8 @@ export default function Home() {
           <div className="grid sm:grid-cols-3 gap-12">
             {[
               { icon: <IconMembership />, step:'01', title:'Pick a spot', body:'Browse Regly-partnered coffee shops, pizza places, burger joints, and more near you. See exactly what each membership includes before you sign up.' },
-              { icon: <IconPerks />,      step:'02', title:'Choose your perks', body:'Select a membership tier. Each tier has specific, defined perks — no vague promises. You know exactly what you get before you pay a cent.' },
-              { icon: <IconPhone />,      step:'03', title:'Give your number', body:'Walk in and give your phone number at the counter. Staff verify and apply your perks instantly. No app to open. No card to show. Done.' },
+              { icon: <IconPerks />,      step:'02', title:'Choose your perks', body:'Select a membership tier. Each tier has specific, defined perks no vague promises. You know exactly what you get before you pay a cent.' },
+              { icon: <IconPhone />,      step:'03', title:'Access rewards instantly', body:'When ordering, simply confirm your membership with your phone number. Staff verify and apply your perks on the spot. As Regly grows, expect even faster access through our app and membership cards.' },
             ].map(c => (
               <div key={c.step} className="relative hover-lift rounded-2xl p-8" style={{background:'white', boxShadow:'0 4px 24px rgba(0,0,0,0.06)'}}>
                 <p className="font-display text-6xl font-black mb-4 leading-none" style={{color:'rgba(138,106,32,0.12)'}}>{c.step}</p>
@@ -337,10 +335,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── PHOTO BREAK — full width editorial photo ─────────────── */}
+      {/* ── PHOTO BREAK full width editorial photo ─────────────── */}
       <section className="relative h-96 sm:h-screen overflow-hidden" style={{maxHeight:600}}>
         <img
-          src="https://images.unsplash.com/photo-1559339352-11d035aa65de?w=1800&q=85&fit=crop"
+          src="https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=1800&q=85&fit=crop"
           alt="Restaurant dining"
           className="w-full h-full object-cover"
           style={{objectPosition:'center 50%'}}
@@ -357,7 +355,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── WHY IT'S WORTH IT — dark ──────────────────────────────── */}
+      {/* ── WHY IT'S WORTH IT dark ──────────────────────────────── */}
       <section className="py-32 px-8 max-w-6xl mx-auto">
         <div className="text-center mb-20">
           <p className="section-label mb-4">Why It's Worth It</p>
@@ -386,7 +384,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── PRICING — light section ───────────────────────────────── */}
+      {/* ── PRICING light section ───────────────────────────────── */}
       <section className="light-section py-32 px-8">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
@@ -395,7 +393,7 @@ export default function Home() {
               Find your <span style={{color:'#8A6A20', fontStyle:'italic'}}>level.</span>
             </h2>
             <p className="font-body text-sm" style={{color:'#6B5A3E', fontWeight:300}}>
-              Each business sets their own perks. These are typical tiers across Regly locations.
+              Each business sets their own perks. Pricing and benefits vary by location.
             </p>
           </div>
           <div className="grid sm:grid-cols-3 gap-6">
@@ -436,7 +434,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── FINAL CTA — dark with photo tint ─────────────────────── */}
+      {/* ── FINAL CTA dark with photo tint ─────────────────────── */}
       <section className="py-32 px-8 text-center relative overflow-hidden" style={{background:'#0F0D0A'}}>
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
           <span className="font-display font-black shimmer" style={{fontSize:'40vw', color:'#C9A84C', lineHeight:1}}>R</span>
@@ -447,7 +445,7 @@ export default function Home() {
             Start getting<br /><span style={{color:'#C9A84C', fontStyle:'italic'}}>more.</span>
           </h2>
           <p className="font-body text-base mb-12 leading-relaxed" style={{color:'#8A7A6A', fontWeight:300}}>
-            Create your account in 60 seconds. Browse Chicago's best coffee shops and restaurants. Subscribe to the ones you visit anyway. Cancel anytime.
+            Create your account in 60 seconds. Browse local coffee shops, restaurants, and neighborhood spots. Subscribe to the ones you visit anyway. Cancel anytime.
           </p>
           <button onClick={() => router.push('/auth?role=customer')}
             className="font-body inline-flex items-center gap-4 px-14 py-5 rounded text-sm tracking-widest uppercase transition-all"
@@ -466,7 +464,7 @@ export default function Home() {
               Turn your regulars into<br /><span style={{color:'#C9A84C', fontStyle:'italic'}}>recurring revenue.</span>
             </h2>
             <p className="font-body text-sm leading-relaxed mb-8" style={{color:'#8A7A6A', fontWeight:300}}>
-              Set up a membership program in 10 minutes. No hardware. No upfront cost. You define the perks, set the price, and keep 85% of every dollar.
+              Set up a membership program in 10 minutes. No hardware. No upfront cost. You define the perks, set the price, and keep more of every dollar.
             </p>
             <button onClick={() => router.push('/auth?role=business')}
               className="font-body text-xs tracking-widest uppercase px-8 py-3.5 rounded border transition-all"
@@ -478,9 +476,9 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-2 gap-4">
             {[
-              { n:'85%', l:'Revenue to you' },
+              { n:'Low', l:'Flat monthly fee' },
               { n:'$0',  l:'Setup cost' },
-              { n:'10m', l:'To go live' },
+              { n:'10 min', l:'To go live' },
               { n:'∞',   l:'Members possible' },
             ].map(s => (
               <div key={s.n} className="rounded-xl p-5 border text-center hover-lift" style={{borderColor:'rgba(201,168,76,0.15)', background:'rgba(26,20,16,0.6)'}}>
@@ -495,7 +493,7 @@ export default function Home() {
       {/* FOOTER */}
       <footer className="py-12 px-8 border-t text-center" style={{borderColor:'rgba(201,168,76,0.1)'}}>
         <p className="font-display text-2xl font-bold mb-2"><span style={{color:'#F5F0E8'}}>REGL</span><span style={{color:'#C9A84C'}}>Y</span></p>
-        <p className="font-body text-xs" style={{color:'#8A7A6A', fontWeight:300}}>© 2025 Regly · Chicago, IL · hello@getregly.com</p>
+        <p className="font-body text-xs" style={{color:'#8A7A6A', fontWeight:300}}>© 2026 Regly · Chicago, IL · getregly@gmail.com</p>
       </footer>
     </div>
   )
