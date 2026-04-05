@@ -2,17 +2,30 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { supabase } from '../../lib/supabase'
 
+const S = {
+  page:     { minHeight:'100vh', background:'#F9FAFB', fontFamily:"'Inter', system-ui, sans-serif" },
+  nav:      { background:'white', borderBottom:'1px solid #F3F4F6', padding:'0 24px', position:'sticky', top:0, zIndex:40 },
+  navInner: { maxWidth:960, margin:'0 auto', display:'flex', alignItems:'center', justifyContent:'space-between', height:64 },
+  logo:     { fontFamily:'Georgia, serif', fontSize:22, fontWeight:700, color:'#111827' },
+  body:     { maxWidth:960, margin:'0 auto', padding:'40px 24px' },
+  card:     { background:'white', borderRadius:20, padding:'28px', boxShadow:'0 2px 12px rgba(0,0,0,0.06)', marginBottom:0 },
+  label:    { fontSize:11, letterSpacing:'0.2em', textTransform:'uppercase', fontWeight:600, color:'#9CA3AF' },
+  h2:       { fontFamily:'Georgia, serif', fontSize:20, fontWeight:700, color:'#111827', margin:0 },
+  btn:      { border:'none', borderRadius:10, fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:'inherit', transition:'all 0.2s ease' },
+}
+
 export default function BusinessDashboard() {
   const router = useRouter()
-  const [restaurant, setRestaurant]     = useState(null)
-  const [submission, setSubmission]     = useState(null)
-  const [members, setMembers]           = useState([])
-  const [stripeData, setStripeData]     = useState({})
-  const [phone, setPhone]               = useState('')
-  const [lookup, setLookup]             = useState(null)
-  const [loading, setLoading]           = useState(true)
-  const [searching, setSearching]       = useState(false)
-  const [stats, setStats]               = useState({ revenue: 0, tierBreakdown: [] })
+  const [restaurant, setRestaurant]   = useState(null)
+  const [submission, setSubmission]   = useState(null)
+  const [members, setMembers]         = useState([])
+  const [stripeData, setStripeData]   = useState({})
+  const [phone, setPhone]             = useState('')
+  const [lookup, setLookup]           = useState(null)
+  const [loading, setLoading]         = useState(true)
+  const [searching, setSearching]     = useState(false)
+  const [phoneFocused, setPhoneFocused] = useState(false)
+  const [stats, setStats]             = useState({ revenue: 0, tierBreakdown: [] })
 
   useEffect(() => { init() }, [])
 
@@ -22,16 +35,10 @@ export default function BusinessDashboard() {
     const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
     if (profile?.role !== 'business') { router.push('/'); return }
 
-    // Check for approved restaurant
     const { data: rest } = await supabase.from('restaurants').select('*').eq('owner_id', user.id).single()
     setRestaurant(rest)
 
-    // Always check for onboarding submission (for name fallback + pending state)
-    const { data: sub } = await supabase
-      .from('onboarding_submissions')
-      .select('*')
-      .eq('user_id', user.id)
-      .single()
+    const { data: sub } = await supabase.from('onboarding_submissions').select('*').eq('user_id', user.id).single()
     setSubmission(sub)
 
     if (rest) {
@@ -44,38 +51,21 @@ export default function BusinessDashboard() {
 
       if (subs && subs.length > 0) {
         const customerIds = subs.map(s => s.customer_id)
-        const { data: profiles } = await supabase
-          .from('profiles')
-          .select('id, name, phone')
-          .in('id', customerIds)
-
-        const merged = subs.map(s => ({
-          ...s,
-          profile: profiles?.find(p => p.id === s.customer_id) || null
-        }))
+        const { data: profiles } = await supabase.from('profiles').select('id, name, phone').in('id', customerIds)
+        const merged = subs.map(s => ({ ...s, profile: profiles?.find(p => p.id === s.customer_id) || null }))
         setMembers(merged)
 
         const revenue = subs.reduce((sum, s) => sum + (s.membership_tiers?.price_monthly || 0), 0)
         const tierMap = {}
-        subs.forEach(s => {
-          const name = s.membership_tiers?.name || 'Unknown'
-          tierMap[name] = (tierMap[name] || 0) + 1
-        })
+        subs.forEach(s => { const n = s.membership_tiers?.name || 'Unknown'; tierMap[n] = (tierMap[n] || 0) + 1 })
         setStats({ revenue, tierBreakdown: Object.entries(tierMap).map(([name, count]) => ({ name, count })) })
 
         const stripeIds = subs.map(s => s.stripe_subscription_id).filter(Boolean)
         if (stripeIds.length > 0) {
           try {
-            const res = await fetch('/api/subscription-status', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ subscriptionIds: stripeIds }),
-            })
-            const data = await res.json()
-            setStripeData(data)
-          } catch (err) {
-            console.error('Stripe fetch error:', err)
-          }
+            const res = await fetch('/api/subscription-status', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ subscriptionIds: stripeIds }) })
+            setStripeData(await res.json())
+          } catch {}
         }
       } else {
         setMembers([])
@@ -90,316 +80,305 @@ export default function BusinessDashboard() {
     if (!restaurant) return
     setSearching(true)
     setLookup(null)
-
     const cleaned = phone.replace(/\D/g, '')
-    const { data: profiles } = await supabase
-      .from('profiles')
-      .select('id, name, phone')
-      .eq('role', 'customer')
-
-    const matchedProfile = profiles?.find(p =>
-      (p.phone || '').replace(/\D/g, '') === cleaned
-    )
-
+    const { data: profiles } = await supabase.from('profiles').select('id, name, phone').eq('role', 'customer')
+    const matchedProfile = profiles?.find(p => (p.phone || '').replace(/\D/g, '') === cleaned)
     if (!matchedProfile) { setLookup(false); setSearching(false); return }
 
     const { data: subs } = await supabase
-      .from('subscriptions')
-      .select('*, membership_tiers(name, price_monthly)')
-      .eq('customer_id', matchedProfile.id)
-      .eq('restaurant_id', restaurant.id)
-      .order('start_date', { ascending: false })
-      .limit(1)
-
+      .from('subscriptions').select('*, membership_tiers(name, price_monthly)')
+      .eq('customer_id', matchedProfile.id).eq('restaurant_id', restaurant.id)
+      .order('start_date', { ascending: false }).limit(1)
     if (!subs || subs.length === 0) { setLookup(false); setSearching(false); return }
 
     let stripeInfo = null
     const subId = subs[0].stripe_subscription_id
     if (subId && subId.startsWith('sub_')) {
       try {
-        const res = await fetch('/api/subscription-status', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ subscriptionIds: [subId] }),
-        })
+        const res = await fetch('/api/subscription-status', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ subscriptionIds: [subId] }) })
         const data = await res.json()
         stripeInfo = data[subId]
-      } catch (err) {}
+      } catch {}
     }
-
     setLookup({ ...subs[0], profile: matchedProfile, stripeInfo })
     setSearching(false)
   }
 
-  async function logout() {
-    await supabase.auth.signOut()
-    router.push('/')
-  }
+  async function logout() { await supabase.auth.signOut(); router.push('/') }
 
   function formatDate(unix) {
-    if (!unix) return '—'
+    if (!unix) return null
     return new Date(unix * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
   }
 
   function renewalInfo(sub) {
     const stripe = stripeData[sub.stripe_subscription_id]
     if (!stripe) return null
-    if (stripe.cancel_at_period_end) {
-      return { label: 'Cancels on', date: formatDate(stripe.current_period_end), color: 'text-red-400' }
-    }
-    return { label: 'Renews on', date: formatDate(stripe.current_period_end), color: 'text-green-400' }
+    return stripe.cancel_at_period_end
+      ? { label: 'Cancels', date: formatDate(stripe.current_period_end), color: '#EF4444', bg: '#FEE2E2' }
+      : { label: 'Renews',  date: formatDate(stripe.current_period_end), color: '#059669', bg: '#D1FAE5' }
   }
 
-  // Display name: approved restaurant > pending submission > fallback
   const displayName = restaurant?.name || submission?.business_name || 'Your Business'
   const isPending   = !restaurant && submission?.status === 'pending'
   const isNew       = !restaurant && !submission
+  const reglyFee    = (stats.revenue * 0.15).toFixed(2)
+  const ownerRevenue= (stats.revenue * 0.85).toFixed(2)
 
-  const reglyFee     = (stats.revenue * 0.15).toFixed(2)
-  const ownerRevenue = (stats.revenue * 0.85).toFixed(2)
-
-  if (loading) return <div className="min-h-screen flex items-center justify-center text-gold">Loading...</div>
+  if (loading) return (
+    <div style={{...S.page, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center'}}>
+      <p style={{fontFamily:'Georgia, serif', fontSize:24, fontWeight:700, color:'#111827'}}>REGL<span style={{color:'#C9A84C'}}>Y</span></p>
+      <p style={{color:'#9CA3AF', fontSize:14, marginTop:8}}>Loading your dashboard...</p>
+    </div>
+  )
 
   return (
-    <div className="min-h-screen px-6 py-8 max-w-4xl mx-auto">
-      <div className="fixed left-0 top-0 w-1.5 h-full bg-gold" />
+    <div style={S.page}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap'); *{box-sizing:border-box;} .hover-row:hover{background:#F9FAFB;} .search-btn:hover{opacity:0.88;} .logout-btn:hover{color:#111827;}`}</style>
 
-      <div className="flex items-center justify-between mb-10">
-        <div>
-          <h1 className="font-serif text-3xl font-bold text-cream"><span className="text-gold">✦</span> Business Dashboard</h1>
-          <p className="text-muted mt-1">{displayName}</p>
-        </div>
-        <button onClick={logout} className="btn-outline text-sm py-2 px-4">Log Out</button>
-      </div>
-
-      {/* Pending state */}
-      {isPending && (
-        <div className="relative overflow-hidden rounded-2xl border border-gold border-opacity-30 px-8 py-14 text-center mb-8"
-          style={{background:'linear-gradient(135deg, #1A1410 0%, #0F0D0A 60%, #1A1410 100%)'}}>
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-            <span className="font-serif font-black text-gold opacity-5" style={{fontSize:'18rem',lineHeight:1}}>R</span>
+      {/* NAV */}
+      <nav style={S.nav}>
+        <div style={S.navInner}>
+          <div style={{display:'flex', alignItems:'center', gap:16}}>
+            <p style={S.logo}>REGL<span style={{color:'#C9A84C'}}>Y</span></p>
+            <span style={{color:'#E5E7EB'}}>|</span>
+            <p style={{fontSize:14, color:'#6B7280', margin:0}}>{displayName}</p>
           </div>
-          <div className="absolute top-0 left-0 w-12 h-12 border-t-2 border-l-2 border-gold border-opacity-40 rounded-tl-2xl" />
-          <div className="absolute top-0 right-0 w-12 h-12 border-t-2 border-r-2 border-gold border-opacity-40 rounded-tr-2xl" />
-          <div className="absolute bottom-0 left-0 w-12 h-12 border-b-2 border-l-2 border-gold border-opacity-40 rounded-bl-2xl" />
-          <div className="absolute bottom-0 right-0 w-12 h-12 border-b-2 border-r-2 border-gold border-opacity-40 rounded-br-2xl" />
-          <div className="relative z-10">
-            <div className="flex justify-center mb-6">
-              <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-                <circle cx="32" cy="32" r="28" stroke="#C9A84C" strokeWidth="1.5" strokeOpacity="0.4"/>
-                <circle cx="32" cy="32" r="20" stroke="#C9A84C" strokeWidth="1" strokeOpacity="0.2"/>
-                <circle cx="32" cy="32" r="2.5" fill="#C9A84C"/>
-                <path d="M32 20V32" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/>
-                <path d="M32 32L40 38" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/>
-                <path d="M32 8V12M32 52V56M8 32H12M52 32H56" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round" strokeOpacity="0.5"/>
-                <path d="M52 12L53.5 14.5L52 17L50.5 14.5L52 12Z" fill="#C9A84C" fillOpacity="0.6"/>
+          <button onClick={logout} className="logout-btn"
+            style={{...S.btn, background:'none', color:'#9CA3AF', border:'1px solid #E5E7EB', padding:'8px 16px', fontSize:13}}>
+            Sign Out
+          </button>
+        </div>
+      </nav>
+
+      <div style={S.body}>
+
+        {/* Page title */}
+        <div style={{marginBottom:32}}>
+          <p style={{...S.label, marginBottom:6}}>Business Dashboard</p>
+          <h1 style={{fontFamily:'Georgia, serif', fontSize:28, fontWeight:700, color:'#111827', margin:0}}>
+            {isPending ? 'Application Status' : isNew ? 'Welcome to Regly' : `Welcome back`}
+          </h1>
+        </div>
+
+        {/* PENDING STATE */}
+        {isPending && (
+          <div style={{background:'white', borderRadius:24, padding:'48px 40px', textAlign:'center', boxShadow:'0 2px 12px rgba(0,0,0,0.06)', marginBottom:24}}>
+            <div style={{width:72, height:72, background:'#FFFBEB', border:'1px solid #FCD34D', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 24px'}}>
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <circle cx="16" cy="16" r="12" stroke="#F59E0B" strokeWidth="1.5" strokeOpacity="0.5"/>
+                <circle cx="16" cy="16" r="1.5" fill="#F59E0B"/>
+                <path d="M16 10V16" stroke="#F59E0B" strokeWidth="1.5" strokeLinecap="round"/>
+                <path d="M16 16L20 19" stroke="#F59E0B" strokeWidth="1.5" strokeLinecap="round"/>
               </svg>
             </div>
-            <div className="flex items-center justify-center gap-3 mb-6">
-              <div className="h-px w-12 bg-gold opacity-30" />
-              <span className="text-gold text-xs tracking-widest uppercase font-semibold">Under Review</span>
-              <div className="h-px w-12 bg-gold opacity-30" />
-            </div>
-            <h2 className="font-serif text-3xl font-bold text-cream mb-3">Application Received</h2>
-            <p className="text-cream text-lg mb-1">
-              <span className="text-gold font-semibold">{submission.business_name}</span>
+            <p style={{...S.label, color:'#92400E', marginBottom:8}}>Under Review</p>
+            <h2 style={{fontFamily:'Georgia, serif', fontSize:26, fontWeight:700, color:'#111827', marginBottom:8}}>Application Received</h2>
+            <p style={{color:'#374151', fontSize:16, fontWeight:500, marginBottom:4}}>{submission.business_name}</p>
+            <p style={{color:'#6B7280', fontSize:14, lineHeight:1.6, maxWidth:420, margin:'0 auto 24px'}}>
+              Our team is reviewing your details. We'll reach out within 1 to 2 business days to get you live on Regly.
             </p>
-            <p className="text-muted text-sm leading-relaxed max-w-md mx-auto mb-6">
-              Our team is reviewing your details. We'll reach out within 1–2 business days to get you live on Regly.
-            </p>
-            <div className="inline-flex items-center gap-2 border border-gold border-opacity-20 rounded-full px-5 py-2 text-muted text-xs">
-              Questions?&nbsp;<span className="text-gold">getregly@gmail.com</span>
+            <div style={{display:'inline-flex', alignItems:'center', gap:8, background:'#F9FAFB', border:'1px solid #E5E7EB', borderRadius:10, padding:'10px 16px'}}>
+              <span style={{fontSize:13, color:'#6B7280'}}>Questions?</span>
+              <span style={{fontSize:13, color:'#C9A84C', fontWeight:500}}>getregly@gmail.com</span>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* New — no submission yet */}
-      {isNew && (
-        <div className="relative overflow-hidden rounded-2xl border border-gold border-opacity-30 px-8 py-14 text-center"
-          style={{background:'linear-gradient(135deg, #1A1410 0%, #0F0D0A 60%, #1A1410 100%)'}}>
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-            <span className="font-serif font-black text-gold opacity-5" style={{fontSize:'18rem',lineHeight:1}}>R</span>
-          </div>
-          <div className="absolute top-0 left-0 w-12 h-12 border-t-2 border-l-2 border-gold border-opacity-40 rounded-tl-2xl" />
-          <div className="absolute top-0 right-0 w-12 h-12 border-t-2 border-r-2 border-gold border-opacity-40 rounded-tr-2xl" />
-          <div className="absolute bottom-0 left-0 w-12 h-12 border-b-2 border-l-2 border-gold border-opacity-40 rounded-bl-2xl" />
-          <div className="absolute bottom-0 right-0 w-12 h-12 border-b-2 border-r-2 border-gold border-opacity-40 rounded-br-2xl" />
-          <div className="relative z-10">
-            <div className="flex justify-center mb-6">
-              <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-                <circle cx="32" cy="32" r="28" stroke="#C9A84C" strokeWidth="1.5" strokeOpacity="0.4"/>
-                <path d="M32 16V32L42 42" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M20 48H44" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/>
-                <path d="M44 20L46 16L48 20L46 24L44 20Z" fill="#C9A84C" fillOpacity="0.6"/>
-                <path d="M16 20L18 16L20 20L18 24L16 20Z" fill="#C9A84C" fillOpacity="0.3"/>
-                <circle cx="32" cy="32" r="2.5" fill="#C9A84C"/>
+        {/* NEW STATE */}
+        {isNew && (
+          <div style={{background:'white', borderRadius:24, padding:'48px 40px', textAlign:'center', boxShadow:'0 2px 12px rgba(0,0,0,0.06)', marginBottom:24}}>
+            <div style={{width:72, height:72, background:'linear-gradient(135deg, #C9A84C, #8A6A20)', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 24px'}}>
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <path d="M16 4C9.37 4 4 9.37 4 16s5.37 12 12 12 12-5.37 12-12S22.63 4 16 4zm1 17h-2v-6h2v6zm0-8h-2V9h2v4z" fill="white"/>
               </svg>
             </div>
-            <div className="flex items-center justify-center gap-3 mb-6">
-              <div className="h-px w-12 bg-gold opacity-30" />
-              <span className="text-gold text-xs tracking-widest uppercase font-semibold">Get Started</span>
-              <div className="h-px w-12 bg-gold opacity-30" />
-            </div>
-            <h2 className="font-serif text-3xl font-bold text-cream mb-3">Welcome to Regly</h2>
-            <p className="text-muted text-sm leading-relaxed max-w-md mx-auto mb-8">
-              Set up your membership program in minutes. Define your tiers, set your perks, and start earning from your regulars.
+            <p style={{...S.label, color:'#C9A84C', marginBottom:8}}>Get Started</p>
+            <h2 style={{fontFamily:'Georgia, serif', fontSize:26, fontWeight:700, color:'#111827', marginBottom:8}}>Set Up Your Business</h2>
+            <p style={{color:'#6B7280', fontSize:15, lineHeight:1.6, maxWidth:420, margin:'0 auto 28px'}}>
+              Create your membership tiers, set your perks, and start earning from the customers who already love your business.
             </p>
             <button onClick={() => router.push('/onboard')}
-              className="inline-flex items-center gap-3 btn-gold px-10 py-4 text-sm tracking-widest uppercase">
+              style={{...S.btn, background:'#111827', color:'white', padding:'14px 32px', fontSize:15, display:'inline-flex', alignItems:'center', gap:8}}>
               Set Up My Business
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </button>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Approved — full dashboard */}
-      {restaurant && (
-        <div className="space-y-10">
+        {/* APPROVED DASHBOARD */}
+        {restaurant && (
+          <div style={{display:'flex', flexDirection:'column', gap:24}}>
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div className="card text-center py-5">
-              <p className="font-serif text-3xl font-bold text-gold">{members.length}</p>
-              <p className="text-muted text-xs mt-1">Active Members</p>
+            {/* Stats row */}
+            <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(200px, 1fr))', gap:16}}>
+              {[
+                { label:'Active Members', value: members.length, prefix:'', suffix:'' },
+                { label:'Monthly Revenue', value: stats.revenue, prefix:'$', suffix:'' },
+                { label:'Your Earnings', value: ownerRevenue, prefix:'$', suffix:'' },
+                { label:'Regly Fee', value: reglyFee, prefix:'$', suffix:'' },
+              ].map(s => (
+                <div key={s.label} style={{...S.card, textAlign:'center', padding:'24px'}}>
+                  <p style={{fontFamily:'Georgia, serif', fontSize:32, fontWeight:700, color:'#111827', marginBottom:4}}>
+                    {s.prefix}{s.value}{s.suffix}
+                  </p>
+                  <p style={{...S.label, fontSize:10}}>{s.label}</p>
+                </div>
+              ))}
             </div>
-            <div className="card text-center py-5">
-              <p className="font-serif text-3xl font-bold text-gold">${stats.revenue}</p>
-              <p className="text-muted text-xs mt-1">Monthly Revenue</p>
-            </div>
-            <div className="card text-center py-5">
-              <p className="font-serif text-3xl font-bold text-gold">${ownerRevenue}</p>
-              <p className="text-muted text-xs mt-1">Your Earnings (85%)</p>
-            </div>
-            <div className="card text-center py-5">
-              <p className="font-serif text-3xl font-bold text-gold">${reglyFee}</p>
-              <p className="text-muted text-xs mt-1">Regly Fee (15%)</p>
-            </div>
-          </div>
 
-          {/* Tier Breakdown */}
-          {stats.tierBreakdown.length > 0 && (
-            <div className="card">
-              <h2 className="font-serif text-xl font-bold text-gold mb-4">Members by Tier</h2>
-              <div className="space-y-3">
-                {stats.tierBreakdown.map(t => {
-                  const pct = Math.round((t.count / members.length) * 100)
-                  return (
-                    <div key={t.name}>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-cream text-sm">{t.name}</span>
-                        <span className="text-muted text-xs">{t.count} member{t.count !== 1 ? 's' : ''} · {pct}%</span>
+            {/* Tier breakdown */}
+            {stats.tierBreakdown.length > 0 && (
+              <div style={S.card}>
+                <div style={{marginBottom:20}}>
+                  <h2 style={S.h2}>Members by Tier</h2>
+                  <p style={{color:'#9CA3AF', fontSize:13, marginTop:4}}>{members.length} active member{members.length !== 1 ? 's' : ''}</p>
+                </div>
+                <div style={{display:'flex', flexDirection:'column', gap:14}}>
+                  {stats.tierBreakdown.map(t => {
+                    const pct = Math.round((t.count / members.length) * 100)
+                    return (
+                      <div key={t.name}>
+                        <div style={{display:'flex', justifyContent:'space-between', marginBottom:6}}>
+                          <span style={{fontSize:14, color:'#374151', fontWeight:500}}>{t.name}</span>
+                          <span style={{fontSize:13, color:'#9CA3AF'}}>{t.count} member{t.count !== 1 ? 's' : ''} · {pct}%</span>
+                        </div>
+                        <div style={{height:6, background:'#F3F4F6', borderRadius:10, overflow:'hidden'}}>
+                          <div style={{height:'100%', width:`${pct}%`, background:'linear-gradient(to right, #C9A84C, #8A6A20)', borderRadius:10}} />
+                        </div>
                       </div>
-                      <div className="w-full h-1.5 rounded-full bg-dark overflow-hidden">
-                        <div className="h-full rounded-full bg-gold" style={{width:`${pct}%`}} />
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Phone Lookup */}
-          <div className="card">
-            <h2 className="font-serif text-xl font-bold text-gold mb-1">Member Lookup</h2>
-            <p className="text-muted text-sm mb-5">Enter a customer's phone number to verify their membership.</p>
-            <form onSubmit={handlePhoneLookup} className="flex gap-3">
-              <input className="input flex-1" placeholder="(312) 555-0000"
-                value={phone} onChange={e => setPhone(e.target.value)} required />
-              <button type="submit" disabled={searching} className="btn-gold px-6">
-                {searching ? '...' : 'Search'}
-              </button>
-            </form>
-
-            {lookup === false && (
-              <div className="mt-4 p-4 bg-dark rounded border border-muted border-opacity-30">
-                <p className="text-muted">❌ No Regly membership found for this number.</p>
-              </div>
-            )}
-
-            {lookup && lookup.profile && (
-              <div className="mt-4 p-4 bg-dark rounded border border-gold border-opacity-40">
-                <p className="font-semibold text-lg mb-3">
-                  {lookup.status === 'active'
-                    ? <span className="text-gold">✓ Active Member</span>
-                    : <span className="text-red-400">✗ Cancelled Membership</span>}
-                </p>
-                <div className="space-y-1 text-cream text-sm">
-                  <p><span className="text-muted">Name:</span> {lookup.profile.name}</p>
-                  <p><span className="text-muted">Phone:</span> {lookup.profile.phone}</p>
-                  <p><span className="text-muted">Tier:</span> {lookup.membership_tiers?.name}</p>
-                  <p><span className="text-muted">Price:</span> ${lookup.membership_tiers?.price_monthly}/mo</p>
-                  <p><span className="text-muted">Member since:</span> {new Date(lookup.start_date).toLocaleDateString()}</p>
-                  {lookup.stripeInfo && (
-                    <p>
-                      <span className="text-muted">{lookup.stripeInfo.cancel_at_period_end ? 'Cancels on:' : 'Renews on:'}</span>{' '}
-                      <span className={lookup.stripeInfo.cancel_at_period_end ? 'text-red-400' : 'text-green-400'}>
-                        {formatDate(lookup.stripeInfo.current_period_end)}
-                      </span>
-                    </p>
-                  )}
-                  {lookup.status === 'cancelled' && (
-                    <p className="text-red-300 mt-2 text-xs">⚠ This membership has been cancelled. Perks are no longer active.</p>
-                  )}
+                    )
+                  })}
                 </div>
               </div>
             )}
-          </div>
 
-          {/* Member List */}
-          <div className="card">
-            <h2 className="font-serif text-xl font-bold text-gold mb-1">
-              Active Members <span className="text-muted font-normal text-base">({members.length})</span>
-            </h2>
-            <p className="text-muted text-sm mb-5">Sorted by most recent. All current Regly subscribers at {restaurant.name}.</p>
-
-            {members.length === 0 ? (
-              <p className="text-muted text-center py-8">No active members yet. Share your Regly link to get started!</p>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-muted border-opacity-30">
-                      <th className="text-left text-muted pb-3 pr-4">Name</th>
-                      <th className="text-left text-muted pb-3 pr-4">Phone</th>
-                      <th className="text-left text-muted pb-3 pr-4">Tier</th>
-                      <th className="text-left text-muted pb-3 pr-4">$/mo</th>
-                      <th className="text-left text-muted pb-3 pr-4">Since</th>
-                      <th className="text-left text-muted pb-3">Renewal</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-muted divide-opacity-20">
-                    {members.map(m => {
-                      const renewal = renewalInfo(m)
-                      return (
-                        <tr key={m.id}>
-                          <td className="py-3 pr-4 text-cream">{m.profile?.name || '—'}</td>
-                          <td className="py-3 pr-4 text-cream">{m.profile?.phone || '—'}</td>
-                          <td className="py-3 pr-4">
-                            <span className="bg-gold bg-opacity-20 text-gold text-xs px-2 py-1 rounded">{m.membership_tiers?.name}</span>
-                          </td>
-                          <td className="py-3 pr-4 text-cream">${m.membership_tiers?.price_monthly}</td>
-                          <td className="py-3 pr-4 text-muted">{new Date(m.start_date).toLocaleDateString()}</td>
-                          <td className="py-3">
-                            {renewal
-                              ? <span className={`text-xs ${renewal.color}`}>{renewal.label} {renewal.date}</span>
-                              : <span className="text-muted text-xs">—</span>}
-                          </td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
+            {/* Phone Lookup */}
+            <div style={S.card}>
+              <div style={{marginBottom:20}}>
+                <h2 style={S.h2}>Member Lookup</h2>
+                <p style={{color:'#9CA3AF', fontSize:13, marginTop:4}}>Enter a customer's phone number to verify their membership.</p>
               </div>
-            )}
-          </div>
+              <form onSubmit={handlePhoneLookup} style={{display:'flex', gap:12}}>
+                <input
+                  value={phone} onChange={e => setPhone(e.target.value)}
+                  onFocus={() => setPhoneFocused(true)} onBlur={() => setPhoneFocused(false)}
+                  required placeholder="(312) 555-0000"
+                  style={{flex:1, padding:'12px 14px', border:`1.5px solid ${phoneFocused ? '#C9A84C' : '#E5E7EB'}`, borderRadius:10, fontSize:14, color:'#111827', outline:'none', fontFamily:'inherit', boxShadow: phoneFocused ? '0 0 0 3px rgba(201,168,76,0.12)' : 'none', transition:'all 0.2s'}}
+                />
+                <button type="submit" disabled={searching} className="search-btn"
+                  style={{...S.btn, background:'#111827', color:'white', padding:'12px 24px', opacity: searching ? 0.7 : 1}}>
+                  {searching ? 'Searching...' : 'Search'}
+                </button>
+              </form>
 
-        </div>
-      )}
+              {lookup === false && (
+                <div style={{marginTop:16, padding:'16px', background:'#F9FAFB', borderRadius:12, border:'1px solid #F3F4F6', display:'flex', alignItems:'center', gap:10}}>
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <circle cx="8" cy="8" r="7" stroke="#9CA3AF" strokeWidth="1.5"/>
+                    <path d="M5 8h6" stroke="#9CA3AF" strokeWidth="1.5" strokeLinecap="round"/>
+                  </svg>
+                  <p style={{fontSize:14, color:'#6B7280', margin:0}}>No Regly membership found for this number.</p>
+                </div>
+              )}
+
+              {lookup && lookup.profile && (
+                <div style={{marginTop:16, padding:'20px', background: lookup.status === 'active' ? '#F0FDF4' : '#FEF2F2', borderRadius:12, border:`1px solid ${lookup.status === 'active' ? '#6EE7B7' : '#FECACA'}`}}>
+                  <div style={{display:'flex', alignItems:'center', gap:8, marginBottom:16}}>
+                    <div style={{width:32, height:32, background: lookup.status === 'active' ? '#059669' : '#EF4444', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center'}}>
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                        {lookup.status === 'active'
+                          ? <path d="M2.5 7L5.5 10L11.5 4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          : <path d="M4 4L10 10M10 4L4 10" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>}
+                      </svg>
+                    </div>
+                    <span style={{fontSize:15, fontWeight:600, color: lookup.status === 'active' ? '#065F46' : '#991B1B'}}>
+                      {lookup.status === 'active' ? 'Active Member' : 'Cancelled Membership'}
+                    </span>
+                  </div>
+                  <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'8px 24px'}}>
+                    {[
+                      ['Name', lookup.profile.name],
+                      ['Phone', lookup.profile.phone],
+                      ['Tier', lookup.membership_tiers?.name],
+                      ['Price', `$${lookup.membership_tiers?.price_monthly}/mo`],
+                      ['Member since', new Date(lookup.start_date).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})],
+                      lookup.stripeInfo ? [lookup.stripeInfo.cancel_at_period_end ? 'Cancels on' : 'Renews on', formatDate(lookup.stripeInfo.current_period_end)] : null,
+                    ].filter(Boolean).map(([label, val]) => (
+                      <div key={label}>
+                        <p style={{fontSize:11, color:'#9CA3AF', fontWeight:600, letterSpacing:'0.1em', textTransform:'uppercase', marginBottom:2}}>{label}</p>
+                        <p style={{fontSize:14, color:'#111827', fontWeight:500}}>{val}</p>
+                      </div>
+                    ))}
+                  </div>
+                  {lookup.status === 'cancelled' && (
+                    <p style={{fontSize:12, color:'#991B1B', marginTop:12, paddingTop:12, borderTop:'1px solid #FECACA'}}>
+                      This membership has been cancelled. Perks are no longer active.
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Member List */}
+            <div style={S.card}>
+              <div style={{marginBottom:20}}>
+                <h2 style={S.h2}>
+                  Active Members <span style={{fontSize:15, fontWeight:400, color:'#9CA3AF'}}>({members.length})</span>
+                </h2>
+                <p style={{color:'#9CA3AF', fontSize:13, marginTop:4}}>Sorted by most recent. All current Regly subscribers at {restaurant.name}.</p>
+              </div>
+
+              {members.length === 0 ? (
+                <div style={{textAlign:'center', padding:'40px 0'}}>
+                  <p style={{color:'#6B7280', fontSize:15, fontWeight:500, marginBottom:4}}>No members yet</p>
+                  <p style={{color:'#9CA3AF', fontSize:13}}>Share your Regly link to get your first subscriber.</p>
+                </div>
+              ) : (
+                <div style={{overflowX:'auto'}}>
+                  <table style={{width:'100%', borderCollapse:'collapse', fontSize:14}}>
+                    <thead>
+                      <tr style={{borderBottom:'2px solid #F3F4F6'}}>
+                        {['Name','Phone','Tier','$/mo','Since','Renewal'].map(h => (
+                          <th key={h} style={{textAlign:'left', padding:'0 16px 12px 0', color:'#9CA3AF', fontSize:11, fontWeight:600, letterSpacing:'0.1em', textTransform:'uppercase', whiteSpace:'nowrap'}}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {members.map(m => {
+                        const renewal = renewalInfo(m)
+                        return (
+                          <tr key={m.id} className="hover-row" style={{borderBottom:'1px solid #F9FAFB'}}>
+                            <td style={{padding:'14px 16px 14px 0', color:'#111827', fontWeight:500}}>{m.profile?.name || '—'}</td>
+                            <td style={{padding:'14px 16px 14px 0', color:'#6B7280'}}>{m.profile?.phone || '—'}</td>
+                            <td style={{padding:'14px 16px 14px 0'}}>
+                              <span style={{background:'rgba(201,168,76,0.1)', color:'#8A6A20', fontSize:12, fontWeight:600, padding:'4px 10px', borderRadius:20, whiteSpace:'nowrap'}}>
+                                {m.membership_tiers?.name}
+                              </span>
+                            </td>
+                            <td style={{padding:'14px 16px 14px 0', color:'#111827', fontWeight:600}}>${m.membership_tiers?.price_monthly}</td>
+                            <td style={{padding:'14px 16px 14px 0', color:'#9CA3AF', whiteSpace:'nowrap'}}>{new Date(m.start_date).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})}</td>
+                            <td style={{padding:'14px 0 14px 0'}}>
+                              {renewal ? (
+                                <span style={{background:renewal.bg, color:renewal.color, fontSize:12, fontWeight:600, padding:'4px 10px', borderRadius:20, whiteSpace:'nowrap'}}>
+                                  {renewal.label} {renewal.date}
+                                </span>
+                              ) : <span style={{color:'#D1D5DB', fontSize:13}}>—</span>}
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+          </div>
+        )}
+      </div>
     </div>
   )
 }
