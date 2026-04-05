@@ -228,7 +228,7 @@ export default function CustomerDashboard() {
                       </div>
                       <p style={{fontFamily:'Georgia, serif', fontSize:18, fontWeight:700, color: isRecord ? '#F5F0E8' : '#111827', marginBottom:4}}>{sub.restaurants?.name}</p>
                       <p style={{color: isRecord ? '#C9A84C' : accent.accent, fontSize:13, fontWeight:500, marginBottom:8}}>{sub.membership_tiers?.name}</p>
-                      <p style={{color: isRecord ? 'rgba(245,240,232,0.5)' : '#9CA3AF', fontSize:12, marginBottom:16, lineHeight:1.5}}>{sub.membership_tiers?.perks?.split(' | ')[0]}</p>
+                      <p style={{color: isRecord ? 'rgba(245,240,232,0.75)' : '#9CA3AF', fontSize:12, marginBottom:16, lineHeight:1.5}}>{sub.membership_tiers?.perks?.split(' | ')[0]}</p>
                       <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', paddingTop:16, borderTop:`1px solid ${isRecord ? 'rgba(201,168,76,0.15)' : '#F3F4F6'}`}}>
                         <span style={{fontFamily:'Georgia, serif', fontSize:22, fontWeight:700, color: isRecord ? '#C9A84C' : '#111827'}}>${sub.membership_tiers?.price_monthly}<span style={{fontSize:12, fontWeight:400, color: isRecord ? 'rgba(245,240,232,0.4)' : '#9CA3AF'}}>/mo</span></span>
                         <button onClick={() => handleCancel(sub)} className="cancel-btn"
@@ -280,8 +280,8 @@ export default function CustomerDashboard() {
                     </div>
                     <p style={{fontFamily:'Georgia, serif', fontSize:17, fontWeight:700, color: isRecord ? '#F5F0E8' : '#111827', marginBottom:4}}>{rest.name}</p>
                     <p style={{color: isRecord ? '#C9A84C' : accent.accent, fontSize:12, fontWeight:600, marginBottom:8, textTransform:'uppercase', letterSpacing:'0.08em'}}>{rest.city}</p>
-                    <p style={{color: isRecord ? 'rgba(245,240,232,0.5)' : '#6B7280', fontSize:13, lineHeight:1.5, marginBottom:12}}>{rest.description}</p>
-                    <p style={{color: isRecord ? 'rgba(245,240,232,0.3)' : '#9CA3AF', fontSize:12}}>{rest.address}</p>
+                    <p style={{color: isRecord ? 'rgba(245,240,232,0.75)' : '#6B7280', fontSize:13, lineHeight:1.5, marginBottom:12}}>{rest.description}</p>
+                    <p style={{color: isRecord ? 'rgba(245,240,232,0.6)' : '#9CA3AF', fontSize:12}}>{rest.address}</p>
                   </div>
                 </button>
               )
