@@ -182,7 +182,7 @@ export default function Home() {
         {/* Hero background photo editorial overhead restaurant */}
         <div className="absolute inset-0">
           <img
-            src="https://images.unsplash.com/IjXZbIQ5e4w?w=1800&q=85&fit=crop"
+            src="https://images.unsplash.com/photo-1653795164352-6f4ba840f525?q=80&w=2670&auto=format&fit=crop"
             alt="Restaurant"
             className="w-full h-full object-cover"
             style={{objectPosition:'center 40%'}}
@@ -341,7 +341,7 @@ export default function Home() {
       {/* ── PHOTO BREAK full width editorial photo ─────────────── */}
       <section className="relative h-96 sm:h-screen overflow-hidden" style={{maxHeight:600}}>
         <img
-          src="https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=1800&q=85&fit=crop"
+          src="https://images.unsplash.com/photo-1653795164352-6f4ba840f525?q=80&w=2670&auto=format&fit=crop"
           alt="Restaurant dining"
           className="w-full h-full object-cover"
           style={{objectPosition:'center 50%'}}
