@@ -285,7 +285,10 @@ export default function Home() {
                     <IconStar />
                   </div>
                   <div className="h-px mb-6" style={{background:'rgba(201,168,76,0.2)'}} />
-                  <p className="font-body text-xs tracking-widest uppercase mb-1" style={{color:'#8A7A6A'}}>Member</p>
+                  <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:4}}>
+                    <p className="font-body text-xs tracking-widest uppercase" style={{color:'#8A7A6A'}}>Member</p>
+                    <span className="font-body" style={{fontSize:'0.55rem', letterSpacing:'0.15em', textTransform:'uppercase', background:'rgba(201,168,76,0.15)', color:'#C9A84C', padding:'2px 8px', borderRadius:20, fontWeight:600}}>Example</span>
+                  </div>
                   <p className="font-display text-2xl font-bold" style={{color:'#F5F0E8'}}>Gold Regular</p>
                   <p className="font-body text-xs mt-1" style={{color:'#C9A84C'}}>Vicenzo's Pizza · Chicago</p>
                 </div>
@@ -388,6 +391,10 @@ export default function Home() {
       <section className="light-section py-32 px-8">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
+            <div style={{display:'inline-flex', alignItems:'center', gap:8, background:'rgba(138,106,32,0.1)', border:'1px solid rgba(138,106,32,0.25)', borderRadius:20, padding:'6px 16px', marginBottom:16}}>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#8A6A20" strokeWidth="1.2"/><path d="M7 4V7M7 10H7.01" stroke="#8A6A20" strokeWidth="1.2" strokeLinecap="round"/></svg>
+              <span className="font-body" style={{fontSize:'0.65rem', letterSpacing:'0.2em', textTransform:'uppercase', color:'#8A6A20', fontWeight:600}}>Example Tiers</span>
+            </div>
             <p className="section-label mb-4">Membership Tiers</p>
             <h2 className="font-display text-5xl font-bold mb-4" style={{color:'#1A1410'}}>
               Find your <span style={{color:'#8A6A20', fontStyle:'italic'}}>level.</span>
