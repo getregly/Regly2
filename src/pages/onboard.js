@@ -24,6 +24,7 @@ export default function Onboard() {
   const [done, setDone]         = useState(false)
   const [error, setError]       = useState('')
   const [focused, setFocused]   = useState(null)
+  const [agreedToTerms, setAgreedToTerms] = useState(false)
   const [form, setForm] = useState({
     business_name:'', address:'', city:'Chicago', description:'', tiers:[newTier()],
   })
@@ -76,6 +77,10 @@ export default function Onboard() {
       if (!t.name.trim()) { setError(`Please enter a name for Tier ${i+1}`); return }
       if (!t.price || isNaN(t.price) || Number(t.price)<=0) { setError(`Please enter a valid price for "${t.name||`Tier ${i+1}`}"`); return }
       if (!t.perks.filter(p=>p.trim()).length) { setError(`Please add at least one perk for "${t.name||`Tier ${i+1}`}"`); return }
+    }
+    if (!agreedToTerms) {
+      setError('Please agree to the Regly Merchant Terms of Service to continue.')
+      return
     }
     setSaving(true)
     try {
@@ -274,6 +279,24 @@ export default function Onboard() {
               <p style={{color:'#DC2626', fontSize:14, margin:0}}>{error}</p>
             </div>
           )}
+
+          {/* Terms agreement */}
+          <div style={{background:'white', borderRadius:16, padding:'20px 24px', boxShadow:'0 2px 12px rgba(0,0,0,0.06)', display:'flex', alignItems:'flex-start', gap:14}}>
+            <input
+              type="checkbox"
+              id="terms"
+              checked={agreedToTerms}
+              onChange={e => setAgreedToTerms(e.target.checked)}
+              style={{marginTop:3, width:18, height:18, accentColor:'#C9A84C', flexShrink:0, cursor:'pointer'}}
+            />
+            <label htmlFor="terms" style={{fontSize:14, color:'#374151', lineHeight:1.6, cursor:'pointer'}}>
+              I have read and agree to the{' '}
+              <a href="/terms" target="_blank" style={{color:'#C9A84C', fontWeight:600, textDecoration:'none'}}>
+                Regly Merchant Terms of Service
+              </a>
+              {' '}including the 85/15 revenue split, weekly payouts via Stripe, and my obligation to honor all membership perks I define for my customers.
+            </label>
+          </div>
 
           <button type="submit" disabled={saving}
             style={{padding:'16px', background: saving ? '#D1D5DB' : '#111827', color:'white', border:'none', borderRadius:12, fontSize:15, fontWeight:600, cursor: saving ? 'not-allowed' : 'pointer', fontFamily:'inherit'}}>
