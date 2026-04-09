@@ -100,7 +100,7 @@ Upon cancellation:
 • Your business listing will be removed from the Regly platform within 48 hours of cancellation confirmation`
           },
           {
-            n:'7', title:'Regly's Right to Remove a Merchant',
+            n:'7', title:'Regly\'s Right to Remove a Merchant',
             body:`Regly reserves the right to suspend or remove a merchant from the platform if:
 
 • The merchant materially fails to honor membership perks owed to subscribers
