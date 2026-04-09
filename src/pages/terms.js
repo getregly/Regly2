@@ -62,11 +62,11 @@ By completing the merchant onboarding form and checking the agreement box, you a
 
 • You receive 85% of the gross subscription amount
 • Regly retains 15% as a platform fee
-• Payments are transferred to your connected Stripe account on a weekly basis, subject to Stripe's standard payout schedule (typically 2 business days after transfer initiation)
+• Payments are transferred to your connected Stripe account on a weekly basis, subject to Stripe\'s standard payout schedule (typically 2 business days after transfer initiation)
 • Regly does not charge any setup fees, monthly SaaS fees, or hardware costs
-• The 15% platform fee is Regly's only compensation — there are no hidden charges
+• The 15% platform fee is Regly\'s only compensation — there are no hidden charges
 
-Example: A customer subscribes to your $20/month tier. You receive $17.00. Regly retains $3.00. Stripe's processing fee (2.9% + $0.30) is deducted from Regly's portion.`
+Example: A customer subscribes to your $20/month tier. You receive $17.00. Regly retains $3.00. Stripe\'s processing fee (2.9% + $0.30) is deducted from Regly\'s portion.`
           },
           {
             n:'4', title:'Your Responsibilities as a Merchant',
@@ -87,7 +87,7 @@ Example: A customer subscribes to your $20/month tier. You receive $17.00. Regly
 • No refunds are issued for partial months
 • You will see cancellation dates reflected in your business dashboard in real time
 
-Regly does not issue refunds on behalf of merchants. If a customer disputes a charge with their bank, Stripe's standard dispute process applies.`
+Regly does not issue refunds on behalf of merchants. If a customer disputes a charge with their bank, Stripe\'s standard dispute process applies.`
           },
           {
             n:'6', title:'Merchant Cancellation',
@@ -104,9 +104,9 @@ Upon cancellation:
             body:`Regly reserves the right to suspend or remove a merchant from the platform if:
 
 • The merchant materially fails to honor membership perks owed to subscribers
-• The merchant's business is found to be operating illegally or in violation of applicable laws
+• The merchant\'s business is found to be operating illegally or in violation of applicable laws
 • The merchant engages in fraudulent activity on the platform
-• The merchant's Stripe account becomes invalid or unable to receive payments
+• The merchant\'s Stripe account becomes invalid or unable to receive payments
 
 In such cases, Regly will provide written notice via email and a reasonable opportunity to resolve the issue before removal, except in cases of fraud or illegal activity.`
           },
@@ -125,7 +125,7 @@ Regly retains ownership of the Regly platform, technology, and brand.`
 • Loss of revenue due to platform downtime, provided Regly makes reasonable efforts to maintain availability
 • Actions taken by Stripe, including payment delays or account holds
 
-To the maximum extent permitted by law, Regly's total liability to any merchant shall not exceed the total platform fees paid to Regly by that merchant in the 3 months preceding the claim.`
+To the maximum extent permitted by law, Regly\'s total liability to any merchant shall not exceed the total platform fees paid to Regly by that merchant in the 3 months preceding the claim.`
           },
           {
             n:'10', title:'Modifications to These Terms',
