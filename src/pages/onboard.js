@@ -304,7 +304,7 @@ export default function Onboard() {
           </button>
 
           <p style={{textAlign:'center', color:'#9CA3AF', fontSize:12}}>
-            By submitting you agree to Regly's revenue share. You keep the majority of all membership revenue.
+            By submitting you agree to Regly\'s revenue share. You keep the majority of all membership revenue.
           </p>
         </form>
       </div>
