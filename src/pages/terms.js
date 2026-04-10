@@ -14,7 +14,7 @@ export default function Terms() {
             style={{fontFamily:'Georgia, serif', fontSize:20, fontWeight:700, color:'#111827', background:'none', border:'none', cursor:'pointer'}}>
             REGL<span style={{color:'#C9A84C'}}>Y</span>
           </button>
-          <button onClick={() => router.back()}
+          <button onClick={() => window.close()}
             style={{display:'flex', alignItems:'center', gap:6, color:'#9CA3AF', background:'none', border:'none', cursor:'pointer', fontSize:14, fontFamily:'inherit'}}>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -35,7 +35,7 @@ export default function Terms() {
 
         <div style={{background:'#FFFBEB', border:'1px solid #FCD34D', borderRadius:12, padding:'16px 20px', marginBottom:40}}>
           <p style={{fontSize:14, color:'#92400E', lineHeight:1.6, margin:0}}>
-            <strong>Plain English Summary:</strong> Regly processes membership payments from your customers and sends you 85% of every dollar collected, weekly via Stripe. We charge 15% as our platform fee. You set your own perks and pricing. Either party can cancel at any time.
+            <strong>Plain English Summary:</strong> Regly processes membership payments from your customers and sends you 85% of every dollar collected, monthly via Stripe. We charge 15% as our platform fee. You set your own perks and pricing. Either party can cancel at any time.
           </p>
         </div>
 
@@ -53,7 +53,7 @@ By completing the merchant onboarding form and checking the agreement box, you a
 • Processing all customer payments securely through Stripe
 • Maintaining the customer-facing membership dashboard at getregly.com
 • Providing your business dashboard for member lookup and management
-• Transferring your earnings to your Stripe account on a weekly basis
+• Transferring your earnings to your Stripe account on a monthly basis
 • Providing basic platform support via getregly@gmail.com`
           },
           {
@@ -62,7 +62,7 @@ By completing the merchant onboarding form and checking the agreement box, you a
 
 • You receive 85% of the gross subscription amount
 • Regly retains 15% as a platform fee
-• Payments are transferred to your connected Stripe account on a weekly basis, subject to Stripe\'s standard payout schedule (typically 2 business days after transfer initiation)
+• Payments are transferred to your connected Stripe account on a monthly basis, subject to Stripe\'s standard payout schedule (typically 2 business days after transfer initiation)
 • Regly does not charge any setup fees, monthly SaaS fees, or hardware costs
 • The 15% platform fee is Regly\'s only compensation — there are no hidden charges
 
