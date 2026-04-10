@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase'
 
 export default function Auth() {
   const router = useRouter()
-  const { role } = router.query
+  const [role, setRole] = useState(router.query.role || 'customer')
   const [mode, setMode] = useState('login')
   const [form, setForm] = useState({ name: '', email: '', password: '', phone: '' })
   const [error, setError] = useState('')
@@ -15,6 +15,11 @@ export default function Auth() {
   const isB = role === 'business'
   const dash = isB ? '/dashboard/business' : '/dashboard/customer'
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
+
+  // Sync role from query param if it changes
+  useState(() => {
+    if (router.query.role) setRole(router.query.role)
+  }, [router.query.role])
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -33,7 +38,7 @@ export default function Auth() {
         const { data: profile } = await supabase.from('profiles').select('role').eq('id', data.user.id).single()
         if (profile?.role !== role) {
           await supabase.auth.signOut()
-          throw new Error(`This account is not registered as a ${isB ? 'business' : 'customer'}.`)
+          throw new Error(`This account is not registered as a ${isB ? 'merchant' : 'customer'}.`)
         }
         router.push(dash)
       }
@@ -45,14 +50,10 @@ export default function Auth() {
   }
 
   const inputStyle = (field) => ({
-    width: '100%',
-    padding: '14px 16px',
+    width: '100%', padding: '14px 16px',
     background: '#fff',
     border: `1.5px solid ${focusedField === field ? '#C9A84C' : '#E5E7EB'}`,
-    borderRadius: 10,
-    fontSize: 15,
-    color: '#111827',
-    outline: 'none',
+    borderRadius: 10, fontSize: 15, color: '#111827', outline: 'none',
     transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
     boxShadow: focusedField === field ? '0 0 0 3px rgba(201,168,76,0.12)' : 'none',
     fontFamily: 'inherit',
@@ -79,7 +80,7 @@ export default function Auth() {
   }
 
   return (
-    <div style={{minHeight:'100vh', display:'grid', gridTemplateColumns: 'auto', fontFamily:'system-ui, -apple-system, sans-serif', background:'#F9FAFB'}}>
+    <div style={{minHeight:'100vh', fontFamily:'system-ui, -apple-system, sans-serif', background:'#F9FAFB'}}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600&display=swap');
         * { box-sizing: border-box; }
@@ -88,16 +89,14 @@ export default function Auth() {
         .auth-btn { transition: all 0.2s ease; }
         .toggle-btn:hover { color: #8A6A20; }
         .back-btn:hover { color: #374151; }
-        @media (min-width: 768px) {
-          .auth-grid { grid-template-columns: 1fr 1fr !important; }
-        }
+        .role-tab { transition: all 0.2s ease; cursor: pointer; border: none; }
+        @media (min-width: 768px) { .auth-grid { grid-template-columns: 1fr 1fr !important; } .md-photo-panel { display: block !important; } }
       `}</style>
 
       <div className="auth-grid" style={{display:'grid', gridTemplateColumns:'1fr', minHeight:'100vh'}}>
 
-        {/* LEFT — Photo panel (hidden on mobile) */}
-        <div style={{position:'relative', overflow:'hidden', display:'none', background:'#0A0906'}} className="md-photo-panel"
-          ref={el => { if (el) { el.style.display = window.innerWidth >= 768 ? 'block' : 'none' } }}>
+        {/* LEFT — Photo panel */}
+        <div style={{position:'relative', overflow:'hidden', display:'none', background:'#0A0906'}} className="md-photo-panel">
           <img
             src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&q=85&fit=crop"
             alt="Restaurant"
@@ -109,7 +108,7 @@ export default function Auth() {
               <span style={{color:'#C9A84C', fontSize:20}}>✦</span> REGLY
             </button>
             <div>
-              <p style={{color:'rgba(201,168,76,0.8)', fontSize:11, letterSpacing:'0.3em', textTransform:'uppercase', marginBottom:16, fontFamily:'system-ui, sans-serif', fontWeight:600}}>
+              <p style={{color:'rgba(201,168,76,0.8)', fontSize:11, letterSpacing:'0.3em', textTransform:'uppercase', marginBottom:16, fontFamily:'system-ui', fontWeight:600}}>
                 {mode === 'login' ? 'Welcome back' : 'Join Regly'}
               </p>
               <p style={{color:'#F5F0E8', fontSize:36, fontFamily:'Georgia, serif', fontStyle:'italic', fontWeight:400, lineHeight:1.2, maxWidth:320}}>
@@ -125,29 +124,46 @@ export default function Auth() {
 
             {/* Back button */}
             <button onClick={() => router.push('/')} className="back-btn"
-              style={{display:'flex', alignItems:'center', gap:6, color:'#9CA3AF', background:'none', border:'none', cursor:'pointer', fontSize:14, marginBottom:40, padding:0, transition:'color 0.2s'}}>
+              style={{display:'flex', alignItems:'center', gap:6, color:'#9CA3AF', background:'none', border:'none', cursor:'pointer', fontSize:14, marginBottom:32, padding:0, transition:'color 0.2s'}}>
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
               Back
             </button>
 
-            {/* Logo — mobile only */}
-            <div style={{marginBottom:32}}>
-              <p style={{fontSize:28, fontFamily:'Georgia, serif', fontWeight:700, color:'#111827', marginBottom:4}}>
+            {/* Role toggle */}
+            <div style={{display:'flex', background:'#F3F4F6', borderRadius:12, padding:4, marginBottom:28, gap:4}}>
+              {['customer', 'business'].map(r => (
+                <button key={r} className="role-tab"
+                  onClick={() => { setRole(r); setError('') }}
+                  style={{
+                    flex:1, padding:'10px', borderRadius:9, fontSize:14, fontWeight:600,
+                    background: role === r ? 'white' : 'transparent',
+                    color: role === r ? '#111827' : '#9CA3AF',
+                    boxShadow: role === r ? '0 1px 4px rgba(0,0,0,0.1)' : 'none',
+                    fontFamily:'inherit',
+                  }}>
+                  {r === 'customer' ? 'Customer' : 'Merchant'}
+                </button>
+              ))}
+            </div>
+
+            {/* Header */}
+            <div style={{marginBottom:28}}>
+              <p style={{fontSize:26, fontFamily:'Georgia, serif', fontWeight:700, color:'#111827', marginBottom:4}}>
                 {mode === 'login' ? 'Welcome back' : 'Create account'}
               </p>
               <p style={{color:'#6B7280', fontSize:15}}>
                 {mode === 'login'
-                  ? `Sign in to your ${isB ? 'business' : ''} Regly account`
-                  : `Join Regly as a ${isB ? 'business owner' : 'member'}`}
+                  ? `Sign in to your ${isB ? 'Merchant' : ''} Regly account`
+                  : `Join Regly as a ${isB ? 'merchant' : 'customer'}`}
               </p>
             </div>
 
             {/* Error */}
             {error && (
               <div style={{background:'#FEF2F2', border:'1px solid #FECACA', borderRadius:10, padding:'12px 16px', marginBottom:20, display:'flex', alignItems:'center', gap:10}}>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{shrink:0}}>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                   <circle cx="8" cy="8" r="7" stroke="#EF4444" strokeWidth="1.5"/>
                   <path d="M8 5V8M8 11H8.01" stroke="#EF4444" strokeWidth="1.5" strokeLinecap="round"/>
                 </svg>
@@ -163,63 +179,33 @@ export default function Auth() {
                     <label style={{display:'block', fontSize:13, fontWeight:500, color:'#374151', marginBottom:6}}>
                       {isB ? 'Business / Contact Name' : 'Full Name'}
                     </label>
-                    <input
-                      className="auth-input"
-                      style={inputStyle('name')}
-                      value={form.name}
-                      onChange={e => set('name', e.target.value)}
-                      onFocus={() => setFocusedField('name')}
-                      onBlur={() => setFocusedField(null)}
-                      required
-                      placeholder="Your name"
-                    />
+                    <input className="auth-input" style={inputStyle('name')}
+                      value={form.name} onChange={e => set('name', e.target.value)}
+                      onFocus={() => setFocusedField('name')} onBlur={() => setFocusedField(null)}
+                      required placeholder="Your name" />
                   </div>
                   <div>
                     <label style={{display:'block', fontSize:13, fontWeight:500, color:'#374151', marginBottom:6}}>Phone Number</label>
-                    <input
-                      className="auth-input"
-                      style={inputStyle('phone')}
-                      value={form.phone}
-                      onChange={e => set('phone', e.target.value)}
-                      onFocus={() => setFocusedField('phone')}
-                      onBlur={() => setFocusedField(null)}
-                      required
-                      placeholder="(312) 555-0000"
-                    />
+                    <input className="auth-input" style={inputStyle('phone')}
+                      value={form.phone} onChange={e => set('phone', e.target.value)}
+                      onFocus={() => setFocusedField('phone')} onBlur={() => setFocusedField(null)}
+                      required placeholder="(312) 555-0000" />
                   </div>
                 </>
               )}
-
               <div>
                 <label style={{display:'block', fontSize:13, fontWeight:500, color:'#374151', marginBottom:6}}>Email address</label>
-                <input
-                  className="auth-input"
-                  style={inputStyle('email')}
-                  type="email"
-                  value={form.email}
-                  onChange={e => set('email', e.target.value)}
-                  onFocus={() => setFocusedField('email')}
-                  onBlur={() => setFocusedField(null)}
-                  required
-                  placeholder="you@email.com"
-                />
+                <input className="auth-input" style={inputStyle('email')} type="email"
+                  value={form.email} onChange={e => set('email', e.target.value)}
+                  onFocus={() => setFocusedField('email')} onBlur={() => setFocusedField(null)}
+                  required placeholder="you@email.com" />
               </div>
-
               <div>
-                <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:6}}>
-                  <label style={{fontSize:13, fontWeight:500, color:'#374151'}}>Password</label>
-                </div>
-                <input
-                  className="auth-input"
-                  style={inputStyle('password')}
-                  type="password"
-                  value={form.password}
-                  onChange={e => set('password', e.target.value)}
-                  onFocus={() => setFocusedField('password')}
-                  onBlur={() => setFocusedField(null)}
-                  required
-                  placeholder="••••••••"
-                />
+                <label style={{display:'block', fontSize:13, fontWeight:500, color:'#374151', marginBottom:6}}>Password</label>
+                <input className="auth-input" style={inputStyle('password')} type="password"
+                  value={form.password} onChange={e => set('password', e.target.value)}
+                  onFocus={() => setFocusedField('password')} onBlur={() => setFocusedField(null)}
+                  required placeholder="••••••••" />
               </div>
 
               <button type="submit" disabled={loading} className="auth-btn"
@@ -235,7 +221,7 @@ export default function Auth() {
               <div style={{flex:1, height:1, background:'#F3F4F6'}} />
             </div>
 
-            {/* Toggle */}
+            {/* Toggle mode */}
             <p style={{textAlign:'center', color:'#6B7280', fontSize:14}}>
               {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
               <button onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError('') }} className="toggle-btn"
@@ -244,21 +230,14 @@ export default function Auth() {
               </button>
             </p>
 
-            {/* Footer note */}
+            {/* Footer */}
             <p style={{textAlign:'center', color:'#D1D5DB', fontSize:12, marginTop:32}}>
-              By continuing you agree to Regly's terms of service.
+              By continuing you agree to Regly&apos;s{' '}
+              <a href="/terms" target="_blank" style={{color:'#D1D5DB', textDecoration:'underline'}}>terms of service</a>.
             </p>
           </div>
         </div>
       </div>
-
-      {/* Responsive: show photo panel on desktop */}
-      <style>{`
-        @media (min-width: 768px) {
-          .auth-grid { grid-template-columns: 1fr 1fr !important; }
-          .md-photo-panel { display: block !important; }
-        }
-      `}</style>
     </div>
   )
 }
