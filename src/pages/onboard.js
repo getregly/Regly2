@@ -294,7 +294,7 @@ export default function Onboard() {
               <a href="/terms" target="_blank" style={{color:'#C9A84C', fontWeight:600, textDecoration:'none'}}>
                 Regly Merchant Terms of Service
               </a>
-              {' '}including the 85/15 revenue split, weekly payouts via Stripe, and my obligation to honor all membership perks I define for my customers.
+              {' '}including the 85/15 revenue split, monthly payouts via Stripe, and my obligation to honor all membership perks I define for my customers.
             </label>
           </div>
 
@@ -304,7 +304,7 @@ export default function Onboard() {
           </button>
 
           <p style={{textAlign:'center', color:'#9CA3AF', fontSize:12}}>
-            By submitting you agree to Regly\'s revenue share. You keep the majority of all membership revenue.
+            By submitting you agree to the <a href="/terms" target="_blank" style={{color:"#C9A84C", fontWeight:500}}>Regly Merchant Terms of Service</a>.
           </p>
         </form>
       </div>
