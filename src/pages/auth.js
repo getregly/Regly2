@@ -233,7 +233,7 @@ export default function Auth() {
             {/* Footer */}
             <p style={{textAlign:'center', color:'#D1D5DB', fontSize:12, marginTop:32}}>
               By continuing you agree to Regly&apos;s{' '}
-              <a href="/terms" target="_blank" style={{color:'#D1D5DB', textDecoration:'underline'}}>terms of service</a>.
+              <a href={isB ? '/merchant-terms' : '/terms'} target="_blank" style={{color:'#D1D5DB', textDecoration:'underline'}}>terms of service</a>.
             </p>
           </div>
         </div>
