@@ -498,9 +498,96 @@ export default function Home() {
       </section>
 
       {/* FOOTER */}
-      <footer className="py-12 px-8 border-t text-center" style={{borderColor:'rgba(201,168,76,0.1)'}}>
-        <p className="font-display text-2xl font-bold mb-2"><span style={{color:'#F5F0E8'}}>REGL</span><span style={{color:'#C9A84C'}}>Y</span></p>
-        <p className="font-body text-xs" style={{color:'#8A7A6A', fontWeight:300}}>© 2026 Regly · Chicago, IL · getregly@gmail.com</p>
+      <footer style={{background:'#0A0906', borderTop:'1px solid rgba(201,168,76,0.15)', padding:'48px 24px 32px'}}>
+        <div style={{maxWidth:1100, margin:'0 auto'}}>
+
+          {/* Top row */}
+          <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(180px, 1fr))', gap:'40px 32px', marginBottom:48}}>
+
+            {/* Brand */}
+            <div>
+              <p style={{fontFamily:'Georgia, serif', fontSize:22, fontWeight:700, color:'#F5F0E8', marginBottom:8}}>
+                REGL<span style={{color:'#C9A84C'}}>Y</span>
+              </p>
+              <p style={{fontSize:13, color:'#8A7A6A', lineHeight:1.6, marginBottom:16}}>
+                Monthly memberships for the local businesses you already love.
+              </p>
+              <a href="mailto:getregly@gmail.com" style={{fontSize:13, color:'#C9A84C', textDecoration:'none'}}>
+                getregly@gmail.com
+              </a>
+            </div>
+
+            {/* Members */}
+            <div>
+              <p style={{fontSize:11, fontWeight:600, letterSpacing:'0.2em', textTransform:'uppercase', color:'#C9A84C', marginBottom:16}}>Members</p>
+              {[
+                { label:'Browse Memberships', href:'/auth?role=customer' },
+                { label:'Sign In', href:'/auth' },
+                { label:'Create Account', href:'/auth' },
+                { label:'Customer Terms', href:'/terms' },
+              ].map(l => (
+                <a key={l.label} href={l.href} style={{display:'block', fontSize:14, color:'#8A7A6A', textDecoration:'none', marginBottom:10, transition:'color 0.2s'}}
+                  onMouseEnter={e => e.target.style.color='#F5F0E8'}
+                  onMouseLeave={e => e.target.style.color='#8A7A6A'}>
+                  {l.label}
+                </a>
+              ))}
+            </div>
+
+            {/* Businesses */}
+            <div>
+              <p style={{fontSize:11, fontWeight:600, letterSpacing:'0.2em', textTransform:'uppercase', color:'#C9A84C', marginBottom:16}}>Businesses</p>
+              {[
+                { label:'Apply to Join', href:'/auth?role=business' },
+                { label:'Merchant Sign In', href:'/auth?role=business' },
+                { label:'How It Works', href:'/#how-it-works' },
+                { label:'Merchant Agreement', href:'/merchant-terms' },
+              ].map(l => (
+                <a key={l.label} href={l.href} style={{display:'block', fontSize:14, color:'#8A7A6A', textDecoration:'none', marginBottom:10, transition:'color 0.2s'}}
+                  onMouseEnter={e => e.target.style.color='#F5F0E8'}
+                  onMouseLeave={e => e.target.style.color='#8A7A6A'}>
+                  {l.label}
+                </a>
+              ))}
+            </div>
+
+            {/* Legal */}
+            <div>
+              <p style={{fontSize:11, fontWeight:600, letterSpacing:'0.2em', textTransform:'uppercase', color:'#C9A84C', marginBottom:16}}>Legal</p>
+              {[
+                { label:'Privacy Policy', href:'/privacy' },
+                { label:'Customer Terms', href:'/terms' },
+                { label:'Merchant Agreement', href:'/merchant-terms' },
+              ].map(l => (
+                <a key={l.label} href={l.href} style={{display:'block', fontSize:14, color:'#8A7A6A', textDecoration:'none', marginBottom:10, transition:'color 0.2s'}}
+                  onMouseEnter={e => e.target.style.color='#F5F0E8'}
+                  onMouseLeave={e => e.target.style.color='#8A7A6A'}>
+                  {l.label}
+                </a>
+              ))}
+            </div>
+
+          </div>
+
+          {/* Bottom bar */}
+          <div style={{borderTop:'1px solid rgba(201,168,76,0.1)', paddingTop:24, display:'flex', flexWrap:'wrap', alignItems:'center', justifyContent:'space-between', gap:12}}>
+            <p style={{fontSize:12, color:'#5A4A3A'}}>© 2026 Regly · Chicago, IL · All rights reserved</p>
+            <div style={{display:'flex', gap:20}}>
+              {[
+                { label:'Privacy', href:'/privacy' },
+                { label:'Terms', href:'/terms' },
+                { label:'Merchant Agreement', href:'/merchant-terms' },
+              ].map(l => (
+                <a key={l.label} href={l.href} style={{fontSize:12, color:'#5A4A3A', textDecoration:'none', transition:'color 0.2s'}}
+                  onMouseEnter={e => e.target.style.color='#8A7A6A'}
+                  onMouseLeave={e => e.target.style.color='#5A4A3A'}>
+                  {l.label}
+                </a>
+              ))}
+            </div>
+          </div>
+
+        </div>
       </footer>
     </div>
   )
