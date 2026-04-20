@@ -100,8 +100,50 @@ export default function BusinessDashboard() {
         stripeInfo = data[subId]
       } catch {}
     }
-    setLookup({ ...subs[0], profile: matchedProfile, stripeInfo })
+    // Fetch perks_config for this tier
+    const { data: tierData } = await supabase
+      .from('membership_tiers')
+      .select('perks_config')
+      .eq('id', subs[0].tier_id)
+      .single()
+
+    // Fetch perk usage for this subscription this billing month
+    const billingMonth = new Date().toISOString().slice(0, 7)
+    const { data: usageData } = await supabase
+      .from('perk_usage')
+      .select('perk_index')
+      .eq('subscription_id', subs[0].id)
+      .eq('billing_month', billingMonth)
+
+    const perksConfig = tierData?.perks_config || []
+    setLookup({ ...subs[0], profile: matchedProfile, stripeInfo, perksConfig, perkUsage: usageData || [] })
     setSearching(false)
+  }
+
+  async function logPerkUsage(perkIndex, perkDescription) {
+    if (!lookup || !restaurant) return
+    setLookup(prev => ({ ...prev, loggingPerk: perkIndex }))
+    const billingMonth = new Date().toISOString().slice(0, 7) // "2026-04"
+    const { error } = await supabase.from('perk_usage').insert({
+      subscription_id: lookup.id,
+      customer_id: lookup.customer_id,
+      restaurant_id: restaurant.id,
+      tier_id: lookup.tier_id,
+      perk_index: perkIndex,
+      perk_description: perkDescription,
+      billing_month: billingMonth,
+      logged_by: (await supabase.auth.getUser()).data.user?.id,
+    })
+    if (!error) {
+      setLookup(prev => ({
+        ...prev,
+        loggingPerk: null,
+        perkUsage: [...(prev.perkUsage || []), { perk_index: perkIndex }],
+      }))
+    } else {
+      setLookup(prev => ({ ...prev, loggingPerk: null }))
+      console.error('Perk usage log error:', error)
+    }
   }
 
   async function logout() { await supabase.auth.signOut(); router.push('/') }
@@ -285,38 +327,77 @@ export default function BusinessDashboard() {
               )}
 
               {lookup && lookup.profile && (
-                <div style={{marginTop:16, padding:'20px', background: lookup.status === 'active' ? '#F0FDF4' : '#FEF2F2', borderRadius:12, border:`1px solid ${lookup.status === 'active' ? '#6EE7B7' : '#FECACA'}`}}>
-                  <div style={{display:'flex', alignItems:'center', gap:8, marginBottom:16}}>
-                    <div style={{width:32, height:32, background: lookup.status === 'active' ? '#059669' : '#EF4444', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center'}}>
-                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                        {lookup.status === 'active'
-                          ? <path d="M2.5 7L5.5 10L11.5 4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                          : <path d="M4 4L10 10M10 4L4 10" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>}
-                      </svg>
-                    </div>
-                    <span style={{fontSize:15, fontWeight:600, color: lookup.status === 'active' ? '#065F46' : '#991B1B'}}>
-                      {lookup.status === 'active' ? 'Active Member' : 'Cancelled Membership'}
-                    </span>
-                  </div>
-                  <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'8px 24px'}}>
-                    {[
-                      ['Name', lookup.profile.name],
-                      ['Phone', lookup.profile.phone],
-                      ['Tier', lookup.membership_tiers?.name],
-                      ['Price', `$${lookup.membership_tiers?.price_monthly}/mo`],
-                      ['Member since', new Date(lookup.start_date).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})],
-                      lookup.stripeInfo ? [lookup.stripeInfo.cancel_at_period_end ? 'Cancels on' : 'Renews on', formatDate(lookup.stripeInfo.current_period_end)] : null,
-                    ].filter(Boolean).map(([label, val]) => (
-                      <div key={label}>
-                        <p style={{fontSize:11, color:'#9CA3AF', fontWeight:600, letterSpacing:'0.1em', textTransform:'uppercase', marginBottom:2}}>{label}</p>
-                        <p style={{fontSize:14, color:'#111827', fontWeight:500}}>{val}</p>
+                <div style={{marginTop:16}}>
+                  {/* Member header */}
+                  <div style={{padding:'16px 20px', background: lookup.status === 'active' ? '#F0FDF4' : '#FEF2F2', borderRadius:12, border:`1px solid ${lookup.status === 'active' ? '#6EE7B7' : '#FECACA'}`, marginBottom:12}}>
+                    <div style={{display:'flex', alignItems:'center', gap:8, marginBottom:12}}>
+                      <div style={{width:30, height:30, background: lookup.status === 'active' ? '#059669' : '#EF4444', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center'}}>
+                        <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+                          {lookup.status === 'active'
+                            ? <path d="M2.5 7L5.5 10L11.5 4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            : <path d="M4 4L10 10M10 4L4 10" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>}
+                        </svg>
                       </div>
-                    ))}
+                      <span style={{fontSize:14, fontWeight:600, color: lookup.status === 'active' ? '#065F46' : '#991B1B'}}>
+                        {lookup.status === 'active' ? 'Active Member' : 'Cancelled Membership'}
+                      </span>
+                    </div>
+                    <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'6px 20px'}}>
+                      {[
+                        ['Name', lookup.profile.name],
+                        ['Phone', lookup.profile.phone],
+                        ['Tier', lookup.membership_tiers?.name],
+                        ['Member since', new Date(lookup.start_date).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})],
+                        lookup.stripeInfo ? [lookup.stripeInfo.cancel_at_period_end ? 'Cancels on' : 'Renews on', formatDate(lookup.stripeInfo.current_period_end)] : null,
+                      ].filter(Boolean).map(([label, val]) => (
+                        <div key={label}>
+                          <p style={{fontSize:10, color:'#6B7280', fontWeight:600, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:1}}>{label}</p>
+                          <p style={{fontSize:13, color:'#111827', fontWeight:500}}>{val}</p>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  {lookup.status === 'cancelled' && (
-                    <p style={{fontSize:12, color:'#991B1B', marginTop:12, paddingTop:12, borderTop:'1px solid #FECACA'}}>
-                      This membership has been cancelled. Perks are no longer active.
-                    </p>
+
+                  {/* Perk usage — only show for active members */}
+                  {lookup.status === 'active' && lookup.perksConfig && lookup.perksConfig.length > 0 && (
+                    <div style={{background:'white', border:'1px solid #E5E7EB', borderRadius:12, padding:'16px 20px'}}>
+                      <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:14}}>
+                        <p style={{fontSize:13, fontWeight:600, color:'#111827'}}>Perk Usage This Month</p>
+                        <p style={{fontSize:11, color:'#9CA3AF'}}>{new Date().toLocaleDateString('en-US',{month:'long', year:'numeric'})}</p>
+                      </div>
+                      <div style={{display:'flex', flexDirection:'column', gap:8}}>
+                        {lookup.perksConfig.map((perk, pi) => {
+                          const usedCount = (lookup.perkUsage || []).filter(u => u.perk_index === pi).length
+                          const isLimited = perk.type === 'limited'
+                          const limit = perk.limit || 0
+                          const exhausted = isLimited && usedCount >= limit
+                          return (
+                            <div key={pi} style={{display:'flex', alignItems:'center', gap:12, padding:'10px 14px', background: exhausted ? '#FEF2F2' : '#F9FAFB', borderRadius:8, border:`1px solid ${exhausted ? '#FECACA' : '#F3F4F6'}`}}>
+                              <div style={{flex:1}}>
+                                <p style={{fontSize:13, color: exhausted ? '#9CA3AF' : '#111827', fontWeight:500, marginBottom:2, textDecoration: exhausted ? 'line-through' : 'none'}}>{perk.description}</p>
+                                <p style={{fontSize:11, color: exhausted ? '#EF4444' : isLimited ? '#6B7280' : '#059669'}}>
+                                  {isLimited ? (exhausted ? `Limit reached (${limit}/${limit})` : `${usedCount} of ${limit} used this month`) : 'Unlimited'}
+                                </p>
+                              </div>
+                              {!exhausted && (
+                                <button
+                                  onClick={() => logPerkUsage(pi, perk.description)}
+                                  disabled={lookup.loggingPerk === pi}
+                                  style={{padding:'6px 14px', background: lookup.loggingPerk===pi ? '#D1D5DB' : '#111827', color:'white', border:'none', borderRadius:8, fontSize:12, fontWeight:600, cursor: lookup.loggingPerk===pi ? 'not-allowed' : 'pointer', fontFamily:'inherit', flexShrink:0}}>
+                                  {lookup.loggingPerk === pi ? '...' : 'Use'}
+                                </button>
+                              )}
+                              {exhausted && (
+                                <div style={{padding:'4px 10px', background:'#FEE2E2', borderRadius:8}}>
+                                  <p style={{fontSize:11, color:'#EF4444', fontWeight:600}}>Done</p>
+                                </div>
+                              )}
+                            </div>
+                          )
+                        })}
+                      </div>
+                      <p style={{fontSize:11, color:'#9CA3AF', marginTop:12}}>Tap "Use" when a customer redeems a perk. Usage resets at the start of each billing month.</p>
+                    </div>
                   )}
                 </div>
               )}
