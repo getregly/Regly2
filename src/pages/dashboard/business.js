@@ -80,17 +80,14 @@ export default function BusinessDashboard() {
           ? Math.round(tenures.reduce((a, b) => a + b, 0) / tenures.length * 10) / 10
           : null
 
-        // Cancellations this month + retention rate — fetch cancelled subs
-        // Use end_date if available, otherwise count all cancelled as a fallback
-        const { data: cancelledSubs } = await supabase
+        // Cancellations — count all cancelled subs for this restaurant
+        // No date filtering since updated_at/end_date may not exist on the table
+        const { count: cancelledCount } = await supabase
           .from('subscriptions')
-          .select('id, end_date, start_date')
+          .select('id', { count: 'exact', head: true })
           .eq('restaurant_id', rest.id)
           .eq('status', 'cancelled')
-        const cancelledThisMonth = (cancelledSubs || []).filter(s => {
-          const dateToCheck = s.end_date || s.start_date
-          return dateToCheck && new Date(dateToCheck) >= thisMonthStart
-        }).length
+        const cancelledThisMonth = cancelledCount || 0
 
         // Retention: members who were active last month and are still active
         const lastMonthStart = new Date(thisMonthStart); lastMonthStart.setMonth(lastMonthStart.getMonth() - 1)
