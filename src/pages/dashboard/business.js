@@ -45,7 +45,7 @@ export default function BusinessDashboard() {
     const { data: rest } = await supabase.from('restaurants').select('*').eq('owner_id', user.id).single()
     setRestaurant(rest)
 
-    const { data: sub } = await supabase.from('onboarding_submissions').select('*').eq('user_id', user.id).single()
+    const { data: sub } = await supabase.from('onboarding_submissions').select('*').eq('user_id', user.id).maybeSingle()
     setSubmission(sub)
 
     if (rest) {
@@ -81,12 +81,16 @@ export default function BusinessDashboard() {
           : null
 
         // Cancellations this month + retention rate — fetch cancelled subs
+        // Use end_date if available, otherwise count all cancelled as a fallback
         const { data: cancelledSubs } = await supabase
           .from('subscriptions')
-          .select('id, updated_at')
+          .select('id, end_date, start_date')
           .eq('restaurant_id', rest.id)
           .eq('status', 'cancelled')
-        const cancelledThisMonth = (cancelledSubs || []).filter(s => new Date(s.updated_at) >= thisMonthStart).length
+        const cancelledThisMonth = (cancelledSubs || []).filter(s => {
+          const dateToCheck = s.end_date || s.start_date
+          return dateToCheck && new Date(dateToCheck) >= thisMonthStart
+        }).length
 
         // Retention: members who were active last month and are still active
         const lastMonthStart = new Date(thisMonthStart); lastMonthStart.setMonth(lastMonthStart.getMonth() - 1)
