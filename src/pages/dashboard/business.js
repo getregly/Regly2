@@ -25,7 +25,14 @@ export default function BusinessDashboard() {
   const [loading, setLoading]         = useState(true)
   const [searching, setSearching]     = useState(false)
   const [phoneFocused, setPhoneFocused] = useState(false)
-  const [stats, setStats]             = useState({ revenue: 0, tierBreakdown: [] })
+  const [stats, setStats]             = useState({
+    revenue: 0,
+    tierBreakdown: [],
+    newThisMonth: 0,
+    cancelledThisMonth: 0,
+    retentionRate: null,
+    avgTenureMonths: null,
+  })
 
   useEffect(() => { init() }, [])
 
@@ -58,7 +65,44 @@ export default function BusinessDashboard() {
         const revenue = subs.reduce((sum, s) => sum + (s.membership_tiers?.price_monthly || 0), 0)
         const tierMap = {}
         subs.forEach(s => { const n = s.membership_tiers?.name || 'Unknown'; tierMap[n] = (tierMap[n] || 0) + 1 })
-        setStats({ revenue, tierBreakdown: Object.entries(tierMap).map(([name, count]) => ({ name, count })) })
+
+        // New members this month
+        const thisMonthStart = new Date(); thisMonthStart.setDate(1); thisMonthStart.setHours(0,0,0,0)
+        const newThisMonth = subs.filter(s => new Date(s.start_date) >= thisMonthStart).length
+
+        // Avg tenure in months
+        const now = new Date()
+        const tenures = subs.map(s => {
+          const start = new Date(s.start_date)
+          return (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth())
+        })
+        const avgTenureMonths = tenures.length > 0
+          ? Math.round(tenures.reduce((a, b) => a + b, 0) / tenures.length * 10) / 10
+          : null
+
+        // Cancellations this month + retention rate — fetch cancelled subs
+        const { data: cancelledSubs } = await supabase
+          .from('subscriptions')
+          .select('id, updated_at')
+          .eq('restaurant_id', rest.id)
+          .eq('status', 'cancelled')
+        const cancelledThisMonth = (cancelledSubs || []).filter(s => new Date(s.updated_at) >= thisMonthStart).length
+
+        // Retention: members who were active last month and are still active
+        const lastMonthStart = new Date(thisMonthStart); lastMonthStart.setMonth(lastMonthStart.getMonth() - 1)
+        const activeLastMonth = subs.filter(s => new Date(s.start_date) <= lastMonthStart).length
+        const retentionRate = activeLastMonth > 0
+          ? Math.round(((activeLastMonth - cancelledThisMonth) / activeLastMonth) * 100)
+          : null
+
+        setStats({
+          revenue,
+          tierBreakdown: Object.entries(tierMap).map(([name, count]) => ({ name, count })),
+          newThisMonth,
+          cancelledThisMonth,
+          retentionRate,
+          avgTenureMonths,
+        })
 
         const stripeIds = subs.map(s => s.stripe_subscription_id).filter(Boolean)
         if (stripeIds.length > 0) {
@@ -255,18 +299,58 @@ export default function BusinessDashboard() {
           <div style={{display:'flex', flexDirection:'column', gap:24}}>
 
             {/* Stats row */}
-            <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(200px, 1fr))', gap:16}}>
+            {/* Stats — row 1 */}
+            <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(180px, 1fr))', gap:16}}>
               {[
-                { label:'Active Members', value: members.length, prefix:'', suffix:'' },
-                { label:'Monthly Revenue', value: stats.revenue, prefix:'$', suffix:'' },
-                { label:'Your Earnings', value: ownerRevenue, prefix:'$', suffix:'' },
-                { label:'Regly Fee', value: reglyFee, prefix:'$', suffix:'' },
+                { label:'Active Members',        value: members.length,          prefix:'',  suffix:'',   sub: null },
+                { label:'Membership Revenue',     value: stats.revenue,           prefix:'$', suffix:'/mo', sub:'subscription income this month' },
+                { label:'Your Earnings',          value: ownerRevenue,            prefix:'$', suffix:'/mo', sub:'after 15% Regly fee' },
+                { label:'New This Month',         value: stats.newThisMonth,      prefix:'',  suffix:'',   sub: stats.newThisMonth === 1 ? 'new subscriber' : 'new subscribers' },
               ].map(s => (
-                <div key={s.label} style={{...S.card, textAlign:'center', padding:'24px'}}>
-                  <p style={{fontFamily:'Georgia, serif', fontSize:32, fontWeight:700, color:'#111827', marginBottom:4}}>
+                <div key={s.label} style={{...S.card, textAlign:'center', padding:'22px'}}>
+                  <p style={{fontFamily:'Georgia, serif', fontSize:30, fontWeight:700, color:'#111827', marginBottom:2}}>
                     {s.prefix}{s.value}{s.suffix}
                   </p>
-                  <p style={{...S.label, fontSize:10}}>{s.label}</p>
+                  <p style={{...S.label, fontSize:10, marginBottom: s.sub ? 4 : 0}}>{s.label}</p>
+                  {s.sub && <p style={{fontSize:11, color:'#D1D5DB'}}>{s.sub}</p>}
+                </div>
+              ))}
+            </div>
+
+            {/* Stats — row 2 */}
+            <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(180px, 1fr))', gap:16}}>
+              {[
+                {
+                  label:'Retention Rate',
+                  value: stats.retentionRate !== null ? `${stats.retentionRate}%` : '—',
+                  sub: 'members who renewed last month',
+                  color: stats.retentionRate === null ? '#111827' : stats.retentionRate >= 80 ? '#059669' : stats.retentionRate >= 60 ? '#F59E0B' : '#EF4444',
+                },
+                {
+                  label:'Avg Member Tenure',
+                  value: stats.avgTenureMonths !== null ? `${stats.avgTenureMonths}mo` : '—',
+                  sub: 'average months a member stays',
+                  color: '#111827',
+                },
+                {
+                  label:'Cancellations',
+                  value: stats.cancelledThisMonth,
+                  sub: 'cancelled this month',
+                  color: stats.cancelledThisMonth === 0 ? '#059669' : stats.cancelledThisMonth <= 2 ? '#F59E0B' : '#EF4444',
+                },
+                {
+                  label:'Total MRR',
+                  value: `$${stats.revenue}`,
+                  sub: 'gross monthly recurring revenue',
+                  color: '#111827',
+                },
+              ].map(s => (
+                <div key={s.label} style={{...S.card, textAlign:'center', padding:'22px'}}>
+                  <p style={{fontFamily:'Georgia, serif', fontSize:30, fontWeight:700, color: s.color, marginBottom:2}}>
+                    {s.value}
+                  </p>
+                  <p style={{...S.label, fontSize:10, marginBottom:4}}>{s.label}</p>
+                  <p style={{fontSize:11, color:'#D1D5DB'}}>{s.sub}</p>
                 </div>
               ))}
             </div>
