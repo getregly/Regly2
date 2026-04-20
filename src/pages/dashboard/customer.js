@@ -62,6 +62,7 @@ export default function CustomerDashboard() {
   const [selected, setSelected]           = useState(null)
   const [tiers, setTiers]                 = useState([])
   const [myMemberships, setMyMemberships] = useState([])
+  const [perkUsageMap, setPerkUsageMap] = useState({})
   const [loading, setLoading]             = useState(true)
   const [subscribing, setSubscribing]     = useState(null)
   const [hoveredCard, setHoveredCard]     = useState(null)
@@ -78,10 +79,29 @@ export default function CustomerDashboard() {
     setRestaurants(rests || [])
     const { data: subs } = await supabase
       .from('subscriptions')
-      .select('*, restaurants(name), membership_tiers(name, price_monthly, perks)')
+      .select('*, restaurants(name), membership_tiers(name, price_monthly, perks, perks_config)')
       .eq('customer_id', u.id)
       .eq('status', 'active')
-    setMyMemberships(subs || [])
+    const activeSubs = subs || []
+    setMyMemberships(activeSubs)
+
+    // Fetch perk usage for all active subs this billing month
+    if (activeSubs.length > 0) {
+      const billingMonth = new Date().toISOString().slice(0, 7)
+      const subIds = activeSubs.map(s => s.id)
+      const { data: usage } = await supabase
+        .from('perk_usage')
+        .select('subscription_id, perk_index')
+        .in('subscription_id', subIds)
+        .eq('billing_month', billingMonth)
+      const usageMap = {}
+      ;(usage || []).forEach(u => {
+        const key = u.subscription_id
+        if (!usageMap[key]) usageMap[key] = {}
+        usageMap[key][u.perk_index] = (usageMap[key][u.perk_index] || 0) + 1
+      })
+      setPerkUsageMap(usageMap)
+    }
     setLoading(false)
   }
 
@@ -228,8 +248,42 @@ export default function CustomerDashboard() {
                       </div>
                       <p style={{fontFamily:'Georgia, serif', fontSize:18, fontWeight:700, color: isRecord ? '#F5F0E8' : '#111827', marginBottom:4}}>{sub.restaurants?.name}</p>
                       <p style={{color: isRecord ? '#C9A84C' : accent.accent, fontSize:13, fontWeight:500, marginBottom:8}}>{sub.membership_tiers?.name}</p>
-                      <p style={{color: isRecord ? 'rgba(245,240,232,0.75)' : '#9CA3AF', fontSize:12, marginBottom:16, lineHeight:1.5}}>{sub.membership_tiers?.perks?.split(' | ')[0]}</p>
-                      <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', paddingTop:16, borderTop:`1px solid ${isRecord ? 'rgba(201,168,76,0.15)' : '#F3F4F6'}`}}>
+                      {/* Perk usage tracker */}
+                      {(() => {
+                        const perksConfig = sub.membership_tiers?.perks_config
+                        const usageThisMonth = perkUsageMap[sub.id] || {}
+                        if (perksConfig && perksConfig.length > 0) {
+                          return (
+                            <div style={{marginBottom:16}}>
+                              {perksConfig.map((perk, pi) => {
+                                const used = usageThisMonth[pi] || 0
+                                const isLimited = perk.type === 'limited'
+                                const limit = perk.limit || 0
+                                const remaining = isLimited ? Math.max(0, limit - used) : null
+                                const exhausted = isLimited && remaining === 0
+                                return (
+                                  <div key={pi} style={{display:'flex', alignItems:'center', justifyContent:'space-between', padding:'7px 0', borderBottom:`1px solid ${isRecord ? 'rgba(201,168,76,0.1)' : '#F9FAFB'}`}}>
+                                    <div style={{display:'flex', alignItems:'center', gap:8}}>
+                                      <div style={{width:16, height:16, borderRadius:'50%', background: exhausted ? '#FEE2E2' : '#D1FAE5', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0}}>
+                                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+                                          <path d="M1.5 4L3 5.5L6.5 2" stroke={exhausted ? '#EF4444' : '#059669'} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        </svg>
+                                      </div>
+                                      <span style={{fontSize:12, color: exhausted ? '#9CA3AF' : isRecord ? 'rgba(245,240,232,0.8)' : '#374151', textDecoration: exhausted ? 'line-through' : 'none'}}>{perk.description}</span>
+                                    </div>
+                                    <span style={{fontSize:11, fontWeight:600, color: exhausted ? '#EF4444' : isLimited ? (isRecord ? '#C9A84C' : '#6B7280') : '#059669', whiteSpace:'nowrap', marginLeft:8}}>
+                                      {isLimited ? (exhausted ? 'Used up' : `${remaining} left`) : 'Unlimited'}
+                                    </span>
+                                  </div>
+                                )
+                              })}
+                            </div>
+                          )
+                        }
+                        // Fallback to plain text perks
+                        return <p style={{color: isRecord ? 'rgba(245,240,232,0.75)' : '#9CA3AF', fontSize:12, marginBottom:16, lineHeight:1.5}}>{sub.membership_tiers?.perks?.split(' | ')[0]}</p>
+                      })()}
+                      <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', paddingTop:12, borderTop:`1px solid ${isRecord ? 'rgba(201,168,76,0.15)' : '#F3F4F6'}`}}>
                         <span style={{fontFamily:'Georgia, serif', fontSize:22, fontWeight:700, color: isRecord ? '#C9A84C' : '#111827'}}>${sub.membership_tiers?.price_monthly}<span style={{fontSize:12, fontWeight:400, color: isRecord ? 'rgba(245,240,232,0.4)' : '#9CA3AF'}}>/mo</span></span>
                         <button onClick={() => handleCancel(sub)} className="cancel-btn"
                           style={{color:'#D1D5DB', background:'none', border:'none', cursor:'pointer', fontSize:12, fontFamily:'inherit', padding:0}}>
