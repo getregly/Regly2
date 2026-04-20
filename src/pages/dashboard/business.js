@@ -25,6 +25,12 @@ export default function BusinessDashboard() {
   const [loading, setLoading]         = useState(true)
   const [searching, setSearching]     = useState(false)
   const [phoneFocused, setPhoneFocused] = useState(false)
+  const [tiers, setTiers]             = useState([])
+  const [addingPerkTo, setAddingPerkTo] = useState(null) // tier id being expanded
+  const [newPerkText, setNewPerkText]   = useState('')
+  const [newPerkType, setNewPerkType]   = useState('unlimited')
+  const [newPerkLimit, setNewPerkLimit] = useState(2)
+  const [savingPerk, setSavingPerk]     = useState(false)
   const [stats, setStats]             = useState({
     revenue: 0,
     tierBreakdown: [],
@@ -49,6 +55,14 @@ export default function BusinessDashboard() {
     setSubmission(sub)
 
     if (rest) {
+      // Fetch this restaurant's membership tiers
+      const { data: tierRows } = await supabase
+        .from('membership_tiers')
+        .select('id, name, price_monthly, perks_config, perks')
+        .eq('restaurant_id', rest.id)
+        .order('price_monthly', { ascending: true })
+      setTiers(tierRows || [])
+
       const { data: subs } = await supabase
         .from('subscriptions')
         .select('*, membership_tiers(name, price_monthly)')
@@ -189,6 +203,32 @@ export default function BusinessDashboard() {
       setLookup(prev => ({ ...prev, loggingPerk: null }))
       console.error('Perk usage log error:', error)
     }
+  }
+
+  async function savePerk(tier) {
+    if (!newPerkText.trim()) return
+    setSavingPerk(true)
+    const existingConfig = tier.perks_config || []
+    const updatedConfig = [
+      ...existingConfig,
+      {
+        description: newPerkText.trim(),
+        type: newPerkType,
+        limit: newPerkType === 'limited' ? Number(newPerkLimit) : null,
+      }
+    ]
+    const { error } = await supabase
+      .from('membership_tiers')
+      .update({ perks_config: updatedConfig })
+      .eq('id', tier.id)
+    if (!error) {
+      setTiers(prev => prev.map(t => t.id === tier.id ? { ...t, perks_config: updatedConfig } : t))
+      setAddingPerkTo(null)
+      setNewPerkText('')
+      setNewPerkType('unlimited')
+      setNewPerkLimit(2)
+    }
+    setSavingPerk(false)
   }
 
   async function logout() { await supabase.auth.signOut(); router.push('/') }
@@ -355,6 +395,126 @@ export default function BusinessDashboard() {
                 </div>
               ))}
             </div>
+
+            {/* My Membership Tiers */}
+            {tiers.length > 0 && (
+              <div style={S.card}>
+                <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:20}}>
+                  <div>
+                    <h2 style={S.h2}>Your Membership Tiers</h2>
+                    <p style={{color:'#9CA3AF', fontSize:13, marginTop:4}}>Your current offerings — contact us to make major changes</p>
+                  </div>
+                </div>
+                <div style={{display:'flex', flexDirection:'column', gap:16}}>
+                  {tiers.map(tier => {
+                    const perks = tier.perks_config && tier.perks_config.length > 0
+                      ? tier.perks_config
+                      : (tier.perks ? tier.perks.split(' | ').map(p => ({ description: p, type: 'unlimited', limit: null })) : [])
+                    const isAdding = addingPerkTo === tier.id
+                    const memberCount = stats.tierBreakdown.find(t => t.name === tier.name)?.count || 0
+                    return (
+                      <div key={tier.id} style={{border:'1px solid #F3F4F6', borderRadius:14, overflow:'hidden'}}>
+                        {/* Tier header */}
+                        <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', background:'#FAFAFA', borderBottom:'1px solid #F3F4F6'}}>
+                          <div style={{display:'flex', alignItems:'center', gap:12}}>
+                            <div>
+                              <p style={{fontSize:15, fontWeight:700, color:'#111827', margin:0}}>{tier.name}</p>
+                              <p style={{fontSize:12, color:'#9CA3AF', marginTop:2}}>
+                                {memberCount} active member{memberCount !== 1 ? 's' : ''}
+                              </p>
+                            </div>
+                          </div>
+                          <div style={{display:'flex', alignItems:'center', gap:10}}>
+                            <span style={{fontFamily:'Georgia, serif', fontSize:20, fontWeight:700, color:'#111827'}}>
+                              ${tier.price_monthly}<span style={{fontSize:12, fontWeight:400, color:'#9CA3AF'}}>/mo</span>
+                            </span>
+                            <button
+                              onClick={() => { setAddingPerkTo(isAdding ? null : tier.id); setNewPerkText(''); setNewPerkType('unlimited'); setNewPerkLimit(2) }}
+                              style={{padding:'6px 14px', background: isAdding ? '#F3F4F6' : '#111827', color: isAdding ? '#6B7280' : 'white', border:'none', borderRadius:8, fontSize:12, fontWeight:600, cursor:'pointer', fontFamily:'inherit'}}>
+                              {isAdding ? 'Cancel' : '+ Add Perk'}
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Perks list */}
+                        <div style={{padding:'16px 20px'}}>
+                          {perks.length === 0 ? (
+                            <p style={{fontSize:13, color:'#D1D5DB'}}>No perks configured yet.</p>
+                          ) : (
+                            <div style={{display:'flex', flexDirection:'column', gap:8}}>
+                              {perks.map((perk, pi) => (
+                                <div key={pi} style={{display:'flex', alignItems:'center', justifyContent:'space-between'}}>
+                                  <div style={{display:'flex', alignItems:'center', gap:8}}>
+                                    <div style={{width:6, height:6, borderRadius:'50%', background:'#C9A84C', flexShrink:0}} />
+                                    <span style={{fontSize:13, color:'#374151'}}>{perk.description}</span>
+                                  </div>
+                                  <span style={{
+                                    fontSize:11, fontWeight:600, padding:'3px 9px', borderRadius:20,
+                                    background: perk.type === 'unlimited' ? '#D1FAE5' : '#FEF9EC',
+                                    color: perk.type === 'unlimited' ? '#065F46' : '#92400E',
+                                  }}>
+                                    {perk.type === 'unlimited' ? 'Unlimited' : `${perk.limit}x / month`}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
+                          {/* Add perk form */}
+                          {isAdding && (
+                            <div style={{marginTop:16, paddingTop:16, borderTop:'1px solid #F3F4F6'}}>
+                              <p style={{fontSize:12, fontWeight:600, color:'#374151', marginBottom:10}}>New Perk</p>
+                              <input
+                                value={newPerkText}
+                                onChange={e => setNewPerkText(e.target.value)}
+                                placeholder="e.g. Free appetizer, Size upgrade..."
+                                style={{width:'100%', padding:'10px 12px', border:'1.5px solid #C9A84C', borderRadius:8, fontSize:13, color:'#111827', outline:'none', fontFamily:'inherit', marginBottom:10}}
+                              />
+                              <div style={{display:'flex', alignItems:'center', gap:8, marginBottom:12}}>
+                                <span style={{fontSize:12, color:'#6B7280'}}>Uses per month:</span>
+                                {['unlimited','limited'].map(t => (
+                                  <button key={t} type="button"
+                                    onClick={() => setNewPerkType(t)}
+                                    style={{padding:'4px 12px', borderRadius:20, fontSize:11, fontWeight:600, cursor:'pointer', fontFamily:'inherit',
+                                      border:`1.5px solid ${newPerkType===t ? '#C9A84C' : '#E5E7EB'}`,
+                                      background: newPerkType===t ? 'rgba(201,168,76,0.1)' : 'white',
+                                      color: newPerkType===t ? '#8A6A20' : '#9CA3AF',
+                                    }}>
+                                    {t.charAt(0).toUpperCase()+t.slice(1)}
+                                  </button>
+                                ))}
+                                {newPerkType === 'limited' && (
+                                  <div style={{display:'flex', alignItems:'center', gap:6}}>
+                                    <input type="number" min="1" max="31"
+                                      value={newPerkLimit}
+                                      onChange={e => setNewPerkLimit(e.target.value)}
+                                      style={{width:48, padding:'4px 8px', border:'1.5px solid #C9A84C', borderRadius:8, fontSize:13, textAlign:'center', fontFamily:'inherit', outline:'none'}}
+                                    />
+                                    <span style={{fontSize:12, color:'#6B7280'}}>times</span>
+                                  </div>
+                                )}
+                              </div>
+                              <button
+                                onClick={() => savePerk(tier)}
+                                disabled={savingPerk || !newPerkText.trim()}
+                                style={{padding:'9px 20px', background: savingPerk || !newPerkText.trim() ? '#D1D5DB' : '#111827', color:'white', border:'none', borderRadius:8, fontSize:13, fontWeight:600, cursor: savingPerk || !newPerkText.trim() ? 'not-allowed' : 'pointer', fontFamily:'inherit'}}>
+                                {savingPerk ? 'Saving...' : 'Save Perk'}
+                              </button>
+                              <p style={{fontSize:11, color:'#9CA3AF', marginTop:8}}>This will immediately appear for all subscribers of this tier.</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+                <div style={{marginTop:16, paddingTop:16, borderTop:'1px solid #F3F4F6'}}>
+                  <p style={{fontSize:12, color:'#9CA3AF'}}>
+                    Need to change pricing or remove a tier? Email <span style={{color:'#C9A84C'}}>getregly@gmail.com</span>
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* Tier breakdown */}
             {stats.tierBreakdown.length > 0 && (
