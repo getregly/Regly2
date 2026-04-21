@@ -741,7 +741,7 @@ export default function BusinessDashboard() {
                           style={{padding:'10px 20px', background: savingTier || !newTier.name.trim() || !newTier.price ? '#D1D5DB' : '#111827', color:'white', border:'none', borderRadius:8, fontSize:13, fontWeight:600, cursor: savingTier ? 'not-allowed' : 'pointer', fontFamily:'inherit'}}>
                           {savingTier ? 'Saving...' : 'Create Tier'}
                         </button>
-                        <p style={{fontSize:11, color:'#9CA3AF'}}>A Stripe price ID will need to be added before customers can subscribe to this tier.</p>
+                        <p style={{fontSize:11, color:'#9CA3AF'}}>New tiers are reviewed by the Regly team before going live. We'll activate it within 48 hours.</p>
                       </div>
                     </div>
                   )}
