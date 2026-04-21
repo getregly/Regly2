@@ -42,25 +42,80 @@ export default function Admin() {
     setApproving(sub.id)
     setMessage(null)
     try {
+      // 1. Create restaurant
       const { data: restaurant, error: restErr } = await supabase.from('restaurants').insert({
         name: sub.business_name, description: sub.description,
         address: sub.address, city: sub.city, owner_id: sub.user_id,
       }).select().single()
       if (restErr) throw restErr
 
+      // 2. Parse tiers — support both old (string perks) and new (perks_config) format
       const tiers = JSON.parse(sub.tiers)
-      const tierRows = tiers.map(t => ({
-        restaurant_id: restaurant.id,
-        name: `${sub.business_name} - ${t.name}`,
-        price_monthly: Number(t.price),
-        perks: Array.isArray(t.perks) ? t.perks.join(' | ') : t.perks,
-        stripe_price_id: '',
-      }))
-      const { error: tierErr } = await supabase.from('membership_tiers').insert(tierRows)
-      if (tierErr) throw tierErr
+      const stripeResults = []
+      const tierErrors = []
 
+      for (const t of tiers) {
+        // Build perks_config — handle both old and new onboarding format
+        let perksConfig = []
+        let perksText = ''
+        if (Array.isArray(t.perks) && t.perks.length > 0 && typeof t.perks[0] === 'object') {
+          // New format: perks is already array of {description, type, limit}
+          perksConfig = t.perks
+          perksText = t.perks.map(p => p.description).join(' | ')
+        } else if (Array.isArray(t.perks)) {
+          // Old format: perks is array of strings
+          perksConfig = t.perks.map(p => ({ description: p, type: 'unlimited', limit: null }))
+          perksText = t.perks.join(' | ')
+        } else if (typeof t.perks === 'string') {
+          perksConfig = t.perks.split(' | ').map(p => ({ description: p.trim(), type: 'unlimited', limit: null }))
+          perksText = t.perks
+        }
+
+        // 3. Insert tier row first (without stripe_price_id)
+        const { data: tierRow, error: tierErr } = await supabase
+          .from('membership_tiers')
+          .insert({
+            restaurant_id: restaurant.id,
+            name: `${sub.business_name} - ${t.name}`,
+            price_monthly: Number(t.price),
+            perks: perksText,
+            perks_config: perksConfig,
+            stripe_price_id: '',
+          })
+          .select()
+          .single()
+
+        if (tierErr) { tierErrors.push(`${t.name}: ${tierErr.message}`); continue }
+
+        // 4. Auto-create Stripe Product + Price
+        try {
+          const stripeRes = await fetch('/api/create-stripe-price', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              tier_id: tierRow.id,
+              tier_name: t.name,
+              price_monthly: Number(t.price),
+              business_name: sub.business_name,
+            }),
+          })
+          const stripeData = await stripeRes.json()
+          if (stripeData.success) {
+            stripeResults.push({ name: t.name, price_id: stripeData.stripe_price_id })
+          } else {
+            tierErrors.push(`${t.name} Stripe: ${stripeData.error}`)
+          }
+        } catch (stripeErr) {
+          tierErrors.push(`${t.name} Stripe: ${stripeErr.message}`)
+        }
+      }
+
+      // 5. Mark submission as approved
       await supabase.from('onboarding_submissions').update({ status: 'approved' }).eq('id', sub.id)
-      setMessage({ type:'success', text:`${sub.business_name} is now live on Regly. Remember to add Stripe price IDs to their tiers.` })
+
+      const successMsg = `${sub.business_name} is live on Regly. ${stripeResults.length} of ${tiers.length} Stripe price${tiers.length !== 1 ? 's' : ''} created automatically.`
+      const errorSuffix = tierErrors.length > 0 ? ` Issues: ${tierErrors.join(', ')}` : ''
+      setMessage({ type: tierErrors.length > 0 ? 'warning' : 'success', text: successMsg + errorSuffix })
       await loadSubmissions()
     } catch (err) {
       setMessage({ type:'error', text: err.message })
@@ -141,7 +196,7 @@ export default function Admin() {
                 ? <><circle cx="8" cy="8" r="7" fill="#059669"/><path d="M5 8L7 10L11 6" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></>
                 : <><circle cx="8" cy="8" r="7" stroke="#EF4444" strokeWidth="1.5"/><path d="M8 5V8M8 11H8.01" stroke="#EF4444" strokeWidth="1.5" strokeLinecap="round"/></>}
             </svg>
-            <p style={{fontSize:14, color: message.type==='success' ? '#065F46' : '#991B1B', margin:0}}>{message.text}</p>
+            <p style={{fontSize:14, color: message.type==='success' ? '#065F46' : message.type==='warning' ? '#92400E' : '#991B1B', margin:0}}>{message.text}</p>
           </div>
         )}
 
@@ -218,14 +273,14 @@ export default function Admin() {
                           </div>
                         </div>
 
-                        {/* Stripe reminder */}
-                        <div style={{background:'#FFFBEB', border:'1px solid #FCD34D', borderRadius:12, padding:'14px 16px', marginBottom:20, display:'flex', gap:10}}>
+                        {/* Stripe auto-creation notice */}
+                        <div style={{background:'#F0FDF4', border:'1px solid #6EE7B7', borderRadius:12, padding:'14px 16px', marginBottom:20, display:'flex', gap:10}}>
                           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{flexShrink:0, marginTop:1}}>
-                            <circle cx="8" cy="8" r="7" fill="#F59E0B"/>
-                            <path d="M8 5V8M8 11H8.01" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                            <circle cx="8" cy="8" r="7" fill="#059669"/>
+                            <path d="M5 8L7 10L11 6" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                           </svg>
-                          <p style={{fontSize:13, color:'#92400E', margin:0, lineHeight:1.5}}>
-                            After approving, go to Stripe and create products for each tier. Copy the <code style={{background:'#FEF3C7', padding:'1px 4px', borderRadius:4}}>price_...</code> IDs into the Supabase membership_tiers table.
+                          <p style={{fontSize:13, color:'#065F46', margin:0, lineHeight:1.5}}>
+                            Stripe Products and Prices will be created automatically when you approve. No manual setup needed.
                           </p>
                         </div>
 
