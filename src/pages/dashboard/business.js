@@ -31,6 +31,9 @@ export default function BusinessDashboard() {
   const [newPerkType, setNewPerkType]   = useState('unlimited')
   const [newPerkLimit, setNewPerkLimit] = useState(2)
   const [savingPerk, setSavingPerk]     = useState(false)
+  const [addingTier, setAddingTier]     = useState(false)
+  const [newTier, setNewTier]           = useState({ name:'', price:'', perks:[{ description:'', type:'unlimited', limit:2 }] })
+  const [savingTier, setSavingTier]     = useState(false)
   const [stats, setStats]             = useState({
     revenue: 0,
     tierBreakdown: [],
@@ -231,6 +234,47 @@ export default function BusinessDashboard() {
     setSavingPerk(false)
   }
 
+  function setNewTierPerkField(pi, k, v) {
+    setNewTier(prev => ({ ...prev, perks: prev.perks.map((p,i) => i===pi ? {...p,[k]:v} : p) }))
+  }
+  function addNewTierPerk() {
+    setNewTier(prev => ({ ...prev, perks: [...prev.perks, { description:'', type:'unlimited', limit:2 }] }))
+  }
+  function removeNewTierPerk(pi) {
+    setNewTier(prev => ({ ...prev, perks: prev.perks.filter((_,i) => i!==pi) }))
+  }
+
+  async function saveNewTier() {
+    if (!newTier.name.trim() || !newTier.price || isNaN(newTier.price)) return
+    const validPerks = newTier.perks.filter(p => p.description.trim())
+    if (!validPerks.length) return
+    setSavingTier(true)
+    const perksConfig = validPerks.map(p => ({
+      description: p.description.trim(),
+      type: p.type,
+      limit: p.type === 'limited' ? Number(p.limit) : null,
+    }))
+    const perksText = validPerks.map(p => p.description.trim()).join(' | ')
+    const { data, error } = await supabase
+      .from('membership_tiers')
+      .insert({
+        restaurant_id: restaurant.id,
+        name: `${restaurant.name} - ${newTier.name.trim()}`,
+        price_monthly: Number(newTier.price),
+        perks_config: perksConfig,
+        perks: perksText,
+        stripe_price_id: '',
+      })
+      .select()
+      .single()
+    if (!error && data) {
+      setTiers(prev => [...prev, data].sort((a,b) => a.price_monthly - b.price_monthly))
+      setAddingTier(false)
+      setNewTier({ name:'', price:'', perks:[{ description:'', type:'unlimited', limit:2 }] })
+    }
+    setSavingTier(false)
+  }
+
   async function logout() { await supabase.auth.signOut(); router.push('/') }
 
   function formatDate(unix) {
@@ -338,6 +382,113 @@ export default function BusinessDashboard() {
         {/* APPROVED DASHBOARD */}
         {restaurant && (
           <div style={{display:'flex', flexDirection:'column', gap:24}}>
+
+            {/* Phone Lookup */}
+            <div style={S.card}>
+              <div style={{marginBottom:20}}>
+                <h2 style={S.h2}>Member Lookup</h2>
+                <p style={{color:'#9CA3AF', fontSize:13, marginTop:4}}>Enter a customer's phone number to verify their membership.</p>
+              </div>
+              <form onSubmit={handlePhoneLookup} style={{display:'flex', gap:12}}>
+                <input
+                  value={phone} onChange={e => setPhone(e.target.value)}
+                  onFocus={() => setPhoneFocused(true)} onBlur={() => setPhoneFocused(false)}
+                  required placeholder="(312) 555-0000"
+                  style={{flex:1, padding:'12px 14px', border:`1.5px solid ${phoneFocused ? '#C9A84C' : '#E5E7EB'}`, borderRadius:10, fontSize:14, color:'#111827', outline:'none', fontFamily:'inherit', boxShadow: phoneFocused ? '0 0 0 3px rgba(201,168,76,0.12)' : 'none', transition:'all 0.2s'}}
+                />
+                <button type="submit" disabled={searching} className="search-btn"
+                  style={{...S.btn, background:'#111827', color:'white', padding:'12px 24px', opacity: searching ? 0.7 : 1}}>
+                  {searching ? 'Searching...' : 'Search'}
+                </button>
+              </form>
+
+              {lookup === false && (
+                <div style={{marginTop:16, padding:'16px', background:'#F9FAFB', borderRadius:12, border:'1px solid #F3F4F6', display:'flex', alignItems:'center', gap:10}}>
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <circle cx="8" cy="8" r="7" stroke="#9CA3AF" strokeWidth="1.5"/>
+                    <path d="M5 8h6" stroke="#9CA3AF" strokeWidth="1.5" strokeLinecap="round"/>
+                  </svg>
+                  <p style={{fontSize:14, color:'#6B7280', margin:0}}>No Regly membership found for this number.</p>
+                </div>
+              )}
+
+              {lookup && lookup.profile && (
+                <div style={{marginTop:16}}>
+                  {/* Member header */}
+                  <div style={{padding:'16px 20px', background: lookup.status === 'active' ? '#F0FDF4' : '#FEF2F2', borderRadius:12, border:`1px solid ${lookup.status === 'active' ? '#6EE7B7' : '#FECACA'}`, marginBottom:12}}>
+                    <div style={{display:'flex', alignItems:'center', gap:8, marginBottom:12}}>
+                      <div style={{width:30, height:30, background: lookup.status === 'active' ? '#059669' : '#EF4444', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center'}}>
+                        <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
+                          {lookup.status === 'active'
+                            ? <path d="M2.5 7L5.5 10L11.5 4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            : <path d="M4 4L10 10M10 4L4 10" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>}
+                        </svg>
+                      </div>
+                      <span style={{fontSize:14, fontWeight:600, color: lookup.status === 'active' ? '#065F46' : '#991B1B'}}>
+                        {lookup.status === 'active' ? 'Active Member' : 'Cancelled Membership'}
+                      </span>
+                    </div>
+                    <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'6px 20px'}}>
+                      {[
+                        ['Name', lookup.profile.name],
+                        ['Phone', lookup.profile.phone],
+                        ['Tier', lookup.membership_tiers?.name],
+                        ['Member since', new Date(lookup.start_date).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})],
+                        lookup.stripeInfo ? [lookup.stripeInfo.cancel_at_period_end ? 'Cancels on' : 'Renews on', formatDate(lookup.stripeInfo.current_period_end)] : null,
+                      ].filter(Boolean).map(([label, val]) => (
+                        <div key={label}>
+                          <p style={{fontSize:10, color:'#6B7280', fontWeight:600, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:1}}>{label}</p>
+                          <p style={{fontSize:13, color:'#111827', fontWeight:500}}>{val}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Perk usage — only show for active members */}
+                  {lookup.status === 'active' && lookup.perksConfig && lookup.perksConfig.length > 0 && (
+                    <div style={{background:'white', border:'1px solid #E5E7EB', borderRadius:12, padding:'16px 20px'}}>
+                      <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:14}}>
+                        <p style={{fontSize:13, fontWeight:600, color:'#111827'}}>Perk Usage This Month</p>
+                        <p style={{fontSize:11, color:'#9CA3AF'}}>{new Date().toLocaleDateString('en-US',{month:'long', year:'numeric'})}</p>
+                      </div>
+                      <div style={{display:'flex', flexDirection:'column', gap:8}}>
+                        {lookup.perksConfig.map((perk, pi) => {
+                          const usedCount = (lookup.perkUsage || []).filter(u => u.perk_index === pi).length
+                          const isLimited = perk.type === 'limited'
+                          const limit = perk.limit || 0
+                          const exhausted = isLimited && usedCount >= limit
+                          return (
+                            <div key={pi} style={{display:'flex', alignItems:'center', gap:12, padding:'10px 14px', background: exhausted ? '#FEF2F2' : '#F9FAFB', borderRadius:8, border:`1px solid ${exhausted ? '#FECACA' : '#F3F4F6'}`}}>
+                              <div style={{flex:1}}>
+                                <p style={{fontSize:13, color: exhausted ? '#9CA3AF' : '#111827', fontWeight:500, marginBottom:2, textDecoration: exhausted ? 'line-through' : 'none'}}>{perk.description}</p>
+                                <p style={{fontSize:11, color: exhausted ? '#EF4444' : isLimited ? '#6B7280' : '#059669'}}>
+                                  {isLimited ? (exhausted ? `Limit reached (${limit}/${limit})` : `${usedCount} of ${limit} used this month`) : 'Unlimited'}
+                                </p>
+                              </div>
+                              {!exhausted && (
+                                <button
+                                  onClick={() => logPerkUsage(pi, perk.description)}
+                                  disabled={lookup.loggingPerk === pi}
+                                  style={{padding:'6px 14px', background: lookup.loggingPerk===pi ? '#D1D5DB' : '#111827', color:'white', border:'none', borderRadius:8, fontSize:12, fontWeight:600, cursor: lookup.loggingPerk===pi ? 'not-allowed' : 'pointer', fontFamily:'inherit', flexShrink:0}}>
+                                  {lookup.loggingPerk === pi ? '...' : 'Use'}
+                                </button>
+                              )}
+                              {exhausted && (
+                                <div style={{padding:'4px 10px', background:'#FEE2E2', borderRadius:8}}>
+                                  <p style={{fontSize:11, color:'#EF4444', fontWeight:600}}>Done</p>
+                                </div>
+                              )}
+                            </div>
+                          )
+                        })}
+                      </div>
+                      <p style={{fontSize:11, color:'#9CA3AF', marginTop:12}}>Tap "Use" when a customer redeems a perk. Usage resets at the start of each billing month.</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
 
             {/* Stats row */}
             {/* Stats — row 1 */}
@@ -509,9 +660,91 @@ export default function BusinessDashboard() {
                   })}
                 </div>
                 <div style={{marginTop:16, paddingTop:16, borderTop:'1px solid #F3F4F6'}}>
-                  <p style={{fontSize:12, color:'#9CA3AF'}}>
-                    Need to change pricing or remove a tier? Email <span style={{color:'#C9A84C'}}>getregly@gmail.com</span>
-                  </p>
+                  <div style={{display:'flex', alignItems:'center', justifyContent:'space-between'}}>
+                    <p style={{fontSize:12, color:'#9CA3AF'}}>
+                      Need to change pricing or remove a tier? Email <span style={{color:'#C9A84C'}}>getregly@gmail.com</span>
+                    </p>
+                    <button onClick={() => setAddingTier(v => !v)}
+                      style={{padding:'8px 16px', background: addingTier ? '#F3F4F6' : '#111827', color: addingTier ? '#6B7280' : 'white', border:'none', borderRadius:8, fontSize:12, fontWeight:600, cursor:'pointer', fontFamily:'inherit', flexShrink:0, marginLeft:16}}>
+                      {addingTier ? 'Cancel' : '+ New Tier'}
+                    </button>
+                  </div>
+
+                  {/* New tier form */}
+                  {addingTier && (
+                    <div style={{marginTop:16, background:'#F9FAFB', borderRadius:12, padding:'20px', border:'1px solid #E5E7EB'}}>
+                      <p style={{fontSize:13, fontWeight:600, color:'#111827', marginBottom:14}}>Create New Tier</p>
+
+                      <div style={{display:'grid', gridTemplateColumns:'1fr 130px', gap:10, marginBottom:14}}>
+                        <div>
+                          <label style={{display:'block', fontSize:12, fontWeight:500, color:'#374151', marginBottom:5}}>Tier Name</label>
+                          <input value={newTier.name} onChange={e => setNewTier(p => ({...p, name:e.target.value}))}
+                            placeholder="e.g. Gold, Superfan..."
+                            style={{width:'100%', padding:'10px 12px', border:'1.5px solid #E5E7EB', borderRadius:8, fontSize:13, outline:'none', fontFamily:'inherit'}} />
+                        </div>
+                        <div>
+                          <label style={{display:'block', fontSize:12, fontWeight:500, color:'#374151', marginBottom:5}}>Price / mo</label>
+                          <div style={{position:'relative'}}>
+                            <span style={{position:'absolute', left:10, top:'50%', transform:'translateY(-50%)', color:'#9CA3AF', fontSize:13}}>$</span>
+                            <input type="number" min="1" value={newTier.price} onChange={e => setNewTier(p => ({...p, price:e.target.value}))}
+                              placeholder="0"
+                              style={{width:'100%', padding:'10px 12px 10px 22px', border:'1.5px solid #E5E7EB', borderRadius:8, fontSize:13, outline:'none', fontFamily:'inherit'}} />
+                          </div>
+                        </div>
+                      </div>
+
+                      <label style={{display:'block', fontSize:12, fontWeight:500, color:'#374151', marginBottom:8}}>Perks</label>
+                      <div style={{display:'flex', flexDirection:'column', gap:8, marginBottom:10}}>
+                        {newTier.perks.map((perk, pi) => (
+                          <div key={pi} style={{background:'white', border:'1px solid #E5E7EB', borderRadius:8, padding:'10px 12px'}}>
+                            <div style={{display:'flex', gap:8, alignItems:'center', marginBottom:8}}>
+                              <div style={{width:6, height:6, borderRadius:'50%', background:'#C9A84C', flexShrink:0}} />
+                              <input value={perk.description} onChange={e => setNewTierPerkField(pi,'description',e.target.value)}
+                                placeholder={`Perk ${pi+1}`}
+                                style={{flex:1, padding:'6px 10px', border:'1px solid #E5E7EB', borderRadius:6, fontSize:12, outline:'none', fontFamily:'inherit'}} />
+                              {newTier.perks.length > 1 && (
+                                <button type="button" onClick={() => removeNewTierPerk(pi)}
+                                  style={{color:'#D1D5DB', background:'none', border:'none', cursor:'pointer', fontSize:16, padding:'0 4px'}}>×</button>
+                              )}
+                            </div>
+                            <div style={{display:'flex', alignItems:'center', gap:8, paddingLeft:14}}>
+                              <span style={{fontSize:11, color:'#6B7280'}}>Uses:</span>
+                              {['unlimited','limited'].map(t => (
+                                <button key={t} type="button" onClick={() => setNewTierPerkField(pi,'type',t)}
+                                  style={{padding:'3px 10px', borderRadius:20, fontSize:11, fontWeight:600, cursor:'pointer', fontFamily:'inherit',
+                                    border:`1.5px solid ${perk.type===t ? '#C9A84C' : '#E5E7EB'}`,
+                                    background: perk.type===t ? 'rgba(201,168,76,0.1)' : 'white',
+                                    color: perk.type===t ? '#8A6A20' : '#9CA3AF',
+                                  }}>
+                                  {t.charAt(0).toUpperCase()+t.slice(1)}
+                                </button>
+                              ))}
+                              {perk.type === 'limited' && (
+                                <div style={{display:'flex', alignItems:'center', gap:4}}>
+                                  <input type="number" min="1" max="31" value={perk.limit}
+                                    onChange={e => setNewTierPerkField(pi,'limit',e.target.value)}
+                                    style={{width:44, padding:'3px 6px', border:'1.5px solid #C9A84C', borderRadius:6, fontSize:12, textAlign:'center', fontFamily:'inherit', outline:'none'}} />
+                                  <span style={{fontSize:11, color:'#6B7280'}}>x</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <button type="button" onClick={addNewTierPerk}
+                        style={{color:'#C9A84C', background:'none', border:'none', cursor:'pointer', fontSize:12, fontWeight:500, fontFamily:'inherit', padding:0, marginBottom:14}}>
+                        + Add another perk
+                      </button>
+
+                      <div style={{display:'flex', gap:10, alignItems:'center'}}>
+                        <button onClick={saveNewTier} disabled={savingTier || !newTier.name.trim() || !newTier.price}
+                          style={{padding:'10px 20px', background: savingTier || !newTier.name.trim() || !newTier.price ? '#D1D5DB' : '#111827', color:'white', border:'none', borderRadius:8, fontSize:13, fontWeight:600, cursor: savingTier ? 'not-allowed' : 'pointer', fontFamily:'inherit'}}>
+                          {savingTier ? 'Saving...' : 'Create Tier'}
+                        </button>
+                        <p style={{fontSize:11, color:'#9CA3AF'}}>A Stripe price ID will need to be added before customers can subscribe to this tier.</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
@@ -541,112 +774,6 @@ export default function BusinessDashboard() {
                 </div>
               </div>
             )}
-
-            {/* Phone Lookup */}
-            <div style={S.card}>
-              <div style={{marginBottom:20}}>
-                <h2 style={S.h2}>Member Lookup</h2>
-                <p style={{color:'#9CA3AF', fontSize:13, marginTop:4}}>Enter a customer's phone number to verify their membership.</p>
-              </div>
-              <form onSubmit={handlePhoneLookup} style={{display:'flex', gap:12}}>
-                <input
-                  value={phone} onChange={e => setPhone(e.target.value)}
-                  onFocus={() => setPhoneFocused(true)} onBlur={() => setPhoneFocused(false)}
-                  required placeholder="(312) 555-0000"
-                  style={{flex:1, padding:'12px 14px', border:`1.5px solid ${phoneFocused ? '#C9A84C' : '#E5E7EB'}`, borderRadius:10, fontSize:14, color:'#111827', outline:'none', fontFamily:'inherit', boxShadow: phoneFocused ? '0 0 0 3px rgba(201,168,76,0.12)' : 'none', transition:'all 0.2s'}}
-                />
-                <button type="submit" disabled={searching} className="search-btn"
-                  style={{...S.btn, background:'#111827', color:'white', padding:'12px 24px', opacity: searching ? 0.7 : 1}}>
-                  {searching ? 'Searching...' : 'Search'}
-                </button>
-              </form>
-
-              {lookup === false && (
-                <div style={{marginTop:16, padding:'16px', background:'#F9FAFB', borderRadius:12, border:'1px solid #F3F4F6', display:'flex', alignItems:'center', gap:10}}>
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                    <circle cx="8" cy="8" r="7" stroke="#9CA3AF" strokeWidth="1.5"/>
-                    <path d="M5 8h6" stroke="#9CA3AF" strokeWidth="1.5" strokeLinecap="round"/>
-                  </svg>
-                  <p style={{fontSize:14, color:'#6B7280', margin:0}}>No Regly membership found for this number.</p>
-                </div>
-              )}
-
-              {lookup && lookup.profile && (
-                <div style={{marginTop:16}}>
-                  {/* Member header */}
-                  <div style={{padding:'16px 20px', background: lookup.status === 'active' ? '#F0FDF4' : '#FEF2F2', borderRadius:12, border:`1px solid ${lookup.status === 'active' ? '#6EE7B7' : '#FECACA'}`, marginBottom:12}}>
-                    <div style={{display:'flex', alignItems:'center', gap:8, marginBottom:12}}>
-                      <div style={{width:30, height:30, background: lookup.status === 'active' ? '#059669' : '#EF4444', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center'}}>
-                        <svg width="13" height="13" viewBox="0 0 14 14" fill="none">
-                          {lookup.status === 'active'
-                            ? <path d="M2.5 7L5.5 10L11.5 4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            : <path d="M4 4L10 10M10 4L4 10" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>}
-                        </svg>
-                      </div>
-                      <span style={{fontSize:14, fontWeight:600, color: lookup.status === 'active' ? '#065F46' : '#991B1B'}}>
-                        {lookup.status === 'active' ? 'Active Member' : 'Cancelled Membership'}
-                      </span>
-                    </div>
-                    <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'6px 20px'}}>
-                      {[
-                        ['Name', lookup.profile.name],
-                        ['Phone', lookup.profile.phone],
-                        ['Tier', lookup.membership_tiers?.name],
-                        ['Member since', new Date(lookup.start_date).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})],
-                        lookup.stripeInfo ? [lookup.stripeInfo.cancel_at_period_end ? 'Cancels on' : 'Renews on', formatDate(lookup.stripeInfo.current_period_end)] : null,
-                      ].filter(Boolean).map(([label, val]) => (
-                        <div key={label}>
-                          <p style={{fontSize:10, color:'#6B7280', fontWeight:600, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:1}}>{label}</p>
-                          <p style={{fontSize:13, color:'#111827', fontWeight:500}}>{val}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Perk usage — only show for active members */}
-                  {lookup.status === 'active' && lookup.perksConfig && lookup.perksConfig.length > 0 && (
-                    <div style={{background:'white', border:'1px solid #E5E7EB', borderRadius:12, padding:'16px 20px'}}>
-                      <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:14}}>
-                        <p style={{fontSize:13, fontWeight:600, color:'#111827'}}>Perk Usage This Month</p>
-                        <p style={{fontSize:11, color:'#9CA3AF'}}>{new Date().toLocaleDateString('en-US',{month:'long', year:'numeric'})}</p>
-                      </div>
-                      <div style={{display:'flex', flexDirection:'column', gap:8}}>
-                        {lookup.perksConfig.map((perk, pi) => {
-                          const usedCount = (lookup.perkUsage || []).filter(u => u.perk_index === pi).length
-                          const isLimited = perk.type === 'limited'
-                          const limit = perk.limit || 0
-                          const exhausted = isLimited && usedCount >= limit
-                          return (
-                            <div key={pi} style={{display:'flex', alignItems:'center', gap:12, padding:'10px 14px', background: exhausted ? '#FEF2F2' : '#F9FAFB', borderRadius:8, border:`1px solid ${exhausted ? '#FECACA' : '#F3F4F6'}`}}>
-                              <div style={{flex:1}}>
-                                <p style={{fontSize:13, color: exhausted ? '#9CA3AF' : '#111827', fontWeight:500, marginBottom:2, textDecoration: exhausted ? 'line-through' : 'none'}}>{perk.description}</p>
-                                <p style={{fontSize:11, color: exhausted ? '#EF4444' : isLimited ? '#6B7280' : '#059669'}}>
-                                  {isLimited ? (exhausted ? `Limit reached (${limit}/${limit})` : `${usedCount} of ${limit} used this month`) : 'Unlimited'}
-                                </p>
-                              </div>
-                              {!exhausted && (
-                                <button
-                                  onClick={() => logPerkUsage(pi, perk.description)}
-                                  disabled={lookup.loggingPerk === pi}
-                                  style={{padding:'6px 14px', background: lookup.loggingPerk===pi ? '#D1D5DB' : '#111827', color:'white', border:'none', borderRadius:8, fontSize:12, fontWeight:600, cursor: lookup.loggingPerk===pi ? 'not-allowed' : 'pointer', fontFamily:'inherit', flexShrink:0}}>
-                                  {lookup.loggingPerk === pi ? '...' : 'Use'}
-                                </button>
-                              )}
-                              {exhausted && (
-                                <div style={{padding:'4px 10px', background:'#FEE2E2', borderRadius:8}}>
-                                  <p style={{fontSize:11, color:'#EF4444', fontWeight:600}}>Done</p>
-                                </div>
-                              )}
-                            </div>
-                          )
-                        })}
-                      </div>
-                      <p style={{fontSize:11, color:'#9CA3AF', marginTop:12}}>Tap "Use" when a customer redeems a perk. Usage resets at the start of each billing month.</p>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
 
             {/* Member List */}
             <div style={S.card}>
