@@ -107,7 +107,7 @@ export default function CustomerDashboard() {
 
   async function selectRestaurant(rest) {
     setSelected(rest)
-    const { data } = await supabase.from('membership_tiers').select('*').eq('restaurant_id', rest.id).order('price_monthly')
+    const { data } = await supabase.from('membership_tiers').select('*, perks_config').eq('restaurant_id', rest.id).order('price_monthly')
     setTiers(data || [])
     setTimeout(() => document.getElementById('tiers-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100)
   }
@@ -363,7 +363,13 @@ export default function CustomerDashboard() {
                 const isThisTierActive  = !!activeSubForTier(tier.id)
                 const hasOtherActive    = !isThisTierActive && !!activeSubForRestaurant(selected.id)
                 const isPopular         = i === 1 && tiers.length >= 2
-                const perksArr = tier.perks ? tier.perks.split(' | ') : [tier.perks]
+
+                // Use perks_config (structured) if available, fall back to plain text
+                const perksConfig = tier.perks_config && tier.perks_config.length > 0
+                  ? tier.perks_config
+                  : tier.perks
+                    ? tier.perks.split(' | ').map(p => ({ description: p.trim(), type: 'unlimited', limit: null }))
+                    : []
 
                 return (
                   <div key={tier.id} className="tier-card-new"
@@ -387,15 +393,27 @@ export default function CustomerDashboard() {
                     </div>
 
                     <div style={{flex:1, marginBottom:24}}>
-                      {perksArr.map((perk, pi) => (
-                        <div key={pi} style={{display:'flex', alignItems:'flex-start', gap:10, marginBottom:10}}>
-                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{marginTop:2, flexShrink:0}}>
-                            <circle cx="8" cy="8" r="7" fill='#F0FDF4'/>
-                            <path d="M5 8L7 10L11 6" stroke='#059669' strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                          <span style={{color: '#374151', fontSize:14, lineHeight:1.4, fontWeight:300}}>{perk}</span>
-                        </div>
-                      ))}
+                      {perksConfig.map((perk, pi) => {
+                        const isLimited = perk.type === 'limited'
+                        return (
+                          <div key={pi} style={{display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:10, marginBottom:10}}>
+                            <div style={{display:'flex', alignItems:'flex-start', gap:10, flex:1}}>
+                              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{marginTop:2, flexShrink:0}}>
+                                <circle cx="8" cy="8" r="7" fill='#F0FDF4'/>
+                                <path d="M5 8L7 10L11 6" stroke='#059669' strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                              </svg>
+                              <span style={{color:'#374151', fontSize:14, lineHeight:1.4, fontWeight:300}}>{perk.description}</span>
+                            </div>
+                            <span style={{
+                              fontSize:10, fontWeight:700, padding:'3px 8px', borderRadius:20, whiteSpace:'nowrap', flexShrink:0, marginTop:2,
+                              background: isLimited ? '#FEF9EC' : '#F0FDF4',
+                              color: isLimited ? '#92400E' : '#065F46',
+                            }}>
+                              {isLimited ? `${perk.limit}x / mo` : 'Unlimited'}
+                            </span>
+                          </div>
+                        )
+                      })}
                     </div>
 
                     <button
