@@ -185,7 +185,8 @@ export default function BusinessDashboard() {
   async function logPerkUsage(perkIndex, perkDescription) {
     if (!lookup || !restaurant) return
     setLookup(prev => ({ ...prev, loggingPerk: perkIndex }))
-    const billingMonth = new Date().toISOString().slice(0, 7) // "2026-04"
+    const billingMonth = new Date().toISOString().slice(0, 7)
+    const { data: { user } } = await supabase.auth.getUser()
     const { error } = await supabase.from('perk_usage').insert({
       subscription_id: lookup.id,
       customer_id: lookup.customer_id,
@@ -194,14 +195,20 @@ export default function BusinessDashboard() {
       perk_index: perkIndex,
       perk_description: perkDescription,
       billing_month: billingMonth,
-      logged_by: (await supabase.auth.getUser()).data.user?.id,
+      logged_by: user?.id,
     })
     if (!error) {
+      // Flash "Logged!" state
       setLookup(prev => ({
         ...prev,
         loggingPerk: null,
+        justLogged: perkIndex,
         perkUsage: [...(prev.perkUsage || []), { perk_index: perkIndex }],
       }))
+      // Reset "Logged!" after 2 seconds
+      setTimeout(() => {
+        setLookup(prev => ({ ...prev, justLogged: null }))
+      }, 2000)
     } else {
       setLookup(prev => ({ ...prev, loggingPerk: null }))
       console.error('Perk usage log error:', error)
@@ -211,7 +218,7 @@ export default function BusinessDashboard() {
   async function savePerk(tier) {
     if (!newPerkText.trim()) return
     setSavingPerk(true)
-    const existingConfig = tier.perks_config || []
+    const existingConfig = Array.isArray(tier.perks_config) ? tier.perks_config : []
     const updatedConfig = [
       ...existingConfig,
       {
@@ -220,11 +227,15 @@ export default function BusinessDashboard() {
         limit: newPerkType === 'limited' ? Number(newPerkLimit) : null,
       }
     ]
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('membership_tiers')
       .update({ perks_config: updatedConfig })
       .eq('id', tier.id)
-    if (!error) {
+      .select()
+    if (error) {
+      console.error('savePerk error:', error)
+      alert(`Could not save perk: ${error.message}`)
+    } else {
       setTiers(prev => prev.map(t => t.id === tier.id ? { ...t, perks_config: updatedConfig } : t))
       setAddingPerkTo(null)
       setNewPerkText('')
@@ -305,7 +316,7 @@ export default function BusinessDashboard() {
 
   return (
     <div style={S.page}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap'); *{box-sizing:border-box;} .hover-row:hover{background:#F9FAFB;} .search-btn:hover{opacity:0.88;} .logout-btn:hover{color:#111827;}`}</style>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap'); *{box-sizing:border-box;} .hover-row:hover{background:#F9FAFB;} .search-btn:hover{opacity:0.88;} .logout-btn:hover{color:#111827;} @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
 
       {/* NAV */}
       <nav style={S.nav}>
@@ -446,43 +457,121 @@ export default function BusinessDashboard() {
 
                   {/* Perk usage — only show for active members */}
                   {lookup.status === 'active' && lookup.perksConfig && lookup.perksConfig.length > 0 && (
-                    <div style={{background:'white', border:'1px solid #E5E7EB', borderRadius:12, padding:'16px 20px'}}>
-                      <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:14}}>
-                        <p style={{fontSize:13, fontWeight:600, color:'#111827'}}>Perk Usage This Month</p>
-                        <p style={{fontSize:11, color:'#9CA3AF'}}>{new Date().toLocaleDateString('en-US',{month:'long', year:'numeric'})}</p>
+                    <div style={{background:'white', border:'1px solid #E5E7EB', borderRadius:12, overflow:'hidden'}}>
+                      {/* Header */}
+                      <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 18px', borderBottom:'1px solid #F3F4F6', background:'#FAFAFA'}}>
+                        <div style={{display:'flex', alignItems:'center', gap:8}}>
+                          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                            <path d="M7 1L8.5 5H13L9.5 7.5L11 11.5L7 9L3 11.5L4.5 7.5L1 5H5.5L7 1Z" fill="#C9A84C"/>
+                          </svg>
+                          <p style={{fontSize:13, fontWeight:600, color:'#111827', margin:0}}>Redeem Perks</p>
+                        </div>
+                        <p style={{fontSize:11, color:'#9CA3AF', margin:0}}>{new Date().toLocaleDateString('en-US',{month:'long', year:'numeric'})}</p>
                       </div>
-                      <div style={{display:'flex', flexDirection:'column', gap:8}}>
+
+                      {/* Perks list */}
+                      <div style={{padding:'12px 18px', display:'flex', flexDirection:'column', gap:8}}>
                         {lookup.perksConfig.map((perk, pi) => {
                           const usedCount = (lookup.perkUsage || []).filter(u => u.perk_index === pi).length
                           const isLimited = perk.type === 'limited'
                           const limit = perk.limit || 0
                           const exhausted = isLimited && usedCount >= limit
+                          const justLogged = lookup.justLogged === pi
+                          const isLogging = lookup.loggingPerk === pi
+
                           return (
-                            <div key={pi} style={{display:'flex', alignItems:'center', gap:12, padding:'10px 14px', background: exhausted ? '#FEF2F2' : '#F9FAFB', borderRadius:8, border:`1px solid ${exhausted ? '#FECACA' : '#F3F4F6'}`}}>
-                              <div style={{flex:1}}>
-                                <p style={{fontSize:13, color: exhausted ? '#9CA3AF' : '#111827', fontWeight:500, marginBottom:2, textDecoration: exhausted ? 'line-through' : 'none'}}>{perk.description}</p>
-                                <p style={{fontSize:11, color: exhausted ? '#EF4444' : isLimited ? '#6B7280' : '#059669'}}>
-                                  {isLimited ? (exhausted ? `Limit reached (${limit}/${limit})` : `${usedCount} of ${limit} used this month`) : 'Unlimited'}
+                            <div key={pi} style={{
+                              display:'flex', alignItems:'center', gap:12,
+                              padding:'12px 14px', borderRadius:10,
+                              background: exhausted ? '#FEF2F2' : justLogged ? '#F0FDF4' : '#F9FAFB',
+                              border:`1px solid ${exhausted ? '#FECACA' : justLogged ? '#6EE7B7' : '#F3F4F6'}`,
+                              transition:'all 0.3s ease',
+                            }}>
+                              {/* Perk info */}
+                              <div style={{flex:1, minWidth:0}}>
+                                <p style={{
+                                  fontSize:13, fontWeight:500, marginBottom:3,
+                                  color: exhausted ? '#9CA3AF' : '#111827',
+                                  textDecoration: exhausted ? 'line-through' : 'none',
+                                }}>
+                                  {perk.description}
                                 </p>
+                                <div style={{display:'flex', alignItems:'center', gap:6}}>
+                                  {isLimited ? (
+                                    <>
+                                      {/* Usage dots for limited perks */}
+                                      <div style={{display:'flex', gap:3}}>
+                                        {Array.from({length: limit}).map((_, di) => (
+                                          <div key={di} style={{
+                                            width:7, height:7, borderRadius:'50%',
+                                            background: di < usedCount ? '#EF4444' : '#D1FAE5',
+                                            border:`1px solid ${di < usedCount ? '#FECACA' : '#6EE7B7'}`,
+                                          }} />
+                                        ))}
+                                      </div>
+                                      <span style={{fontSize:11, color: exhausted ? '#EF4444' : '#6B7280'}}>
+                                        {exhausted ? 'Limit reached' : `${limit - usedCount} of ${limit} remaining`}
+                                      </span>
+                                    </>
+                                  ) : (
+                                    <span style={{fontSize:11, color:'#059669', fontWeight:500}}>∞ Unlimited</span>
+                                  )}
+                                </div>
                               </div>
-                              {!exhausted && (
+
+                              {/* Action button */}
+                              {exhausted ? (
+                                <div style={{display:'flex', alignItems:'center', gap:4, padding:'6px 12px', background:'#FEE2E2', borderRadius:8, flexShrink:0}}>
+                                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                    <path d="M3 3L9 9M9 3L3 9" stroke="#EF4444" strokeWidth="1.5" strokeLinecap="round"/>
+                                  </svg>
+                                  <span style={{fontSize:11, color:'#EF4444', fontWeight:600}}>Used up</span>
+                                </div>
+                              ) : justLogged ? (
+                                <div style={{display:'flex', alignItems:'center', gap:4, padding:'6px 14px', background:'#D1FAE5', borderRadius:8, flexShrink:0, transition:'all 0.3s'}}>
+                                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                    <path d="M2 6L5 9L10 3" stroke="#059669" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                  </svg>
+                                  <span style={{fontSize:11, color:'#059669', fontWeight:600}}>Logged!</span>
+                                </div>
+                              ) : (
                                 <button
                                   onClick={() => logPerkUsage(pi, perk.description)}
-                                  disabled={lookup.loggingPerk === pi}
-                                  style={{padding:'6px 14px', background: lookup.loggingPerk===pi ? '#D1D5DB' : '#111827', color:'white', border:'none', borderRadius:8, fontSize:12, fontWeight:600, cursor: lookup.loggingPerk===pi ? 'not-allowed' : 'pointer', fontFamily:'inherit', flexShrink:0}}>
-                                  {lookup.loggingPerk === pi ? '...' : 'Use'}
+                                  disabled={isLogging}
+                                  style={{
+                                    display:'flex', alignItems:'center', gap:6,
+                                    padding:'7px 16px', borderRadius:8, fontSize:12, fontWeight:600,
+                                    cursor: isLogging ? 'not-allowed' : 'pointer',
+                                    border:'none', fontFamily:'inherit', flexShrink:0,
+                                    background: isLogging ? '#F3F4F6' : '#111827',
+                                    color: isLogging ? '#9CA3AF' : 'white',
+                                    transition:'all 0.2s',
+                                  }}>
+                                  {isLogging ? (
+                                    <>
+                                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style={{animation:'spin 0.8s linear infinite'}}>
+                                        <circle cx="5" cy="5" r="4" stroke="#9CA3AF" strokeWidth="1.5" strokeDasharray="6 6"/>
+                                      </svg>
+                                      Logging...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                                        <path d="M5 1V5L7.5 7.5" stroke="white" strokeWidth="1.2" strokeLinecap="round"/>
+                                        <circle cx="5" cy="5" r="4" stroke="white" strokeWidth="1.2"/>
+                                      </svg>
+                                      Use
+                                    </>
+                                  )}
                                 </button>
-                              )}
-                              {exhausted && (
-                                <div style={{padding:'4px 10px', background:'#FEE2E2', borderRadius:8}}>
-                                  <p style={{fontSize:11, color:'#EF4444', fontWeight:600}}>Done</p>
-                                </div>
                               )}
                             </div>
                           )
                         })}
                       </div>
-                      <p style={{fontSize:11, color:'#9CA3AF', marginTop:12}}>Tap "Use" when a customer redeems a perk. Usage resets at the start of each billing month.</p>
+                      <div style={{padding:'10px 18px', borderTop:'1px solid #F3F4F6', background:'#FAFAFA'}}>
+                        <p style={{fontSize:11, color:'#9CA3AF', margin:0}}>All redemptions are logged and visible in member analytics. Usage resets monthly.</p>
+                      </div>
                     </div>
                   )}
                 </div>
