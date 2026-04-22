@@ -34,6 +34,8 @@ export default function BusinessDashboard() {
   const [addingTier, setAddingTier]     = useState(false)
   const [newTier, setNewTier]           = useState({ name:'', price:'', perks:[{ description:'', type:'unlimited', limit:2 }] })
   const [savingTier, setSavingTier]     = useState(false)
+  const [connectStatus, setConnectStatus] = useState(null) // 'success'|'pending'|'error'|'refresh'
+  const [connectLoading, setConnectLoading] = useState(false)
   const [stats, setStats]             = useState({
     revenue: 0,
     tierBreakdown: [],
@@ -44,6 +46,13 @@ export default function BusinessDashboard() {
   })
 
   useEffect(() => { init() }, [])
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search)
+      const connect = params.get('connect')
+      if (connect) setConnectStatus(connect)
+    }
+  }, [])
 
   async function init() {
     const { data: { user } } = await supabase.auth.getUser()
@@ -51,7 +60,7 @@ export default function BusinessDashboard() {
     const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single()
     if (profile?.role !== 'business') { router.push('/'); return }
 
-    const { data: rest } = await supabase.from('restaurants').select('*').eq('owner_id', user.id).single()
+    const { data: rest } = await supabase.from('restaurants').select('*, stripe_account_id, stripe_onboarding_complete').eq('owner_id', user.id).single()
     setRestaurant(rest)
 
     const { data: sub } = await supabase.from('onboarding_submissions').select('*').eq('user_id', user.id).maybeSingle()
@@ -286,6 +295,34 @@ export default function BusinessDashboard() {
     setSavingTier(false)
   }
 
+  async function startConnectOnboarding() {
+    if (!restaurant) return
+    setConnectLoading(true)
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      const { data: profile } = await supabase.from('profiles').select('name').eq('id', user.id).single()
+      const res = await fetch('/api/create-connect-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          restaurant_id: restaurant.id,
+          business_name: restaurant.name,
+          email: user.email,
+        }),
+      })
+      const data = await res.json()
+      if (data.onboarding_url) {
+        window.location.href = data.onboarding_url
+      } else {
+        alert('Could not start Stripe onboarding: ' + (data.error || 'Unknown error'))
+      }
+    } catch (err) {
+      alert('Error: ' + err.message)
+    } finally {
+      setConnectLoading(false)
+    }
+  }
+
   async function logout() { await supabase.auth.signOut(); router.push('/') }
 
   function formatDate(unix) {
@@ -342,6 +379,73 @@ export default function BusinessDashboard() {
             {isPending ? 'Application Status' : isNew ? 'Welcome to Regly' : `Welcome back`}
           </h1>
         </div>
+
+        {/* STRIPE CONNECT BANNER */}
+        {restaurant && (
+          <>
+            {/* Success banner */}
+            {connectStatus === 'success' && (
+              <div style={{background:'#D1FAE5', border:'1px solid #6EE7B7', borderRadius:12, padding:'14px 18px', marginBottom:20, display:'flex', alignItems:'center', gap:10}}>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <circle cx="8" cy="8" r="7" fill="#059669"/>
+                  <path d="M5 8L7 10L11 6" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                <p style={{fontSize:14, color:'#065F46', margin:0, fontWeight:500}}>Stripe account connected! Payouts are now active for your memberships.</p>
+              </div>
+            )}
+
+            {/* Pending banner */}
+            {connectStatus === 'pending' && (
+              <div style={{background:'#FFFBEB', border:'1px solid #FCD34D', borderRadius:12, padding:'14px 18px', marginBottom:20, display:'flex', alignItems:'center', justifyContent:'space-between', gap:10}}>
+                <div style={{display:'flex', alignItems:'center', gap:10}}>
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <circle cx="8" cy="8" r="7" fill="#F59E0B"/>
+                    <path d="M8 5V8M8 11H8.01" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                  </svg>
+                  <p style={{fontSize:14, color:'#92400E', margin:0}}>Stripe still needs a bit more information to activate your payouts.</p>
+                </div>
+                <button onClick={startConnectOnboarding} disabled={connectLoading}
+                  style={{padding:'7px 14px', background:'#F59E0B', color:'white', border:'none', borderRadius:8, fontSize:12, fontWeight:600, cursor:'pointer', fontFamily:'inherit', flexShrink:0}}>
+                  {connectLoading ? 'Loading...' : 'Continue Setup'}
+                </button>
+              </div>
+            )}
+
+            {/* Error banner */}
+            {connectStatus === 'error' && (
+              <div style={{background:'#FEF2F2', border:'1px solid #FECACA', borderRadius:12, padding:'14px 18px', marginBottom:20, display:'flex', alignItems:'center', gap:10}}>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <circle cx="8" cy="8" r="7" stroke="#EF4444" strokeWidth="1.5"/>
+                  <path d="M8 5V8M8 11H8.01" stroke="#EF4444" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+                <p style={{fontSize:14, color:'#991B1B', margin:0}}>Something went wrong with Stripe setup. Please contact <span style={{color:'#C9A84C'}}>getregly@gmail.com</span></p>
+              </div>
+            )}
+
+            {/* Not yet connected — prompt to set up */}
+            {!restaurant.stripe_onboarding_complete && connectStatus !== 'success' && (
+              <div style={{background:'white', border:'1px solid #E5E7EB', borderRadius:16, padding:'20px 24px', marginBottom:20, display:'flex', alignItems:'center', justifyContent:'space-between', gap:16, boxShadow:'0 2px 12px rgba(0,0,0,0.04)'}}>
+                <div style={{display:'flex', alignItems:'center', gap:14}}>
+                  <div style={{width:44, height:44, background:'#FEF9EC', border:'1px solid #FCD34D', borderRadius:12, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0}}>
+                    <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                      <rect x="2" y="6" width="18" height="13" rx="2" stroke="#F59E0B" strokeWidth="1.5"/>
+                      <path d="M2 10H20" stroke="#F59E0B" strokeWidth="1.5"/>
+                      <path d="M6 14H8M10 14H12" stroke="#F59E0B" strokeWidth="1.5" strokeLinecap="round"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <p style={{fontSize:14, fontWeight:600, color:'#111827', marginBottom:3}}>Connect your bank account to receive payouts</p>
+                    <p style={{fontSize:13, color:'#6B7280'}}>Takes about 2 minutes. Stripe securely handles your banking details — Regly never sees them.</p>
+                  </div>
+                </div>
+                <button onClick={startConnectOnboarding} disabled={connectLoading}
+                  style={{padding:'10px 20px', background: connectLoading ? '#D1D5DB' : '#111827', color:'white', border:'none', borderRadius:10, fontSize:13, fontWeight:600, cursor: connectLoading ? 'not-allowed' : 'pointer', fontFamily:'inherit', flexShrink:0, whiteSpace:'nowrap'}}>
+                  {connectLoading ? 'Loading...' : 'Set Up Payouts'}
+                </button>
+              </div>
+            )}
+          </>
+        )}
 
         {/* PENDING STATE */}
         {isPending && (
