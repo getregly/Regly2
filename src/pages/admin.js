@@ -258,16 +258,26 @@ export default function Admin() {
                                   <p style={{fontSize:15, fontWeight:600, color:'#111827', margin:0}}>{tier.name}</p>
                                   <span style={{fontFamily:'Georgia, serif', fontSize:18, fontWeight:700, color:'#C9A84C'}}>${tier.price}<span style={{fontSize:11, color:'#9CA3AF', fontWeight:400}}>/mo</span></span>
                                 </div>
-                                {(Array.isArray(tier.perks) ? tier.perks : [tier.perks]).map((perk, j) => (
-                                  <div key={j} style={{display:'flex', gap:8, marginBottom:6}}>
-                                    <div style={{width:16, height:16, background:'#D1FAE5', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginTop:1}}>
-                                      <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
-                                        <path d="M1.5 4L3 5.5L6.5 2" stroke="#059669" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
-                                      </svg>
+                                {(Array.isArray(tier.perks) ? tier.perks : [tier.perks]).map((perk, j) => {
+                                  const isObj = perk && typeof perk === 'object'
+                                  const label = isObj ? perk.description : perk
+                                  const badge = isObj ? (perk.type === 'limited' ? `${perk.limit}x/mo` : 'Unlimited') : null
+                                  return (
+                                    <div key={j} style={{display:'flex', gap:8, marginBottom:6, alignItems:'flex-start'}}>
+                                      <div style={{width:16, height:16, background:'#D1FAE5', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginTop:1}}>
+                                        <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
+                                          <path d="M1.5 4L3 5.5L6.5 2" stroke="#059669" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                                        </svg>
+                                      </div>
+                                      <span style={{fontSize:13, color:'#6B7280', lineHeight:1.4, flex:1}}>{label}</span>
+                                      {badge && (
+                                        <span style={{fontSize:10, fontWeight:600, padding:'2px 7px', borderRadius:20, background: perk.type === 'unlimited' ? '#D1FAE5' : '#FEF9EC', color: perk.type === 'unlimited' ? '#065F46' : '#92400E', flexShrink:0}}>
+                                          {badge}
+                                        </span>
+                                      )}
                                     </div>
-                                    <span style={{fontSize:13, color:'#6B7280', lineHeight:1.4}}>{perk}</span>
-                                  </div>
-                                ))}
+                                  )
+                                })}
                               </div>
                             ))}
                           </div>
