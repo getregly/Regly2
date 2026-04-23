@@ -201,13 +201,13 @@ export default function Home() {
           </div>
 
           <h1 className="font-display hero-text text-left fade-up-2 mb-8 max-w-4xl" style={{color:'#F5F0E8'}}>
-            Get more from<br />
-            <span style={{color:'#C9A84C', fontStyle:'italic'}}>places you</span><br />
-            <span style={{fontStyle:'italic'}}>already love.</span>
+            Your favorite spots<br />
+            <span style={{color:'#C9A84C', fontStyle:'italic'}}>rewarding you</span><br />
+            <span style={{fontStyle:'italic'}}>every visit.</span>
           </h1>
 
           <p className="fade-up-3 font-body text-lg max-w-xl mb-10 leading-relaxed" style={{color:'rgba(245,240,232,0.75)', fontWeight:300}}>
-            Regly is a monthly membership that gets you real, tangible perks at your favorite coffee shops, pizza spots, and restaurants every single visit.
+            Regly is a membership platform that lets local businesses offer their own monthly memberships — with real, defined perks their customers get every single visit. Not points. Not punch cards. Actual value, every time you walk in.
           </p>
 
           <div className="fade-up-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
@@ -255,14 +255,14 @@ export default function Home() {
           <div>
             <p className="section-label mb-5">What is Regly</p>
             <h2 className="font-display text-5xl font-bold leading-tight mb-6" style={{color:'#F5F0E8'}}>
-              A membership that<br />pays you back<br />
-              <span style={{color:'#C9A84C', fontStyle:'italic'}}>every visit.</span>
+              A platform that turns<br />local businesses into<br />
+              <span style={{color:'#C9A84C', fontStyle:'italic'}}>membership destinations.</span>
             </h2>
             <p className="font-body text-base leading-relaxed mb-6" style={{color:'#8A7A6A', fontWeight:300}}>
-              You already spend money at your favorite spots. Regly lets you pay a small monthly fee in exchange for real perks free items, discounts, and bonuses every time you go.
+              Regly gives independent restaurants, coffee shops, and local businesses the tools to offer their own monthly memberships — complete with custom perks, defined benefits, and recurring value for their most loyal customers.
             </p>
             <p className="font-body text-base leading-relaxed mb-10" style={{color:'#8A7A6A', fontWeight:300}}>
-              No points to track. No apps to open. Just show up and give your phone number. Your perks are already waiting.
+              As a customer, you subscribe to the businesses you already visit. No points to track. No apps to open. Just give your phone number at the counter and your perks are applied instantly.
             </p>
             <button onClick={() => router.push('/auth?role=customer')}
               className="font-body text-xs tracking-widest uppercase px-8 py-3.5 rounded border transition-all"
@@ -387,57 +387,59 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── PRICING light section ───────────────────────────────── */}
+      {/* ── POSSIBILITIES section ──────────────────────────────── */}
       <section className="light-section py-32 px-8">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
-            <div style={{display:'inline-flex', alignItems:'center', gap:8, background:'rgba(138,106,32,0.1)', border:'1px solid rgba(138,106,32,0.25)', borderRadius:20, padding:'6px 16px', marginBottom:16}}>
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#8A6A20" strokeWidth="1.2"/><path d="M7 4V7M7 10H7.01" stroke="#8A6A20" strokeWidth="1.2" strokeLinecap="round"/></svg>
-              <span className="font-body" style={{fontSize:'0.65rem', letterSpacing:'0.2em', textTransform:'uppercase', color:'#8A6A20', fontWeight:600}}>Example Tiers</span>
-            </div>
-            <p className="section-label mb-4">Membership Tiers</p>
+            <p className="section-label mb-4">The Possibilities</p>
             <h2 className="font-display text-5xl font-bold mb-4" style={{color:'#1A1410'}}>
-              Find your <span style={{color:'#8A6A20', fontStyle:'italic'}}>level.</span>
+              A membership can be<br /><span style={{color:'#8A6A20', fontStyle:'italic'}}>anything you can imagine.</span>
             </h2>
-            <p className="font-body text-sm" style={{color:'#6B5A3E', fontWeight:300}}>
-              Each business sets their own perks. Pricing and benefits vary by location.
+            <p className="font-body text-base max-w-2xl mx-auto" style={{color:'#6B5A3E', fontWeight:300}}>
+              Every business on Regly designs their own membership. There are no templates, no boxes to fit into. The only limit is your creativity. Here are just a few ideas to get you thinking.
             </p>
           </div>
-          <div className="grid sm:grid-cols-3 gap-6">
+
+          {/* Perk idea grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-16">
             {[
-              { name:'Regular',      price:'$10', label:'Entry',   perks:['1 free item per visit','Members-only discount','Free delivery once a month'],                              border:'rgba(138,106,32,0.2)', bg:'white', badge:null,         textDark:true },
-              { name:'Gold Regular', price:'$20', label:'Popular', perks:['1 free item every visit','2 free deliveries per month','5% off every order'],                              border:'rgba(138,106,32,0.8)', bg:'#1A1410', badge:'MOST POPULAR', textDark:false },
-              { name:'VIP Regular',  price:'$35', label:'Elite',   perks:['1 premium free item every visit','Unlimited free deliveries','10% off every order'],                      border:'rgba(138,106,32,0.3)', bg:'white', badge:null,         textDark:true },
-            ].map((tier, i) => (
-              <div key={tier.name} className="tier-card rounded-2xl p-8 flex flex-col border relative" style={{borderColor:tier.border, background:tier.bg, boxShadow: tier.textDark ? '0 4px 24px rgba(0,0,0,0.06)' : 'none'}}>
-                {tier.badge && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 font-body text-xs px-4 py-1 rounded-full font-semibold tracking-widest" style={{background:'#C9A84C', color:'#0A0906'}}>
-                    {tier.badge}
-                  </span>
-                )}
-                <p className="font-body text-xs tracking-widest uppercase mb-3" style={{color: tier.textDark ? '#8A6A20' : '#8A7A6A'}}>{tier.label}</p>
-                <p className="font-display text-2xl font-bold mb-1" style={{color: tier.textDark ? '#1A1410' : '#F5F0E8'}}>{tier.name}</p>
-                <p className="font-display text-5xl font-black mb-1" style={{color:'#C9A84C'}}>{tier.price}</p>
-                <p className="font-body text-xs mb-8" style={{color: tier.textDark ? '#6B5A3E' : '#8A7A6A'}}>/month · cancel anytime</p>
-                <div className="flex-1 space-y-3 mb-8">
-                  {tier.perks.map(p => (
-                    <div key={p} className="flex items-start gap-3">
-                      <div className="mt-0.5 shrink-0"><IconGold size={12} /></div>
-                      <span className="font-body text-sm" style={{color: tier.textDark ? '#3A2E1E' : '#F5F0E8', fontWeight:300}}>{p}</span>
-                    </div>
-                  ))}
-                </div>
-                <button onClick={() => router.push('/auth?role=customer')}
-                  className={`font-body text-xs tracking-widest uppercase py-3 rounded border transition-all w-full ${tier.textDark ? 'btn-dark' : ''}`}
-                  style={!tier.textDark ? {borderColor:'#C9A84C', color:'#C9A84C', background:'transparent'} : {}}>
-                  Get Started
-                </button>
+              { emoji:'🍕', label:'Free slice every visit',       cat:'Restaurant' },
+              { emoji:'☕', label:'Free coffee every morning',    cat:'Coffee Shop' },
+              { emoji:'🤫', label:'Access to the secret menu',    cat:'Any Business' },
+              { emoji:'👕', label:'Free branded shirt on signup', cat:'Any Business' },
+              { emoji:'🪑', label:'Reserved seating, always',     cat:'Bar / Lounge' },
+              { emoji:'🎂', label:'Free dessert on your birthday',cat:'Restaurant' },
+              { emoji:'🚚', label:'Free delivery every order',    cat:'Restaurant' },
+              { emoji:'🎵', label:'Skip the line on event nights',cat:'Venue / Bar' },
+              { emoji:'🥤', label:'Free drink upgrade every visit',cat:'Cafe' },
+              { emoji:'📦', label:'Monthly exclusive merch drop', cat:'Retail / Brand' },
+              { emoji:'🍷', label:'Members-only wine list',       cat:'Wine Bar' },
+              { emoji:'✨', label:'Early access to new items',    cat:'Any Business' },
+            ].map(p => (
+              <div key={p.label} className="hover-lift rounded-2xl p-5 border text-center" style={{background:'white', borderColor:'rgba(138,106,32,0.15)', boxShadow:'0 2px 12px rgba(0,0,0,0.04)'}}>
+                <p style={{fontSize:'2rem', marginBottom:8}}>{p.emoji}</p>
+                <p className="font-body text-sm font-semibold mb-1" style={{color:'#1A1410'}}>{p.label}</p>
+                <p className="font-body" style={{fontSize:'0.65rem', letterSpacing:'0.1em', textTransform:'uppercase', color:'#8A6A20', fontWeight:600}}>{p.cat}</p>
               </div>
             ))}
           </div>
-          <p className="text-center font-body text-xs mt-6" style={{color:'#6B5A3E', fontWeight:300}}>
-            Actual perks are defined by each business and displayed before you subscribe.
-          </p>
+
+          {/* Bottom callout */}
+          <div className="rounded-2xl p-10 text-center border" style={{background:'#1A1410', borderColor:'rgba(201,168,76,0.2)'}}>
+            <p className="section-label mb-4" style={{color:'rgba(201,168,76,0.7)'}}>The point</p>
+            <h3 className="font-display text-3xl font-bold mb-4" style={{color:'#F5F0E8'}}>
+              Your membership is yours to define.<br />
+              <span style={{color:'#C9A84C', fontStyle:'italic'}}>Make it irresistible.</span>
+            </h3>
+            <p className="font-body text-sm max-w-xl mx-auto mb-8" style={{color:'#8A7A6A', fontWeight:300}}>
+              Regly gives you the platform. You bring the creativity. The businesses on Regly aren't just offering discounts — they are building relationships, creating habits, and giving customers a real reason to choose them over everyone else.
+            </p>
+            <button onClick={() => router.push('/auth?role=business')}
+              className="font-body text-xs tracking-widest uppercase px-10 py-4 rounded transition-all"
+              style={{background:'#C9A84C', color:'#0A0906', fontWeight:600}}>
+              Build My Membership Program
+            </button>
+          </div>
         </div>
       </section>
 
@@ -452,7 +454,7 @@ export default function Home() {
             Start getting<br /><span style={{color:'#C9A84C', fontStyle:'italic'}}>more.</span>
           </h2>
           <p className="font-body text-base mb-12 leading-relaxed" style={{color:'#8A7A6A', fontWeight:300}}>
-            Create your account in 60 seconds. Browse local coffee shops, restaurants, and neighborhood spots. Subscribe to the ones you visit anyway. Cancel anytime.
+            Browse local businesses on Regly, choose a membership that fits how you already spend, and start getting real perks from day one. No points. No waiting. Cancel anytime.
           </p>
           <button onClick={() => router.push('/auth?role=customer')}
             className="font-body inline-flex items-center gap-4 px-14 py-5 rounded text-sm tracking-widest uppercase transition-all"
@@ -468,10 +470,10 @@ export default function Home() {
           <div>
             <p className="section-label mb-4">For Business Owners</p>
             <h2 className="font-display text-4xl font-bold mb-4" style={{color:'#F5F0E8'}}>
-              Turn your regulars into<br /><span style={{color:'#C9A84C', fontStyle:'italic'}}>recurring revenue.</span>
+              Give your regulars a reason<br />to <span style={{color:'#C9A84C', fontStyle:'italic'}}>always choose you.</span>
             </h2>
             <p className="font-body text-sm leading-relaxed mb-8" style={{color:'#8A7A6A', fontWeight:300}}>
-              Set up a membership program in 10 minutes. No hardware. No upfront cost. You define the perks, set the price, and keep more of every dollar.
+              Regly is the platform that powers your membership program. You design the experience — the perks, the tiers, the price. Regly handles payments, member tracking, and monthly payouts directly to your bank. No hardware. No upfront cost. Live in 48 hours.
             </p>
             <button onClick={() => router.push('/auth?role=business')}
               className="font-body text-xs tracking-widest uppercase px-8 py-3.5 rounded border transition-all"
