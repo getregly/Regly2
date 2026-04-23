@@ -58,7 +58,7 @@ export default async function handler(req, res) {
     const priceInCents = Math.round(tier.price_monthly * 100)
     const reglyFeeCents = Math.round(priceInCents * (REGLY_FEE_PERCENT / 100))
 
-    // 5. Build the session — with or without Connect depending on setup status
+    // 5. Build the session, with or without Connect depending on setup status
     const sessionParams = {
       mode: 'subscription',
       payment_method_types: ['card'],
@@ -88,7 +88,7 @@ export default async function handler(req, res) {
         },
       }
     } else {
-      // Merchant not yet connected — payments go to Regly account only
+      // Merchant not yet connected, payments go to Regly account only
       // Flag this so we can handle it manually or prompt merchant to connect
       console.warn(`Restaurant ${restaurant.name} (${restaurantId}) does not have Stripe Connect set up. Payment will go to Regly account.`)
       sessionParams.subscription_data = {
