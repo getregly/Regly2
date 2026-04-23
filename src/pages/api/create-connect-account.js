@@ -17,6 +17,16 @@ export default async function handler(req, res) {
 
   const { restaurant_id, business_name, email } = req.body
 
+
+  // ── Auth guard ──────────────────────────────────────────────
+  const token = req.headers.authorization?.replace('Bearer ', '')
+  if (!token) return res.status(401).json({ error: 'Unauthorized' })
+  const { data: { user: caller }, error: authErr } = await supabase.auth.getUser(token)
+  if (!caller || authErr) return res.status(401).json({ error: 'Unauthorized' })
+
+  // Verify the caller owns this restaurant
+  if (caller.email !== email) return res.status(403).json({ error: 'Forbidden' })
+
   if (!restaurant_id || !business_name || !email) {
     return res.status(400).json({ error: 'Missing required fields' })
   }
