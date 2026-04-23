@@ -95,7 +95,7 @@ export default function Auth() {
 
       <div className="auth-grid" style={{display:'grid', gridTemplateColumns:'1fr', minHeight:'100vh'}}>
 
-        {/* LEFT — Photo panel */}
+        {/* LEFT, Photo panel */}
         <div style={{position:'relative', overflow:'hidden', display:'none', background:'#0A0906'}} className="md-photo-panel">
           <img
             src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&q=85&fit=crop"
@@ -118,7 +118,7 @@ export default function Auth() {
           </div>
         </div>
 
-        {/* RIGHT — Form panel */}
+        {/* RIGHT, Form panel */}
         <div style={{display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center', padding:'40px 24px', background:'white', minHeight:'100vh'}}>
           <div style={{width:'100%', maxWidth:400}}>
 
