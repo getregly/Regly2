@@ -306,9 +306,10 @@ export default function CustomerDashboard() {
               })}
             </div>
           </div>
+        )}
 
-          {/* VISIT LOG */}
-          {visitLog.length > 0 && (
+        {/* VISIT LOG */}
+        {visitLog.length > 0 && (
             <div style={{marginBottom:40}}>
               <div style={{marginBottom:20}}>
                 <h2 style={{fontFamily:'Georgia, serif', fontSize:24, fontWeight:700, color:'#111827', margin:0}}>Visit History</h2>
@@ -344,8 +345,6 @@ export default function CustomerDashboard() {
               </div>
             </div>
           )}
-        </div>
-        )}
 
         {/* BROWSE RESTAURANTS */}
         <div id="browse">
