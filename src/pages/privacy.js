@@ -32,7 +32,7 @@ export default function Privacy() {
 
         <div style={{background:'#EFF6FF', border:'1px solid #BFDBFE', borderRadius:12, padding:'16px 20px', marginBottom:40}}>
           <p style={{fontSize:14, color:'#1E40AF', lineHeight:1.6, margin:0}}>
-            <strong>Plain English Summary:</strong> We collect your name, email, and phone number to operate your membership. We collect payment information through Stripe — we never see or store your card details directly. We do not sell your data to anyone, ever.
+            <strong>Plain English Summary:</strong> We collect your name, email, and phone number to operate your membership. We collect payment information through Stripe, we never see or store your card details directly. We do not sell your data to anyone, ever.
           </p>
         </div>
 
@@ -46,15 +46,15 @@ export default function Privacy() {
             body:`We collect the following information when you use Regly:
 
 From customers:
-• Name — to identify your account and display it to businesses when looking up your membership
-• Email address — to create and manage your account
-• Phone number — to verify your membership at participating businesses at the point of sale
-• Subscription and payment history — to manage your active memberships
+• Name, to identify your account and display it to businesses when looking up your membership
+• Email address, to create and manage your account
+• Phone number, to verify your membership at participating businesses at the point of sale
+• Subscription and payment history, to manage your active memberships
 
 From merchants:
-• Business name, address, and description — to list your business on the platform
-• Contact name and email — to manage your merchant account
-• Stripe account details — to process payouts to your business
+• Business name, address, and description, to list your business on the platform
+• Contact name and email, to manage your merchant account
+• Stripe account details, to process payouts to your business
 
 From all users:
 • Login credentials (email and encrypted password)
