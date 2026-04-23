@@ -61,7 +61,7 @@ By completing the merchant onboarding form and checking the agreement box, you a
 • Regly retains 15% as a platform fee
 • Payments are transferred to your connected Stripe account on a monthly basis
 • Regly does not charge any setup fees, monthly SaaS fees, or hardware costs
-• The 15% platform fee is Regly\'s only compensation — there are no hidden charges
+• The 15% platform fee is Regly\'s only compensation, there are no hidden charges
 
 Example: A customer subscribes to your $20/month tier. You receive $17.00. Regly retains $3.00. Stripe\'s processing fee (2.9% + $0.30) is deducted from Regly\'s portion.`
           },
