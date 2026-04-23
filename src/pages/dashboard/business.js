@@ -448,8 +448,8 @@ export default function BusinessDashboard() {
                     </svg>
                   </div>
                   <div>
-                    <p style={{fontSize:14, fontWeight:600, color:'#111827', marginBottom:3}}>Connect your bank account to receive payouts</p>
-                    <p style={{fontSize:13, color:'#6B7280'}}>Takes about 2 minutes. Stripe securely handles your banking details — Regly never sees them.</p>
+                    <p style={{fontSize:14, fontWeight:600, color:'#111827', marginBottom:3}}>Stripe Connect setup required to receive payouts</p>
+                    <p style={{fontSize:13, color:'#6B7280'}}>You must complete Stripe Connect to begin accepting membership payouts. Payouts are deposited monthly directly to your bank account. Takes about 2 minutes.</p>
                   </div>
                 </div>
                 <button onClick={startConnectOnboarding} disabled={connectLoading}
