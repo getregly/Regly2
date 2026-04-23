@@ -29,12 +29,17 @@ export default function Success() {
       })
     }
     const { data: tierData } = await supabase
-      .from('membership_tiers').select('name, perks, restaurants(name)').eq('id', tier).single()
+      .from('membership_tiers').select('name, perks, perks_config, restaurants(name)').eq('id', tier).single()
     setInfo(tierData)
     setDone(true)
   }
 
-  const perks = info?.perks ? info.perks.split(' | ') : []
+  // Use perks_config if available, fall back to plain text
+  const perks = (() => {
+    if (info?.perks_config && info.perks_config.length > 0) return info.perks_config
+    if (info?.perks) return info.perks.split(' | ').map(p => ({ description: p.trim(), type: 'unlimited', limit: null }))
+    return []
+  })()
 
   return (
     <div style={{minHeight:'100vh', background:'#F9FAFB', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'40px 24px', fontFamily:"'Inter', system-ui, sans-serif"}}>
@@ -78,21 +83,25 @@ export default function Success() {
             {perks.length > 0 && (
               <div>
                 <p style={{fontSize:11, color:'#9CA3AF', letterSpacing:'0.1em', textTransform:'uppercase', fontWeight:600, marginBottom:12}}>Your Perks</p>
-                {perks.map((perk, i) => (
-                  <div key={i} style={{display:'flex', alignItems:'flex-start', gap:10, marginBottom:8}}>
-                    <div style={{width:20, height:20, background:'#D1FAE5', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginTop:1}}>
-                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                        <path d="M2 5L4 7L8 3" stroke="#059669" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
+                {perks.map((perk, i) => {
+                  const isLimited = perk.type === 'limited'
+                  return (
+                    <div key={i} style={{display:'flex', alignItems:'center', justifyContent:'space-between', gap:10, marginBottom:10, padding:'10px 12px', background:'white', borderRadius:10, border:'1px solid #F3F4F6'}}>
+                      <div style={{display:'flex', alignItems:'center', gap:10}}>
+                        <div style={{width:8, height:8, borderRadius:'50%', background:'#C9A84C', flexShrink:0}} />
+                        <span style={{fontSize:14, color:'#374151', lineHeight:1.5}}>{perk.description}</span>
+                      </div>
+                      <span style={{
+                        fontSize:10, fontWeight:700, padding:'3px 9px', borderRadius:20, whiteSpace:'nowrap', flexShrink:0,
+                        background: isLimited ? '#FEF9EC' : '#F0FDF4',
+                        color: isLimited ? '#92400E' : '#065F46',
+                      }}>
+                        {isLimited ? `${perk.limit}x / month` : 'Unlimited'}
+                      </span>
                     </div>
-                    <span style={{fontSize:14, color:'#374151', lineHeight:1.5}}>{perk}</span>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
-            )}
-
-            {perks.length === 0 && info.perks && (
-              <p style={{fontSize:14, color:'#374151'}}>{info.perks}</p>
             )}
           </div>
         )}
