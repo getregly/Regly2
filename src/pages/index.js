@@ -3,6 +3,18 @@ import { useRouter } from 'next/router'
 
 const PASSCODE = 'PERKS'
 
+// ─── Responsive hook ──────────────────────────────────────────────
+function useWindowWidth() {
+  const [width, setWidth] = useState(768)
+  useEffect(() => {
+    setWidth(window.innerWidth)
+    const handler = () => setWidth(window.innerWidth)
+    window.addEventListener('resize', handler)
+    return () => window.removeEventListener('resize', handler)
+  }, [])
+  return width
+}
+
 // ─── Icons ────────────────────────────────────────────────────────
 const ArrowRight = () => (
   <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
@@ -44,6 +56,8 @@ function PasscodeGate({ onUnlock }) {
 // ─── Main Landing Page ────────────────────────────────────────────
 export default function Home() {
   const router = useRouter()
+  const width = useWindowWidth()
+  const isMobile = width < 768
   const [unlocked, setUnlocked] = useState(false)
   const [checking, setChecking] = useState(true)
   const [scrolled, setScrolled] = useState(false)
@@ -86,16 +100,16 @@ export default function Home() {
 
       {/* ── NAV ─────────────────────────────────────────────────── */}
       <nav className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${scrolled ? 'nav-blur' : ''}`}
-        style={{background: scrolled ? 'rgba(255,255,255,0.95)' : 'transparent', borderBottom: scrolled ? '1px solid #F3F4F6' : 'none', padding:'0 40px', height:68, display:'flex', alignItems:'center', justifyContent:'space-between'}}>
+        style={{background: scrolled ? 'rgba(255,255,255,0.95)' : 'transparent', borderBottom: scrolled ? '1px solid #F3F4F6' : 'none', padding: isMobile ? '0 20px' : '0 40px', height:64, display:'flex', alignItems:'center', justifyContent:'space-between'}}>
         <button onClick={() => router.push('/')}
           style={{fontFamily:'Georgia, serif', fontSize:22, fontWeight:700, color:'#111827', background:'none', border:'none', cursor:'pointer'}}>
           REGL<span style={{color:'#C9A84C'}}>Y</span>
         </button>
         <div style={{display:'flex', alignItems:'center', gap:8}}>
           <button onClick={() => router.push('/auth')} className="nav-link" style={{padding:'8px 16px'}}>Log in</button>
-          <button onClick={() => router.push('/auth?role=business')} className="nav-link" style={{padding:'8px 16px'}}>For businesses</button>
+          {!isMobile && <button onClick={() => router.push('/auth?role=business')} className="nav-link" style={{padding:'8px 16px'}}>For businesses</button>}
           <button onClick={() => router.push('/auth?role=customer')}
-            style={{padding:'10px 22px', background:'#111827', color:'white', border:'none', borderRadius:8, fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:'inherit', transition:'background 0.2s'}}
+            style={{padding:'10px 18px', background:'#111827', color:'white', border:'none', borderRadius:8, fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:'inherit', transition:'background 0.2s'}}
             onMouseEnter={e => e.currentTarget.style.background='#C9A84C'}
             onMouseLeave={e => e.currentTarget.style.background='#111827'}>
             Join free
@@ -112,7 +126,7 @@ export default function Home() {
         />
         <div style={{position:'absolute', inset:0, background:'linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.45) 50%, rgba(0,0,0,0.88) 100%)'}} />
 
-        <div className="fade-up" style={{position:'relative', zIndex:10, maxWidth:1100, margin:'0 auto', padding:'0 40px 80px', width:'100%'}}>
+        <div className="fade-up" style={{position:'relative', zIndex:10, maxWidth:1100, margin:'0 auto', padding: isMobile ? '0 24px 60px' : '0 40px 80px', width:'100%'}}>
           <p style={{fontSize:11, letterSpacing:'0.25em', textTransform:'uppercase', color:'rgba(201,168,76,0.9)', fontWeight:600, marginBottom:20}}>Now in Chicago</p>
           <h1 style={{fontFamily:'Georgia, serif', fontSize:'clamp(3rem, 7vw, 6.5rem)', fontWeight:700, color:'#FFFFFF', lineHeight:1.0, letterSpacing:'-0.02em', marginBottom:28, maxWidth:800}}>
             Your favorite spots,<br />
@@ -139,7 +153,7 @@ export default function Home() {
 
       {/* ── STAT BAR ────────────────────────────────────────────── */}
       <section style={{background:'#111827', padding:'32px 40px'}}>
-        <div style={{maxWidth:1100, margin:'0 auto', display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(160px, 1fr))', gap:32}}>
+        <div style={{maxWidth:1100, margin:'0 auto', display:'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: isMobile ? 24 : 32}}>
           {[
             { n:'$0',        l:'Setup cost for businesses' },
             { n:'48 hrs',    l:'Average time to go live' },
@@ -155,9 +169,9 @@ export default function Home() {
       </section>
 
       {/* ── HOW IT WORKS ────────────────────────────────────────── */}
-      <section id="how" style={{padding:'120px 40px', background:'#FFFFFF'}}>
+      <section id="how" style={{padding: isMobile ? '72px 24px' : '120px 40px', background:'#FFFFFF'}}>
         <div style={{maxWidth:1100, margin:'0 auto'}}>
-          <div style={{marginBottom:72}}>
+          <div style={{marginBottom: isMobile ? 48 : 72}}>
             <p style={{fontSize:11, letterSpacing:'0.25em', textTransform:'uppercase', color:'#C9A84C', fontWeight:600, marginBottom:16}}>How it works</p>
             <h2 style={{fontFamily:'Georgia, serif', fontSize:'clamp(2rem, 4vw, 3.5rem)', fontWeight:700, color:'#111827', lineHeight:1.1, maxWidth:600}}>
               Simple for businesses.<br />
@@ -166,7 +180,7 @@ export default function Home() {
           </div>
 
           {/* Split steps */}
-          <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:2}}>
+          <div style={{display:'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap:2}}>
             {[
               {
                 n:'01', title:'Business designs their membership',
@@ -215,7 +229,7 @@ export default function Home() {
           style={{position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', objectPosition:'center 50%'}}
         />
         <div style={{position:'absolute', inset:0, background:'linear-gradient(105deg, rgba(10,9,6,0.82) 0%, rgba(10,9,6,0.3) 100%)'}} />
-        <div style={{position:'absolute', inset:0, display:'flex', alignItems:'center', padding:'0 80px'}}>
+        <div style={{position:'absolute', inset:0, display:'flex', alignItems:'center', padding: isMobile ? '0 28px' : '0 80px'}}>
           <div style={{maxWidth:560}}>
             <div style={{width:32, height:2, background:'#C9A84C', marginBottom:24}} />
             <p style={{fontFamily:'Georgia, serif', fontSize:'clamp(1.6rem, 3.5vw, 2.8rem)', fontStyle:'italic', fontWeight:400, color:'#F5F0E8', lineHeight:1.3, marginBottom:20}}>
@@ -227,9 +241,9 @@ export default function Home() {
       </section>
 
       {/* ── THE POSSIBILITIES ───────────────────────────────────── */}
-      <section style={{padding:'120px 40px', background:'#FAFAF8'}}>
+      <section style={{padding: isMobile ? '72px 24px' : '120px 40px', background:'#FAFAF8'}}>
         <div style={{maxWidth:1100, margin:'0 auto'}}>
-          <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:80, alignItems:'start', marginBottom:80}}>
+          <div style={{display:'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 24 : 80, alignItems:'start', marginBottom: isMobile ? 48 : 80}}>
             <div>
               <p style={{fontSize:11, letterSpacing:'0.25em', textTransform:'uppercase', color:'#C9A84C', fontWeight:600, marginBottom:16}}>The possibilities</p>
               <h2 style={{fontFamily:'Georgia, serif', fontSize:'clamp(2rem, 4vw, 3.2rem)', fontWeight:700, color:'#111827', lineHeight:1.1}}>
@@ -270,7 +284,7 @@ export default function Home() {
           </div>
 
           {/* Callout */}
-          <div style={{marginTop:48, padding:'48px', background:'#111827', borderRadius:16, display:'flex', alignItems:'center', justifyContent:'space-between', gap:40, flexWrap:'wrap'}}>
+          <div style={{marginTop:48, padding: isMobile ? '32px 24px' : '48px', background:'#111827', borderRadius:16, display:'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'flex-start' : 'center', justifyContent:'space-between', gap:32}}>
             <div>
               <h3 style={{fontFamily:'Georgia, serif', fontSize:28, fontWeight:700, color:'#F5F0E8', marginBottom:10}}>
                 Your membership. Your rules.<br />
@@ -291,9 +305,9 @@ export default function Home() {
       </section>
 
       {/* ── WHY REGLY ───────────────────────────────────────────── */}
-      <section style={{padding:'120px 40px', background:'#FFFFFF'}}>
+      <section style={{padding: isMobile ? '72px 24px' : '120px 40px', background:'#FFFFFF'}}>
         <div style={{maxWidth:1100, margin:'0 auto'}}>
-          <div style={{textAlign:'center', marginBottom:72}}>
+          <div style={{textAlign:'center', marginBottom: isMobile ? 48 : 72}}>
             <p style={{fontSize:11, letterSpacing:'0.25em', textTransform:'uppercase', color:'#C9A84C', fontWeight:600, marginBottom:16}}>Why Regly</p>
             <h2 style={{fontFamily:'Georgia, serif', fontSize:'clamp(2rem, 4vw, 3.2rem)', fontWeight:700, color:'#111827', lineHeight:1.1}}>
               Real perks. Real value.<br />
@@ -330,12 +344,12 @@ export default function Home() {
       </section>
 
       {/* ── FOR BUSINESSES ──────────────────────────────────────── */}
-      <section style={{padding:'120px 40px', background:'#0A0906', position:'relative', overflow:'hidden'}}>
+      <section style={{padding: isMobile ? '72px 24px' : '120px 40px', background:'#0A0906', position:'relative', overflow:'hidden'}}>
         <div className="shimmer" style={{position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', pointerEvents:'none'}}>
           <span style={{fontFamily:'Georgia, serif', fontSize:'60vw', fontWeight:700, color:'#C9A84C', lineHeight:1}}>R</span>
         </div>
         <div style={{maxWidth:1100, margin:'0 auto', position:'relative', zIndex:2}}>
-          <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:80, alignItems:'center'}}>
+          <div style={{display:'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 48 : 80, alignItems:'center'}}>
             <div>
               <p style={{fontSize:11, letterSpacing:'0.25em', textTransform:'uppercase', color:'rgba(201,168,76,0.7)', fontWeight:600, marginBottom:16}}>For business owners</p>
               <h2 style={{fontFamily:'Georgia, serif', fontSize:'clamp(2rem, 4vw, 3.2rem)', fontWeight:700, color:'#F5F0E8', lineHeight:1.1, marginBottom:24}}>
@@ -352,7 +366,7 @@ export default function Home() {
                 List my business <ArrowRight />
               </button>
             </div>
-            <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:16}}>
+            <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:12}}>
               {[
                 { n:'$0',     l:'Setup cost' },
                 { n:'85%',    l:'Revenue you keep' },
@@ -370,7 +384,7 @@ export default function Home() {
       </section>
 
       {/* ── FINAL CTA ───────────────────────────────────────────── */}
-      <section style={{padding:'120px 40px', background:'#FAFAF8', textAlign:'center'}}>
+      <section style={{padding: isMobile ? '72px 24px' : '120px 40px', background:'#FAFAF8', textAlign:'center'}}>
         <div style={{maxWidth:680, margin:'0 auto'}}>
           <p style={{fontSize:11, letterSpacing:'0.25em', textTransform:'uppercase', color:'#C9A84C', fontWeight:600, marginBottom:20}}>Start today</p>
           <h2 style={{fontFamily:'Georgia, serif', fontSize:'clamp(2.5rem, 5vw, 4rem)', fontWeight:700, color:'#111827', lineHeight:1.05, marginBottom:24}}>
@@ -390,9 +404,9 @@ export default function Home() {
       </section>
 
       {/* ── FOOTER ──────────────────────────────────────────────── */}
-      <footer style={{background:'#0A0906', borderTop:'1px solid rgba(201,168,76,0.1)', padding:'64px 40px 40px'}}>
+      <footer style={{background:'#0A0906', borderTop:'1px solid rgba(201,168,76,0.1)', padding: isMobile ? '48px 24px 32px' : '64px 40px 40px'}}>
         <div style={{maxWidth:1100, margin:'0 auto'}}>
-          <div style={{display:'grid', gridTemplateColumns:'2fr 1fr 1fr 1fr', gap:'48px 32px', marginBottom:64}}>
+          <div style={{display:'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : '2fr 1fr 1fr 1fr', gap: isMobile ? '40px 24px' : '48px 32px', marginBottom: isMobile ? 48 : 64}}>
             <div>
               <p style={{fontFamily:'Georgia, serif', fontSize:22, fontWeight:700, color:'#F5F0E8', marginBottom:12}}>
                 REGL<span style={{color:'#C9A84C'}}>Y</span>
