@@ -32,14 +32,14 @@ export default function Terms() {
 
         <div style={{background:'#F0FDF4', border:'1px solid #6EE7B7', borderRadius:12, padding:'16px 20px', marginBottom:40}}>
           <p style={{fontSize:14, color:'#065F46', lineHeight:1.6, margin:0}}>
-            <strong>Plain English Summary:</strong> You pay a monthly fee to access perks at local businesses on Regly. You get your perks every visit from day one. Cancel anytime. Regly is a platform — the business is responsible for delivering your perks.
+            <strong>Plain English Summary:</strong> You pay a monthly fee to access perks at local businesses on Regly. You get your perks every visit from day one. Cancel anytime. Regly is a platform, the business is responsible for delivering your perks.
           </p>
         </div>
 
         {[
           {
             n:'1', title:'What Regly Is',
-            body:`Regly is a membership platform that connects customers with local businesses through monthly subscription tiers. When you subscribe to a business on Regly, you pay a recurring monthly fee in exchange for defined perks at that business — such as free items, discounts, or free deliveries — every time you visit.
+            body:`Regly is a membership platform that connects customers with local businesses through monthly subscription tiers. When you subscribe to a business on Regly, you pay a recurring monthly fee in exchange for defined perks at that business, such as free items, discounts, or free deliveries, every time you visit.
 
 Regly is a technology platform. We are not the business providing your perks. The local business you subscribe to is responsible for honoring the membership benefits they have defined.`
           },
@@ -69,13 +69,13 @@ If you believe you have been charged incorrectly, contact us at getregly@gmail.c
 
 • Simply give your phone number at the counter when you visit
 • Staff will look up your membership and apply your perks
-• Perks reset each billing cycle — you receive your full benefits on every visit throughout your membership period
+• Perks reset each billing cycle, you receive your full benefits on every visit throughout your membership period
 
 Regly is not responsible if a business fails to honor your perks. If a business consistently fails to deliver your benefits, contact us at getregly@gmail.com and we will investigate.`
           },
           {
             n:'5', title:'Your Account',
-            body:`To use Regly you must create an account with a valid email address and phone number. You are responsible for keeping your account credentials secure. Your phone number is used to verify your membership at participating businesses — please keep it accurate and up to date in your dashboard.`
+            body:`To use Regly you must create an account with a valid email address and phone number. You are responsible for keeping your account credentials secure. Your phone number is used to verify your membership at participating businesses, please keep it accurate and up to date in your dashboard.`
           },
           {
             n:'6', title:'Acceptable Use',
