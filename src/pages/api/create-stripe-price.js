@@ -17,6 +17,14 @@ export default async function handler(req, res) {
 
   const { tier_id, tier_name, price_monthly, business_name } = req.body
 
+
+  // ── Admin-only guard ────────────────────────────────────────
+  const token = req.headers.authorization?.replace('Bearer ', '')
+  if (!token) return res.status(401).json({ error: 'Unauthorized' })
+  const { data: { user: caller }, error: authErr } = await supabase.auth.getUser(token)
+  if (!caller || authErr) return res.status(401).json({ error: 'Unauthorized' })
+  if (caller.email !== 'sarrafian.josh@gmail.com') return res.status(403).json({ error: 'Forbidden — admin only' })
+
   if (!tier_id || !tier_name || !price_monthly || !business_name) {
     return res.status(400).json({ error: 'Missing required fields' })
   }
