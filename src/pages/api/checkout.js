@@ -27,13 +27,12 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Missing Stripe price ID' })
     }
 
-    // 1. Get the authenticated user
+    // 1. Get and verify the authenticated user
     const token = req.headers.authorization?.replace('Bearer ', '')
-    let userId = null
-    if (token) {
-      const { data: { user } } = await supabase.auth.getUser(token)
-      userId = user?.id
-    }
+    if (!token) return res.status(401).json({ error: 'Unauthorized' })
+    const { data: { user }, error: authErr } = await supabase.auth.getUser(token)
+    if (!user || authErr) return res.status(401).json({ error: 'Unauthorized' })
+    const userId = user.id
 
     // 2. Fetch the restaurant's Stripe Connect account ID
     const { data: restaurant, error: restErr } = await supabase
