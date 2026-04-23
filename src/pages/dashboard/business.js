@@ -721,13 +721,13 @@ export default function BusinessDashboard() {
               {[
                 {
                   label:'Retention Rate',
-                  value: stats.retentionRate !== null ? `${stats.retentionRate}%` : ', ',
+                  value: stats.retentionRate !== null ? `${stats.retentionRate}%` : 'N/A',
                   sub: 'members who renewed last month',
                   color: stats.retentionRate === null ? '#111827' : stats.retentionRate >= 80 ? '#059669' : stats.retentionRate >= 60 ? '#F59E0B' : '#EF4444',
                 },
                 {
                   label:'Avg Member Tenure',
-                  value: stats.avgTenureMonths !== null ? `${stats.avgTenureMonths}mo` : ', ',
+                  value: stats.avgTenureMonths !== null ? `${stats.avgTenureMonths}mo` : 'N/A',
                   sub: 'average months a member stays',
                   color: '#111827',
                 },
