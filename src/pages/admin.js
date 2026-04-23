@@ -26,8 +26,21 @@ export default function Admin() {
   useEffect(() => { init() }, [])
 
   async function init() {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user || user.email !== ADMIN_EMAIL) { router.push('/'); return }
+    // 1. Client-side check first for fast redirect
+    const { data: { user }, error } = await supabase.auth.getUser()
+    if (!user || error) { router.push('/'); return }
+
+    // 2. Server-side verification — cannot be bypassed by client manipulation
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const verifyRes = await fetch('/api/verify-admin', {
+        headers: { Authorization: `Bearer ${session?.access_token}` }
+      })
+      if (!verifyRes.ok) { router.push('/'); return }
+    } catch {
+      router.push('/'); return
+    }
+
     setAuthorized(true)
     await loadSubmissions()
     setLoading(false)
