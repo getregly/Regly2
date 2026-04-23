@@ -106,7 +106,7 @@ export default function BusinessDashboard() {
           ? Math.round(tenures.reduce((a, b) => a + b, 0) / tenures.length * 10) / 10
           : null
 
-        // Cancellations — count all cancelled subs for this restaurant
+        // Cancellations, count all cancelled subs for this restaurant
         // No date filtering since updated_at/end_date may not exist on the table
         const { count: cancelledCount } = await supabase
           .from('subscriptions')
@@ -152,7 +152,7 @@ export default function BusinessDashboard() {
     setSearching(true)
     setLookup(null)
     const cleaned = phone.replace(/\D/g, '')
-    // Query only the specific phone number — never fetch all profiles
+    // Query only the specific phone number, never fetch all profiles
     const { data: profiles } = await supabase
       .from('profiles')
       .select('id, name, phone')
@@ -436,7 +436,7 @@ export default function BusinessDashboard() {
               </div>
             )}
 
-            {/* Not yet connected — prompt to set up */}
+            {/* Not yet connected, prompt to set up */}
             {!restaurant.stripe_onboarding_complete && connectStatus !== 'success' && (
               <div style={{background:'white', border:'1px solid #E5E7EB', borderRadius:16, padding:'20px 24px', marginBottom:20, display:'flex', alignItems:'center', justifyContent:'space-between', gap:16, boxShadow:'0 2px 12px rgba(0,0,0,0.04)'}}>
                 <div style={{display:'flex', alignItems:'center', gap:14}}>
@@ -573,7 +573,7 @@ export default function BusinessDashboard() {
                     </div>
                   </div>
 
-                  {/* Perk usage — only show for active members */}
+                  {/* Perk usage, only show for active members */}
                   {lookup.status === 'active' && lookup.perksConfig && lookup.perksConfig.length > 0 && (
                     <div style={{background:'white', border:'1px solid #E5E7EB', borderRadius:12, overflow:'hidden'}}>
                       {/* Header */}
@@ -698,7 +698,7 @@ export default function BusinessDashboard() {
 
 
             {/* Stats row */}
-            {/* Stats — row 1 */}
+            {/* Stats, row 1 */}
             <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(180px, 1fr))', gap:16}}>
               {[
                 { label:'Active Members',        value: members.length,          prefix:'',  suffix:'',   sub: null },
@@ -716,18 +716,18 @@ export default function BusinessDashboard() {
               ))}
             </div>
 
-            {/* Stats — row 2 */}
+            {/* Stats, row 2 */}
             <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(180px, 1fr))', gap:16}}>
               {[
                 {
                   label:'Retention Rate',
-                  value: stats.retentionRate !== null ? `${stats.retentionRate}%` : '—',
+                  value: stats.retentionRate !== null ? `${stats.retentionRate}%` : ', ',
                   sub: 'members who renewed last month',
                   color: stats.retentionRate === null ? '#111827' : stats.retentionRate >= 80 ? '#059669' : stats.retentionRate >= 60 ? '#F59E0B' : '#EF4444',
                 },
                 {
                   label:'Avg Member Tenure',
-                  value: stats.avgTenureMonths !== null ? `${stats.avgTenureMonths}mo` : '—',
+                  value: stats.avgTenureMonths !== null ? `${stats.avgTenureMonths}mo` : ', ',
                   sub: 'average months a member stays',
                   color: '#111827',
                 },
@@ -760,7 +760,7 @@ export default function BusinessDashboard() {
                 <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:20}}>
                   <div>
                     <h2 style={S.h2}>Your Membership Tiers</h2>
-                    <p style={{color:'#9CA3AF', fontSize:13, marginTop:4}}>Your current offerings — contact us to make major changes</p>
+                    <p style={{color:'#9CA3AF', fontSize:13, marginTop:4}}>Your current offerings, contact us to make major changes</p>
                   </div>
                 </div>
                 <div style={{display:'flex', flexDirection:'column', gap:16}}>
@@ -1011,8 +1011,8 @@ export default function BusinessDashboard() {
                         const renewal = renewalInfo(m)
                         return (
                           <tr key={m.id} className="hover-row" style={{borderBottom:'1px solid #F9FAFB'}}>
-                            <td style={{padding:'14px 16px 14px 0', color:'#111827', fontWeight:500}}>{m.profile?.name || '—'}</td>
-                            <td style={{padding:'14px 16px 14px 0', color:'#6B7280'}}>{m.profile?.phone || '—'}</td>
+                            <td style={{padding:'14px 16px 14px 0', color:'#111827', fontWeight:500}}>{m.profile?.name || ', '}</td>
+                            <td style={{padding:'14px 16px 14px 0', color:'#6B7280'}}>{m.profile?.phone || ', '}</td>
                             <td style={{padding:'14px 16px 14px 0'}}>
                               <span style={{background:'rgba(201,168,76,0.1)', color:'#8A6A20', fontSize:12, fontWeight:600, padding:'4px 10px', borderRadius:20, whiteSpace:'nowrap'}}>
                                 {m.membership_tiers?.name}
@@ -1025,7 +1025,7 @@ export default function BusinessDashboard() {
                                 <span style={{background:renewal.bg, color:renewal.color, fontSize:12, fontWeight:600, padding:'4px 10px', borderRadius:20, whiteSpace:'nowrap'}}>
                                   {renewal.label} {renewal.date}
                                 </span>
-                              ) : <span style={{color:'#D1D5DB', fontSize:13}}>—</span>}
+                              ) : <span style={{color:'#D1D5DB', fontSize:13}}>, </span>}
                             </td>
                           </tr>
                         )
