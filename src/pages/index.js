@@ -207,7 +207,7 @@ export default function Home() {
           </h1>
 
           <p className="fade-up-3 font-body text-lg max-w-xl mb-10 leading-relaxed" style={{color:'rgba(245,240,232,0.75)', fontWeight:300}}>
-            Regly is a membership platform that lets local businesses offer their own monthly memberships — with real, defined perks their customers get every single visit. Not points. Not punch cards. Actual value, every time you walk in.
+            Regly is a membership platform that lets local businesses offer their own monthly memberships, with real, defined perks their customers get every single visit. Not points. Not punch cards. Actual value, every time you walk in.
           </p>
 
           <div className="fade-up-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
@@ -259,7 +259,7 @@ export default function Home() {
               <span style={{color:'#C9A84C', fontStyle:'italic'}}>membership destinations.</span>
             </h2>
             <p className="font-body text-base leading-relaxed mb-6" style={{color:'#8A7A6A', fontWeight:300}}>
-              Regly gives independent restaurants, coffee shops, and local businesses the tools to offer their own monthly memberships — complete with custom perks, defined benefits, and recurring value for their most loyal customers.
+              Regly gives independent restaurants, coffee shops, and local businesses the tools to offer their own monthly memberships, complete with custom perks, defined benefits, and recurring value for their most loyal customers.
             </p>
             <p className="font-body text-base leading-relaxed mb-10" style={{color:'#8A7A6A', fontWeight:300}}>
               As a customer, you subscribe to the businesses you already visit. No points to track. No apps to open. Just give your phone number at the counter and your perks are applied instantly.
@@ -400,7 +400,7 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Perk idea grid — polished SVG icons */}
+          {/* Perk idea grid, polished SVG icons */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-16">
             {[
               {
@@ -470,7 +470,7 @@ export default function Home() {
               <span style={{color:'#C9A84C', fontStyle:'italic'}}>Make it irresistible.</span>
             </h3>
             <p className="font-body text-sm max-w-xl mx-auto mb-8" style={{color:'#8A7A6A', fontWeight:300}}>
-              Regly gives you the platform. You bring the creativity. The businesses on Regly aren't just offering discounts — they are building relationships, creating habits, and giving customers a real reason to choose them over everyone else.
+              Regly gives you the platform. You bring the creativity. The businesses on Regly aren't just offering discounts, they are building relationships, creating habits, and giving customers a real reason to choose them over everyone else.
             </p>
             <button onClick={() => router.push('/auth?role=business')}
               className="font-body text-xs tracking-widest uppercase px-10 py-4 rounded transition-all"
@@ -511,7 +511,7 @@ export default function Home() {
               Give your regulars a reason<br />to <span style={{color:'#C9A84C', fontStyle:'italic'}}>always choose you.</span>
             </h2>
             <p className="font-body text-sm leading-relaxed mb-8" style={{color:'#8A7A6A', fontWeight:300}}>
-              Regly is the platform that powers your membership program. You design the experience — the perks, the tiers, the price. Regly handles payments, member tracking, and monthly payouts directly to your bank. No hardware. No upfront cost. Live in 48 hours.
+              Regly is the platform that powers your membership program. You design the experience, the perks, the tiers, the price. Regly handles payments, member tracking, and monthly payouts directly to your bank. No hardware. No upfront cost. Live in 48 hours.
             </p>
             <button onClick={() => router.push('/auth?role=business')}
               className="font-body text-xs tracking-widest uppercase px-8 py-3.5 rounded border transition-all"
