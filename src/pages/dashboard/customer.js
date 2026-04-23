@@ -63,6 +63,7 @@ export default function CustomerDashboard() {
   const [tiers, setTiers]                 = useState([])
   const [myMemberships, setMyMemberships] = useState([])
   const [perkUsageMap, setPerkUsageMap] = useState({})
+  const [visitLog, setVisitLog] = useState([])
   const [loading, setLoading]             = useState(true)
   const [subscribing, setSubscribing]     = useState(null)
   const [hoveredCard, setHoveredCard]     = useState(null)
@@ -101,6 +102,15 @@ export default function CustomerDashboard() {
         usageMap[key][u.perk_index] = (usageMap[key][u.perk_index] || 0) + 1
       })
       setPerkUsageMap(usageMap)
+
+      // Fetch full visit log — all perk redemptions across all subscriptions
+      const { data: log } = await supabase
+        .from('perk_usage')
+        .select('perk_description, billing_month, used_at, subscription_id, restaurants(name)')
+        .in('subscription_id', subIds)
+        .order('used_at', { ascending: false })
+        .limit(50)
+      setVisitLog(log || [])
     }
     setLoading(false)
   }
@@ -196,7 +206,7 @@ export default function CustomerDashboard() {
 
       <div style={{maxWidth:1100, margin:'0 auto', padding:'40px 24px'}}>
 
-        {/* HERO PROMPT — no memberships */}
+        {/* HERO PROMPT, no memberships */}
         {hasNoMemberships && (
           <div style={{background:'linear-gradient(135deg, #0A0906 0%, #1A1410 100%)', borderRadius:24, padding:'48px 40px', marginBottom:40, position:'relative', overflow:'hidden'}}>
             <div style={{position:'absolute', right:-40, top:-40, width:240, height:240, borderRadius:'50%', background:'rgba(201,168,76,0.08)'}} />
@@ -272,7 +282,7 @@ export default function CustomerDashboard() {
                                       <span style={{fontSize:12, color: exhausted ? '#9CA3AF' : isRecord ? 'rgba(245,240,232,0.8)' : '#374151', textDecoration: exhausted ? 'line-through' : 'none'}}>{perk.description}</span>
                                     </div>
                                     <span style={{fontSize:11, fontWeight:600, color: exhausted ? '#EF4444' : isLimited ? (isRecord ? '#C9A84C' : '#6B7280') : '#059669', whiteSpace:'nowrap', marginLeft:8}}>
-                                      {isLimited ? (exhausted ? 'Used up' : `${remaining} left`) : 'Unlimited'}
+                                      {isLimited ? (exhausted ? `Used up (${limit} total)` : `${remaining} of ${limit} left`) : 'Unlimited'}
                                     </span>
                                   </div>
                                 )
@@ -296,6 +306,44 @@ export default function CustomerDashboard() {
               })}
             </div>
           </div>
+
+          {/* VISIT LOG */}
+          {visitLog.length > 0 && (
+            <div style={{marginBottom:40}}>
+              <div style={{marginBottom:20}}>
+                <h2 style={{fontFamily:'Georgia, serif', fontSize:24, fontWeight:700, color:'#111827', margin:0}}>Visit History</h2>
+                <p style={{color:'#9CA3AF', fontSize:14, marginTop:4}}>Every perk you have redeemed, most recent first</p>
+              </div>
+              <div style={{background:'white', borderRadius:20, overflow:'hidden', boxShadow:'0 2px 12px rgba(0,0,0,0.06)', border:'1px solid #F3F4F6'}}>
+                {visitLog.map((entry, i) => {
+                  const date = new Date(entry.used_at)
+                  const isToday = new Date().toDateString() === date.toDateString()
+                  const dateLabel = isToday ? 'Today' : date.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' })
+                  const timeLabel = date.toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit' })
+                  const [year, month] = (entry.billing_month || '').split('-')
+                  const monthLabel = year && month ? new Date(year, parseInt(month)-1).toLocaleDateString('en-US', { month:'long', year:'numeric' }) : ''
+                  return (
+                    <div key={i} style={{display:'flex', alignItems:'center', gap:16, padding:'16px 24px', borderBottom: i < visitLog.length - 1 ? '1px solid #F9FAFB' : 'none'}}>
+                      <div style={{width:40, height:40, borderRadius:10, background:'rgba(201,168,76,0.08)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0}}>
+                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                          <circle cx="9" cy="9" r="7.5" stroke="#C9A84C" strokeWidth="1.2"/>
+                          <path d="M9 5.5V9L11.5 11" stroke="#C9A84C" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </div>
+                      <div style={{flex:1, minWidth:0}}>
+                        <p style={{fontSize:14, fontWeight:600, color:'#111827', marginBottom:2, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}>{entry.perk_description}</p>
+                        <p style={{fontSize:12, color:'#9CA3AF'}}>{entry.restaurants?.name}{monthLabel ? ` · ${monthLabel}` : ''}</p>
+                      </div>
+                      <div style={{textAlign:'right', flexShrink:0}}>
+                        <p style={{fontSize:13, fontWeight:500, color:'#374151'}}>{dateLabel}</p>
+                        <p style={{fontSize:11, color:'#9CA3AF'}}>{timeLabel}</p>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
         )}
 
         {/* BROWSE RESTAURANTS */}
