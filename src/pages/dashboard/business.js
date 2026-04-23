@@ -152,8 +152,22 @@ export default function BusinessDashboard() {
     setSearching(true)
     setLookup(null)
     const cleaned = phone.replace(/\D/g, '')
-    const { data: profiles } = await supabase.from('profiles').select('id, name, phone').eq('role', 'customer')
-    const matchedProfile = profiles?.find(p => (p.phone || '').replace(/\D/g, '') === cleaned)
+    // Query only the specific phone number — never fetch all profiles
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('id, name, phone')
+      .eq('role', 'customer')
+      .eq('phone', phone.trim())
+    // Also try cleaned version in case formatting differs
+    let matchedProfile = profiles?.[0] || null
+    if (!matchedProfile) {
+      const { data: profiles2 } = await supabase
+        .from('profiles')
+        .select('id, name, phone')
+        .eq('role', 'customer')
+        .ilike('phone', `%${cleaned.slice(-10)}%`)
+      matchedProfile = profiles2?.[0] || null
+    }
     if (!matchedProfile) { setLookup(false); setSearching(false); return }
 
     const { data: subs } = await supabase
