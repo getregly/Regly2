@@ -400,26 +400,64 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Perk idea grid */}
+          {/* Perk idea grid — polished SVG icons */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-16">
             {[
-              { emoji:'🍕', label:'Free slice every visit',       cat:'Restaurant' },
-              { emoji:'☕', label:'Free coffee every morning',    cat:'Coffee Shop' },
-              { emoji:'🤫', label:'Access to the secret menu',    cat:'Any Business' },
-              { emoji:'👕', label:'Free branded shirt on signup', cat:'Any Business' },
-              { emoji:'🪑', label:'Reserved seating, always',     cat:'Bar / Lounge' },
-              { emoji:'🎂', label:'Free dessert on your birthday',cat:'Restaurant' },
-              { emoji:'🚚', label:'Free delivery every order',    cat:'Restaurant' },
-              { emoji:'🎵', label:'Skip the line on event nights',cat:'Venue / Bar' },
-              { emoji:'🥤', label:'Free drink upgrade every visit',cat:'Cafe' },
-              { emoji:'📦', label:'Monthly exclusive merch drop', cat:'Retail / Brand' },
-              { emoji:'🍷', label:'Members-only wine list',       cat:'Wine Bar' },
-              { emoji:'✨', label:'Early access to new items',    cat:'Any Business' },
+              {
+                label:'Free item every visit', cat:'Restaurant',
+                icon: <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M4 20C4 20 6 14 14 14C22 14 24 20 24 20" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/><path d="M14 14V8" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/><circle cx="14" cy="6" r="2" stroke="#C9A84C" strokeWidth="1.5"/><path d="M4 22H24" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/></svg>
+              },
+              {
+                label:'Free coffee every morning', cat:'Coffee Shop',
+                icon: <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M6 12H20V22C20 23.1 19.1 24 18 24H8C6.9 24 6 23.1 6 22V12Z" stroke="#C9A84C" strokeWidth="1.5" strokeLinejoin="round"/><path d="M20 14H22C23.1 14 24 14.9 24 16V17C24 18.1 23.1 19 22 19H20" stroke="#C9A84C" strokeWidth="1.5" strokeLinejoin="round"/><path d="M10 6C10 6 10 4 12 4C14 4 14 2 14 2" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/></svg>
+              },
+              {
+                label:'Secret menu access', cat:'Any Business',
+                icon: <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="6" y="8" width="16" height="14" rx="2" stroke="#C9A84C" strokeWidth="1.5"/><path d="M10 8V6C10 4.9 10.9 4 12 4H16C17.1 4 18 4.9 18 6V8" stroke="#C9A84C" strokeWidth="1.5"/><circle cx="14" cy="15" r="2" stroke="#C9A84C" strokeWidth="1.5"/><path d="M14 17V19" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/></svg>
+              },
+              {
+                label:'Free branded merch on signup', cat:'Any Business',
+                icon: <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M10 4H18L20 8H24L22 12H18V24H10V12H6L4 8H8L10 4Z" stroke="#C9A84C" strokeWidth="1.5" strokeLinejoin="round"/><path d="M10 8H18" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/></svg>
+              },
+              {
+                label:'Reserved seating, always', cat:'Bar / Lounge',
+                icon: <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="6" y="10" width="16" height="10" rx="2" stroke="#C9A84C" strokeWidth="1.5"/><path d="M4 14H6M22 14H24" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/><path d="M10 20V24M18 20V24" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/><path d="M10 6H18" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/></svg>
+              },
+              {
+                label:'Birthday month bonus', cat:'Restaurant',
+                icon: <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="6" y="14" width="16" height="10" rx="1.5" stroke="#C9A84C" strokeWidth="1.5"/><path d="M8 14V12C8 10.9 8.9 10 10 10H18C19.1 10 20 10.9 20 12V14" stroke="#C9A84C" strokeWidth="1.5"/><path d="M10 10V8M14 10V6M18 10V8" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/><path d="M10 18H18" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/></svg>
+              },
+              {
+                label:'Free delivery every order', cat:'Restaurant',
+                icon: <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="4" y="10" width="14" height="10" rx="1.5" stroke="#C9A84C" strokeWidth="1.5"/><path d="M18 14H22L24 18H18V14Z" stroke="#C9A84C" strokeWidth="1.5" strokeLinejoin="round"/><circle cx="9" cy="22" r="2" stroke="#C9A84C" strokeWidth="1.5"/><circle cx="21" cy="22" r="2" stroke="#C9A84C" strokeWidth="1.5"/><path d="M4 14H2" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/></svg>
+              },
+              {
+                label:'Skip the line on event nights', cat:'Venue / Bar',
+                icon: <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M8 6H20L22 10H6L8 6Z" stroke="#C9A84C" strokeWidth="1.5" strokeLinejoin="round"/><path d="M6 10V22H22V10" stroke="#C9A84C" strokeWidth="1.5" strokeLinejoin="round"/><path d="M11 16L14 19L20 13" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              },
+              {
+                label:'Free drink upgrade every visit', cat:'Cafe',
+                icon: <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M8 8H20L18 22H10L8 8Z" stroke="#C9A84C" strokeWidth="1.5" strokeLinejoin="round"/><path d="M6 8H22" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/><path d="M11 8V5M14 8V4M17 8V5" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/><path d="M11 14H17" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/></svg>
+              },
+              {
+                label:'Monthly exclusive merch drop', cat:'Retail / Brand',
+                icon: <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="6" y="10" width="16" height="14" rx="1.5" stroke="#C9A84C" strokeWidth="1.5"/><path d="M10 10V8C10 6.34 11.34 5 13 5H15C16.66 5 18 6.34 18 8V10" stroke="#C9A84C" strokeWidth="1.5"/><path d="M6 17H22" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/></svg>
+              },
+              {
+                label:'Members-only wine list', cat:'Wine Bar',
+                icon: <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M10 4H18L17 14C17 16.76 15.76 19 14 19C12.24 19 11 16.76 11 14L10 4Z" stroke="#C9A84C" strokeWidth="1.5" strokeLinejoin="round"/><path d="M14 19V24" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/><path d="M10 24H18" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/><path d="M11 9H17" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/></svg>
+              },
+              {
+                label:'Early access to new items', cat:'Any Business',
+                icon: <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="10" stroke="#C9A84C" strokeWidth="1.5"/><path d="M14 8V14L18 16" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M8 5L6 3M20 5L22 3" stroke="#C9A84C" strokeWidth="1.2" strokeLinecap="round"/></svg>
+              },
             ].map(p => (
-              <div key={p.label} className="hover-lift rounded-2xl p-5 border text-center" style={{background:'white', borderColor:'rgba(138,106,32,0.15)', boxShadow:'0 2px 12px rgba(0,0,0,0.04)'}}>
-                <p style={{fontSize:'2rem', marginBottom:8}}>{p.emoji}</p>
-                <p className="font-body text-sm font-semibold mb-1" style={{color:'#1A1410'}}>{p.label}</p>
-                <p className="font-body" style={{fontSize:'0.65rem', letterSpacing:'0.1em', textTransform:'uppercase', color:'#8A6A20', fontWeight:600}}>{p.cat}</p>
+              <div key={p.label} className="hover-lift rounded-2xl p-6 border" style={{background:'white', borderColor:'rgba(138,106,32,0.12)', boxShadow:'0 2px 16px rgba(0,0,0,0.05)'}}>
+                <div style={{width:48, height:48, background:'rgba(201,168,76,0.08)', borderRadius:12, display:'flex', alignItems:'center', justifyContent:'center', marginBottom:14}}>
+                  {p.icon}
+                </div>
+                <p className="font-body text-sm font-semibold mb-1" style={{color:'#1A1410', lineHeight:1.4}}>{p.label}</p>
+                <p className="font-body" style={{fontSize:'0.62rem', letterSpacing:'0.12em', textTransform:'uppercase', color:'#8A6A20', fontWeight:600}}>{p.cat}</p>
               </div>
             ))}
           </div>
