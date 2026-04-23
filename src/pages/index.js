@@ -3,55 +3,10 @@ import { useRouter } from 'next/router'
 
 const PASSCODE = 'PERKS'
 
-// ─── SVG Icons ────────────────────────────────────────────────────
-const IconStar = () => (
-  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-    <path d="M16 2L16 30M2 16L30 16M5.5 5.5L26.5 26.5M26.5 5.5L5.5 26.5" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/>
-    <circle cx="16" cy="16" r="3" fill="#C9A84C"/>
-  </svg>
-)
-const IconMembership = () => (
-  <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-    <path d="M24 4C17.373 4 12 9.373 12 16C12 25 24 44 24 44C24 44 36 25 36 16C36 9.373 30.627 4 24 4Z" stroke="#C9A84C" strokeWidth="1.5" strokeLinejoin="round"/>
-    <circle cx="24" cy="16" r="5" stroke="#C9A84C" strokeWidth="1.5"/>
-    <path d="M16 40C12 41 8 43 8 45H40C40 43 36 41 32 40" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/>
-  </svg>
-)
-const IconPerks = () => (
-  <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-    <path d="M24 6L28.5 17H40L30.5 23.5L34 34L24 27.5L14 34L17.5 23.5L8 17H19.5L24 6Z" stroke="#C9A84C" strokeWidth="1.5" strokeLinejoin="round"/>
-    <path d="M24 14L26.5 20.5H33L27.5 24.5L29.5 31L24 27.5L18.5 31L20.5 24.5L15 20.5H21.5L24 14Z" fill="#C9A84C" fillOpacity="0.15"/>
-  </svg>
-)
-const IconPhone = () => (
-  <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-    <rect x="14" y="4" width="20" height="40" rx="3" stroke="#C9A84C" strokeWidth="1.5"/>
-    <path d="M14 36H34M14 12H34" stroke="#C9A84C" strokeWidth="1.5"/>
-    <circle cx="24" cy="40" r="1.5" fill="#C9A84C"/>
-    <path d="M20 8H28" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/>
-  </svg>
-)
-const IconShield = () => (
-  <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-    <path d="M24 4L8 10V22C8 31 15 39 24 42C33 39 40 31 40 22V10L24 4Z" stroke="#C9A84C" strokeWidth="1.5" strokeLinejoin="round"/>
-    <path d="M17 24L21 28L31 18" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-)
-const IconVIP = () => (
-  <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-    <path d="M8 14L16 30L24 16L32 30L40 14" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M6 34H42" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/>
-    <path d="M24 8V4M16 10L13 7M32 10L35 7" stroke="#C9A84C" strokeWidth="1.2" strokeLinecap="round"/>
-  </svg>
-)
-const IconArrow = () => (
-  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-    <path d="M4 10H16M16 10L11 5M16 10L11 15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
-)
-const IconGold = ({ size = 16 }) => (
-  <svg width={size} height={size} viewBox="0 0 16 16" fill="none">
-    <path d="M8 1L8 15M1 8L15 8M3.05 3.05L12.95 12.95M12.95 3.05L3.05 12.95" stroke="#C9A84C" strokeWidth="1" strokeLinecap="round"/>
+// ─── Icons ────────────────────────────────────────────────────────
+const ArrowRight = () => (
+  <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+    <path d="M3 9H15M15 9L10 4M15 9L10 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 )
 
@@ -59,41 +14,29 @@ const IconGold = ({ size = 16 }) => (
 function PasscodeGate({ onUnlock }) {
   const [input, setInput] = useState('')
   const [error, setError] = useState(false)
-  const [shake, setShake] = useState(false)
 
   function handle(e) {
     e.preventDefault()
     if (input.toUpperCase() === PASSCODE) { onUnlock() }
-    else {
-      setError(true); setShake(true)
-      setTimeout(() => setShake(false), 500)
-      setInput('')
-    }
+    else { setError(true); setTimeout(() => setError(false), 1200); setInput('') }
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6 text-center relative overflow-hidden" style={{background:'#0A0906'}}>
-      <div className="fixed left-0 top-0 w-1.5 h-full" style={{background:'#C9A84C'}} />
-      <div className="fixed inset-0 opacity-20 pointer-events-none" style={{backgroundImage:"url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E\")"}} />
-      <div className="relative z-10">
-        <div className="mb-8 flex items-center justify-center gap-2">
-          <div className="w-8 h-0.5 opacity-40" style={{background:'#C9A84C'}} />
-          <IconGold size={12} />
-          <div className="w-8 h-0.5 opacity-40" style={{background:'#C9A84C'}} />
-        </div>
-        <h1 className="font-serif text-6xl font-bold tracking-tight mb-3">
-          <span className="text-cream">REGL</span><span className="text-gold">Y</span>
-        </h1>
-        <p className="text-muted text-sm tracking-widest uppercase mb-12">Members Only</p>
-        <form onSubmit={handle}>
-          <div className={`transition-transform ${shake ? 'translate-x-2' : ''}`}>
-            <input className="input text-center text-lg tracking-[0.4em] uppercase mb-4 w-64" placeholder="· · · · ·"
-              value={input} onChange={e => setInput(e.target.value)} autoFocus />
-          </div>
-          {error && <p className="text-red-400 text-xs mb-4 tracking-widest uppercase">Invalid passcode</p>}
-          <button type="submit" className="btn-gold w-64 py-3 tracking-widest text-sm uppercase">Enter</button>
-        </form>
-      </div>
+    <div style={{minHeight:'100vh', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', background:'#0A0906', fontFamily:'system-ui, sans-serif'}}>
+      <p style={{fontFamily:'Georgia, serif', fontSize:32, fontWeight:700, color:'#F5F0E8', marginBottom:4}}>REGL<span style={{color:'#C9A84C'}}>Y</span></p>
+      <p style={{color:'#8A7A6A', fontSize:13, marginBottom:32, letterSpacing:'0.15em', textTransform:'uppercase'}}>Enter passcode to continue</p>
+      <form onSubmit={handle} style={{display:'flex', flexDirection:'column', gap:12, alignItems:'center'}}>
+        <input
+          value={input} onChange={e => setInput(e.target.value)}
+          placeholder="Passcode"
+          style={{padding:'14px 20px', background:'#1A1410', border:`1px solid ${error ? '#EF4444' : 'rgba(201,168,76,0.3)'}`, borderRadius:8, color:'#F5F0E8', fontSize:16, textAlign:'center', letterSpacing:'0.2em', outline:'none', width:220, fontFamily:'inherit', transition:'border 0.2s'}}
+        />
+        <button type="submit"
+          style={{padding:'12px 32px', background:'#C9A84C', color:'#0A0906', border:'none', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer', letterSpacing:'0.1em', fontFamily:'inherit'}}>
+          Continue
+        </button>
+      </form>
+      {error && <p style={{color:'#EF4444', fontSize:12, marginTop:12}}>Incorrect passcode</p>}
     </div>
   )
 }
@@ -122,511 +65,386 @@ export default function Home() {
   if (!unlocked) return <PasscodeGate onUnlock={unlock} />
 
   return (
-    <div className="min-h-screen overflow-x-hidden" style={{background:'#0A0906'}}>
+    <div style={{minHeight:'100vh', background:'#FFFFFF', fontFamily:"'Inter', system-ui, sans-serif", overflowX:'hidden'}}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap');
-        .font-display  { font-family: 'Playfair Display', Georgia, serif; }
-        .font-editorial{ font-family: 'Cormorant Garamond', Georgia, serif; }
-        .font-body     { font-family: 'Montserrat', system-ui, sans-serif; }
-        .hero-text     { font-size: clamp(3.2rem, 9vw, 8.5rem); line-height: 0.92; letter-spacing: -0.03em; }
-        .section-label { font-family: 'Montserrat', sans-serif; font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase; color: #C9A84C; font-weight: 600; }
-        .gold-line     { width: 40px; height: 1px; background: #C9A84C; display: inline-block; opacity: 0.6; }
-        @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
-        @keyframes shimmer { 0%,100% { opacity:0.03; } 50% { opacity:0.07; } }
-        .fade-up  { animation: fadeUp 1s ease forwards; }
-        .fade-up-2{ animation: fadeUp 1s ease 0.2s forwards; opacity:0; }
-        .fade-up-3{ animation: fadeUp 1s ease 0.4s forwards; opacity:0; }
-        .fade-up-4{ animation: fadeUp 1s ease 0.6s forwards; opacity:0; }
-        .shimmer  { animation: shimmer 4s ease-in-out infinite; }
-        .tier-card:hover { transform: translateY(-6px); box-shadow: 0 20px 60px rgba(201,168,76,0.1); transition: all 0.35s ease; }
-        .nav-blur { backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
-        .divider-ornament { display:flex; align-items:center; gap:16px; }
-        .divider-ornament::before,.divider-ornament::after { content:''; flex:1; height:1px; background:linear-gradient(90deg,transparent,#C9A84C44); }
-        .photo-overlay { background: linear-gradient(to bottom, rgba(10,9,6,0.3) 0%, rgba(10,9,6,0.55) 50%, rgba(10,9,6,0.92) 100%); }
-        .light-section { background: #F5F0E8; }
-        .light-section .section-label { color: #8A6A20; }
-        .hover-lift { transition: transform 0.25s ease, box-shadow 0.25s ease; }
-        .hover-lift:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.15); }
-        .btn-dark { background: #0A0906; color: #C9A84C; border: 1px solid rgba(201,168,76,0.5); font-family: 'Montserrat', sans-serif; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 600; border-radius: 6px; cursor: pointer; transition: all 0.25s ease; }
-        .btn-dark:hover { background: #C9A84C; color: #0A0906; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,700;0,900;1,600&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        .nav-blur { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+        .fade-up   { animation: fadeUp 0.8s ease forwards; }
+        .fade-up-2 { animation: fadeUp 0.8s ease 0.15s forwards; opacity:0; }
+        .fade-up-3 { animation: fadeUp 0.8s ease 0.3s forwards; opacity:0; }
+        .fade-up-4 { animation: fadeUp 0.8s ease 0.45s forwards; opacity:0; }
+        .hover-lift { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .hover-lift:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(0,0,0,0.1); }
+        .perk-card:hover { border-color: rgba(201,168,76,0.4) !important; }
+        .nav-link { color: #374151; font-size: 14px; font-weight: 500; background: none; border: none; cursor: pointer; font-family: inherit; transition: color 0.2s; }
+        .nav-link:hover { color: #111827; }
+        @keyframes shimmer { 0%,100% { opacity:0.04; } 50% { opacity:0.08; } }
+        .shimmer { animation: shimmer 5s ease-in-out infinite; }
       `}</style>
 
-      <div className="fixed left-0 top-0 w-1.5 h-full z-50" style={{background:'#C9A84C'}} />
-
-      {/* NAV */}
-      <nav className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ${scrolled ? 'nav-blur border-b py-3' : 'py-5'}`}
-        style={{borderColor:'rgba(201,168,76,0.12)', background: scrolled ? 'rgba(10,9,6,0.92)' : 'transparent'}}>
-        <div className="max-w-6xl mx-auto px-8 flex items-center justify-between">
-          <button onClick={() => router.push('/')} className="font-display text-2xl font-bold tracking-tight">
-            <span style={{color:'#F5F0E8'}}>REGL</span><span style={{color:'#C9A84C'}}>Y</span>
+      {/* ── NAV ─────────────────────────────────────────────────── */}
+      <nav className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${scrolled ? 'nav-blur' : ''}`}
+        style={{background: scrolled ? 'rgba(255,255,255,0.95)' : 'transparent', borderBottom: scrolled ? '1px solid #F3F4F6' : 'none', padding:'0 40px', height:68, display:'flex', alignItems:'center', justifyContent:'space-between'}}>
+        <button onClick={() => router.push('/')}
+          style={{fontFamily:'Georgia, serif', fontSize:22, fontWeight:700, color:'#111827', background:'none', border:'none', cursor:'pointer'}}>
+          REGL<span style={{color:'#C9A84C'}}>Y</span>
+        </button>
+        <div style={{display:'flex', alignItems:'center', gap:8}}>
+          <button onClick={() => router.push('/auth')} className="nav-link" style={{padding:'8px 16px'}}>Log in</button>
+          <button onClick={() => router.push('/auth?role=business')} className="nav-link" style={{padding:'8px 16px'}}>For businesses</button>
+          <button onClick={() => router.push('/auth?role=customer')}
+            style={{padding:'10px 22px', background:'#111827', color:'white', border:'none', borderRadius:8, fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:'inherit', transition:'background 0.2s'}}
+            onMouseEnter={e => e.currentTarget.style.background='#C9A84C'}
+            onMouseLeave={e => e.currentTarget.style.background='#111827'}>
+            Join free
           </button>
-          <div className="flex items-center gap-4">
-            <button onClick={() => router.push('/auth?role=customer')}
-              className="font-body text-xs tracking-widest uppercase px-6 py-2.5 rounded border transition-all duration-300"
-              style={{borderColor:'rgba(245,240,232,0.3)', color:'#F5F0E8', background:'transparent'}}
-              onMouseEnter={e => { e.target.style.borderColor='#C9A84C'; e.target.style.color='#C9A84C'; }}
-              onMouseLeave={e => { e.target.style.borderColor='rgba(245,240,232,0.3)'; e.target.style.color='#F5F0E8'; }}>
-              Log In
-            </button>
-            <button onClick={() => router.push('/auth?role=customer')}
-              className="font-body text-xs tracking-widest uppercase px-6 py-2.5 rounded transition-all duration-300"
-              style={{background:'#C9A84C', color:'#0A0906', fontWeight:600}}>
-              Join Free
-            </button>
-          </div>
         </div>
       </nav>
 
-      {/* ── HERO full bleed photo ───────────────────────────────── */}
-      <section className="relative min-h-screen flex flex-col justify-end overflow-hidden">
-        {/* Hero background photo editorial overhead restaurant */}
-        <div className="absolute inset-0">
-          <img
-            src="https://images.unsplash.com/photo-1653795164352-6f4ba840f525?q=80&w=2670&auto=format&fit=crop"
-            alt="Restaurant"
-            className="w-full h-full object-cover"
-            style={{objectPosition:'center 40%'}}
-          />
-          <div className="photo-overlay absolute inset-0" />
-          {/* Extra dark vignette at top for nav readability */}
-          <div className="absolute inset-0" style={{background:'linear-gradient(to bottom, rgba(10,9,6,0.5) 0%, transparent 30%)'}} />
-        </div>
+      {/* ── HERO ────────────────────────────────────────────────── */}
+      <section style={{minHeight:'100vh', position:'relative', display:'flex', flexDirection:'column', justifyContent:'flex-end', overflow:'hidden'}}>
+        <img
+          src="https://images.unsplash.com/photo-1653795164352-6f4ba840f525?q=80&w=2670&auto=format&fit=crop"
+          alt="Restaurant"
+          style={{position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', objectPosition:'center 40%'}}
+        />
+        <div style={{position:'absolute', inset:0, background:'linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.45) 50%, rgba(0,0,0,0.88) 100%)'}} />
 
-        {/* Hero content */}
-        <div className="relative z-10 max-w-7xl mx-auto px-8 sm:px-16 pb-24 pt-40">
-          <div className="fade-up flex items-center gap-3 mb-8">
-            <div className="gold-line" />
-            <span className="section-label" style={{color:'rgba(201,168,76,0.9)'}}>Now in Chicago</span>
-            <div className="gold-line" />
-          </div>
-
-          <h1 className="font-display hero-text text-left fade-up-2 mb-8 max-w-4xl" style={{color:'#F5F0E8'}}>
-            Your favorite spots<br />
+        <div className="fade-up" style={{position:'relative', zIndex:10, maxWidth:1100, margin:'0 auto', padding:'0 40px 80px', width:'100%'}}>
+          <p style={{fontSize:11, letterSpacing:'0.25em', textTransform:'uppercase', color:'rgba(201,168,76,0.9)', fontWeight:600, marginBottom:20}}>Now in Chicago</p>
+          <h1 style={{fontFamily:'Georgia, serif', fontSize:'clamp(3rem, 7vw, 6.5rem)', fontWeight:700, color:'#FFFFFF', lineHeight:1.0, letterSpacing:'-0.02em', marginBottom:28, maxWidth:800}}>
+            Your favorite spots,<br />
             <span style={{color:'#C9A84C', fontStyle:'italic'}}>rewarding you</span><br />
-            <span style={{fontStyle:'italic'}}>every visit.</span>
+            every visit.
           </h1>
-
-          <p className="fade-up-3 font-body text-lg max-w-xl mb-10 leading-relaxed" style={{color:'rgba(245,240,232,0.75)', fontWeight:300}}>
-            Regly is a membership platform that lets local businesses offer their own monthly memberships, with real, defined perks their customers get every single visit. Not points. Not punch cards. Actual value, every time you walk in.
+          <p className="fade-up-2" style={{fontSize:18, color:'rgba(255,255,255,0.75)', fontWeight:300, maxWidth:520, lineHeight:1.65, marginBottom:40}}>
+            Regly is the membership platform for local businesses. Subscribe to the spots you already love and get real perks every time you walk in. Not points. Not punch cards. Actual value, instantly.
           </p>
-
-          <div className="fade-up-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <div className="fade-up-3" style={{display:'flex', gap:12, flexWrap:'wrap'}}>
             <button onClick={() => router.push('/auth?role=customer')}
-              className="font-body group flex items-center gap-3 px-10 py-4 rounded text-sm tracking-widest uppercase transition-all duration-300"
-              style={{background:'#C9A84C', color:'#0A0906', fontWeight:600}}>
-              See What's Near Me <IconArrow />
+              style={{display:'flex', alignItems:'center', gap:10, padding:'14px 28px', background:'#C9A84C', color:'#0A0906', border:'none', borderRadius:8, fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:'inherit', transition:'opacity 0.2s'}}
+              onMouseEnter={e => e.currentTarget.style.opacity='0.88'}
+              onMouseLeave={e => e.currentTarget.style.opacity='1'}>
+              Browse memberships <ArrowRight />
             </button>
-            <button
-              onClick={() => { document.getElementById('how')?.scrollIntoView({behavior:'smooth'}) }}
-              className="font-body text-xs tracking-widest uppercase transition-all duration-300"
-              style={{color:'rgba(245,240,232,0.6)'}}>
-              See how it works ↓
+            <button onClick={() => document.getElementById('how')?.scrollIntoView({behavior:'smooth'})}
+              style={{padding:'14px 24px', background:'rgba(255,255,255,0.1)', color:'rgba(255,255,255,0.85)', border:'1px solid rgba(255,255,255,0.25)', borderRadius:8, fontSize:14, fontWeight:500, cursor:'pointer', fontFamily:'inherit', backdropFilter:'blur(8px)'}}>
+              See how it works
             </button>
           </div>
-        </div>
-
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 right-16 hidden sm:flex flex-col items-center gap-2 z-10">
-          <div className="w-px h-16 opacity-20" style={{background:'#C9A84C'}} />
-          <span className="section-label" style={{writingMode:'vertical-rl', color:'rgba(201,168,76,0.5)'}}>Scroll</span>
         </div>
       </section>
 
-      {/* ── TRUST BAR light section ─────────────────────────────── */}
-      <section className="light-section py-16 border-y" style={{borderColor:'rgba(201,168,76,0.2)'}}>
-        <div className="max-w-4xl mx-auto px-8 grid grid-cols-2 sm:grid-cols-4 gap-8 text-center">
+      {/* ── STAT BAR ────────────────────────────────────────────── */}
+      <section style={{background:'#111827', padding:'32px 40px'}}>
+        <div style={{maxWidth:1100, margin:'0 auto', display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(160px, 1fr))', gap:32}}>
           {[
-            { n: 'Local',  l: 'Built for the places\nin your neighborhood' },
-            { n: 'Yours',  l: 'For the spots\nyou already go' },
-            { n: '100%',   l: 'Secure payments\nvia Stripe' },
-            { n: '∞',      l: 'Cancel anytime\nno commitment' },
+            { n:'$0',        l:'Setup cost for businesses' },
+            { n:'48 hrs',    l:'Average time to go live' },
+            { n:'85%',       l:'Revenue kept by the business' },
+            { n:'No app',    l:'Required for customers' },
           ].map(s => (
-            <div key={s.n}>
-              <p className="font-display text-4xl font-bold" style={{color:'#8A6A20'}}>{s.n}</p>
-              <p className="font-body text-xs mt-2 leading-relaxed whitespace-pre-line" style={{color:'#6B5A3E', fontWeight:400}}>{s.l}</p>
+            <div key={s.n} style={{textAlign:'center'}}>
+              <p style={{fontFamily:'Georgia, serif', fontSize:28, fontWeight:700, color:'#C9A84C', marginBottom:4}}>{s.n}</p>
+              <p style={{fontSize:12, color:'rgba(255,255,255,0.5)', fontWeight:400, letterSpacing:'0.02em'}}>{s.l}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ── WHAT IS REGLY dark, split layout with photo ─────────── */}
-      <section id="how" className="py-32 px-8 max-w-6xl mx-auto">
-        <div className="grid sm:grid-cols-2 gap-20 items-center">
-          <div>
-            <p className="section-label mb-5">What is Regly</p>
-            <h2 className="font-display text-5xl font-bold leading-tight mb-6" style={{color:'#F5F0E8'}}>
-              A platform that turns<br />local businesses into<br />
-              <span style={{color:'#C9A84C', fontStyle:'italic'}}>membership destinations.</span>
-            </h2>
-            <p className="font-body text-base leading-relaxed mb-6" style={{color:'#8A7A6A', fontWeight:300}}>
-              Regly gives independent restaurants, coffee shops, and local businesses the tools to offer their own monthly memberships, complete with custom perks, defined benefits, and recurring value for their most loyal customers.
-            </p>
-            <p className="font-body text-base leading-relaxed mb-10" style={{color:'#8A7A6A', fontWeight:300}}>
-              As a customer, you subscribe to the businesses you already visit. No points to track. No apps to open. Just give your phone number at the counter and your perks are applied instantly.
-            </p>
-            <button onClick={() => router.push('/auth?role=customer')}
-              className="font-body text-xs tracking-widest uppercase px-8 py-3.5 rounded border transition-all"
-              style={{borderColor:'#C9A84C', color:'#C9A84C', background:'transparent'}}
-              onMouseEnter={e => { e.currentTarget.style.background='#C9A84C'; e.currentTarget.style.color='#0A0906'; }}
-              onMouseLeave={e => { e.currentTarget.style.background='transparent'; e.currentTarget.style.color='#C9A84C'; }}>
-              Browse Memberships
-            </button>
-          </div>
-
-          {/* Membership card illustration */}
-          <div className="relative">
-            <div className="relative mx-auto" style={{width:320, height:400}}>
-              <div className="absolute rounded-2xl border" style={{width:280, height:360, top:30, left:30, borderColor:'rgba(201,168,76,0.15)', background:'rgba(201,168,76,0.04)', transform:'rotate(6deg)'}} />
-              <div className="absolute rounded-2xl border" style={{width:280, height:360, top:15, left:20, borderColor:'rgba(201,168,76,0.25)', background:'rgba(201,168,76,0.06)', transform:'rotate(3deg)'}} />
-              <div className="absolute rounded-2xl border p-8 flex flex-col justify-between" style={{width:280, height:360, top:0, left:10, borderColor:'rgba(201,168,76,0.5)', background:'#1A1410'}}>
-                <div>
-                  <div className="flex items-center justify-between mb-6">
-                    <span className="font-display text-xl font-bold" style={{color:'#F5F0E8'}}>REGL<span style={{color:'#C9A84C'}}>Y</span></span>
-                    <IconStar />
-                  </div>
-                  <div className="h-px mb-6" style={{background:'rgba(201,168,76,0.2)'}} />
-                  <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:4}}>
-                    <p className="font-body text-xs tracking-widest uppercase" style={{color:'#8A7A6A'}}>Member</p>
-                    <span className="font-body" style={{fontSize:'0.55rem', letterSpacing:'0.15em', textTransform:'uppercase', background:'rgba(201,168,76,0.15)', color:'#C9A84C', padding:'2px 8px', borderRadius:20, fontWeight:600}}>Example</span>
-                  </div>
-                  <p className="font-display text-2xl font-bold" style={{color:'#F5F0E8'}}>Gold Regular</p>
-                  <p className="font-body text-xs mt-1" style={{color:'#C9A84C'}}>Vicenzo's Pizza · Chicago</p>
-                </div>
-                <div>
-                  <div className="h-px mb-4" style={{background:'rgba(201,168,76,0.2)'}} />
-                  <p className="font-body text-xs tracking-widest uppercase mb-2" style={{color:'#8A7A6A'}}>Your Perks</p>
-                  {['Free breadsticks every visit','2 free deliveries/month','5% off every order'].map(p => (
-                    <div key={p} className="flex items-center gap-2 mb-1.5">
-                      <IconGold size={10} />
-                      <span className="font-body text-xs" style={{color:'#F5F0E8', fontWeight:300}}>{p}</span>
-                    </div>
-                  ))}
-                  <div className="mt-4 pt-3 border-t flex items-center justify-between" style={{borderColor:'rgba(201,168,76,0.15)'}}>
-                    <span className="font-body text-xs" style={{color:'#8A7A6A'}}>Monthly</span>
-                    <span className="font-display text-xl font-bold" style={{color:'#C9A84C'}}>$20</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── HOW IT WORKS light section ─────────────────────────── */}
-      <section className="light-section py-32 px-8">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-20">
-            <p className="section-label mb-4">How It Works</p>
-            <h2 className="font-display text-5xl font-bold" style={{color:'#1A1410'}}>
-              Three steps.<br /><span style={{color:'#8A6A20', fontStyle:'italic'}}>That's it.</span>
+      {/* ── HOW IT WORKS ────────────────────────────────────────── */}
+      <section id="how" style={{padding:'120px 40px', background:'#FFFFFF'}}>
+        <div style={{maxWidth:1100, margin:'0 auto'}}>
+          <div style={{marginBottom:72}}>
+            <p style={{fontSize:11, letterSpacing:'0.25em', textTransform:'uppercase', color:'#C9A84C', fontWeight:600, marginBottom:16}}>How it works</p>
+            <h2 style={{fontFamily:'Georgia, serif', fontSize:'clamp(2rem, 4vw, 3.5rem)', fontWeight:700, color:'#111827', lineHeight:1.1, maxWidth:600}}>
+              Simple for businesses.<br />
+              <span style={{fontStyle:'italic', color:'#8A6A20'}}>Effortless for customers.</span>
             </h2>
           </div>
-          <div className="grid sm:grid-cols-3 gap-12">
+
+          {/* Split steps */}
+          <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:2}}>
             {[
-              { icon: <IconMembership />, step:'01', title:'Pick a spot', body:'Browse Regly-partnered coffee shops, pizza places, burger joints, and more near you. See exactly what each membership includes before you sign up.' },
-              { icon: <IconPerks />,      step:'02', title:'Choose your perks', body:'Select a membership tier. Each tier has specific, defined perks no vague promises. You know exactly what you get before you pay a cent.' },
-              { icon: <IconPhone />,      step:'03', title:'Access rewards instantly', body:'When ordering, simply confirm your membership with your phone number. Staff verify and apply your perks on the spot. As Regly grows, expect even faster access through our app and membership cards.' },
-            ].map(c => (
-              <div key={c.step} className="relative hover-lift rounded-2xl p-8" style={{background:'white', boxShadow:'0 4px 24px rgba(0,0,0,0.06)'}}>
-                <p className="font-display text-6xl font-black mb-4 leading-none" style={{color:'rgba(138,106,32,0.12)'}}>{c.step}</p>
-                <div className="mb-5">{c.icon}</div>
-                <h3 className="font-display text-2xl font-bold mb-3" style={{color:'#1A1410'}}>{c.title}</h3>
-                <p className="font-body text-sm leading-relaxed" style={{color:'#6B5A3E', fontWeight:300}}>{c.body}</p>
+              {
+                n:'01', title:'Business designs their membership',
+                body:'The business creates tiers with specific perks and a monthly price. Free items, discounts, secret menu access, reserved seating, anything they want. Regly handles everything else.',
+                img:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80&fit=crop',
+                dark: true,
+              },
+              {
+                n:'02', title:'Customer subscribes in two minutes',
+                body:'Customers browse local businesses on Regly, pick a membership tier, and subscribe with their credit card. They see exactly what they get before they pay a cent.',
+                img:'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&q=80&fit=crop',
+                dark: false,
+              },
+              {
+                n:'03', title:'Phone number at the counter',
+                body:'When a member visits, they give their phone number at the counter. Staff look them up instantly in the Regly dashboard and apply their perks. No app. No card. No hardware.',
+                img:'https://images.unsplash.com/photo-1556742111-a301076d9d18?w=800&q=80&fit=crop',
+                dark: false,
+              },
+              {
+                n:'04', title:'Business gets paid monthly',
+                body:'Subscription revenue is collected automatically each month and deposited directly into the business bank account via Stripe. The business keeps 85% of every dollar.',
+                img:'https://images.unsplash.com/photo-1559526324-593bc073d938?w=800&q=80&fit=crop',
+                dark: true,
+              },
+            ].map((step, i) => (
+              <div key={step.n} style={{position:'relative', height:420, overflow:'hidden', cursor:'default'}}>
+                <img src={step.img} alt={step.title} style={{position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover'}} />
+                <div style={{position:'absolute', inset:0, background: step.dark ? 'rgba(10,9,6,0.72)' : 'rgba(245,240,232,0.88)'}} />
+                <div style={{position:'absolute', inset:0, padding:'40px', display:'flex', flexDirection:'column', justifyContent:'flex-end'}}>
+                  <p style={{fontFamily:'Georgia, serif', fontSize:48, fontWeight:700, color: step.dark ? 'rgba(201,168,76,0.25)' : 'rgba(138,106,32,0.2)', lineHeight:1, marginBottom:12}}>{step.n}</p>
+                  <h3 style={{fontFamily:'Georgia, serif', fontSize:22, fontWeight:700, color: step.dark ? '#F5F0E8' : '#111827', marginBottom:12, lineHeight:1.2}}>{step.title}</h3>
+                  <p style={{fontSize:14, color: step.dark ? 'rgba(245,240,232,0.65)' : '#4B5563', lineHeight:1.65, fontWeight:300, maxWidth:360}}>{step.body}</p>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── PHOTO BREAK full width editorial photo ─────────────── */}
-      <section className="relative h-96 sm:h-screen overflow-hidden" style={{maxHeight:600}}>
+      {/* ── PHOTO BREAK with quote ───────────────────────────────── */}
+      <section style={{position:'relative', height:480, overflow:'hidden'}}>
         <img
           src="https://images.unsplash.com/photo-1445116572660-236099ec97a0?w=1800&q=85&fit=crop"
-          alt="Restaurant dining"
-          className="w-full h-full object-cover"
-          style={{objectPosition:'center 50%'}}
+          alt="Restaurant"
+          style={{position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', objectPosition:'center 50%'}}
         />
-        <div className="absolute inset-0" style={{background:'linear-gradient(to right, rgba(10,9,6,0.7) 0%, rgba(10,9,6,0.2) 60%, rgba(10,9,6,0.4) 100%)'}} />
-        <div className="absolute inset-0 flex items-center px-8 sm:px-16">
-          <div className="max-w-lg">
-            <div className="divider-ornament mb-6 opacity-60" style={{maxWidth:200}}><IconGold /></div>
-            <blockquote className="font-editorial text-4xl sm:text-5xl italic font-light leading-tight mb-4" style={{color:'#F5F0E8'}}>
-              "Become a member at your favorite places."
-            </blockquote>
-            <p className="section-label" style={{color:'rgba(201,168,76,0.7)'}}>Regly · Chicago 2025</p>
-          </div>
-        </div>
-      </section>
-
-      {/* ── WHY IT'S WORTH IT dark ──────────────────────────────── */}
-      <section className="py-32 px-8 max-w-6xl mx-auto">
-        <div className="text-center mb-20">
-          <p className="section-label mb-4">Why It's Worth It</p>
-          <h2 className="font-display text-5xl font-bold mb-4" style={{color:'#F5F0E8'}}>
-            Real perks.<br /><span style={{color:'#C9A84C', fontStyle:'italic'}}>Real value.</span>
-          </h2>
-          <p className="font-body text-base max-w-xl mx-auto" style={{color:'#8A7A6A', fontWeight:300}}>
-            Every perk on Regly is set by the business and locked in when you subscribe. No bait and switch. No expiring points.
-          </p>
-        </div>
-        <div className="grid sm:grid-cols-3 gap-6">
-          {[
-            { icon: <IconVIP />,    title:'Defined perks, every visit',    body:'Your membership spells out exactly what you get. It\'s the same every visit. You know what to expect before you walk in.' },
-            { icon: <IconPerks />,  title:'No points. No punch cards.',    body:'Your perks don\'t expire, accumulate, or require an app. You show up, give your number, get your perk. Every time.' },
-            { icon: <IconShield />, title:'No risk to try it',             body:'Cancel anytime from your dashboard with one click. No cancellation fees. No questions asked.' },
-          ].map((c, i) => (
-            <div key={c.title} className="tier-card rounded-2xl p-8 border" style={{
-              borderColor: i===1 ? 'rgba(201,168,76,0.6)' : 'rgba(201,168,76,0.15)',
-              background: i===1 ? 'rgba(201,168,76,0.06)' : 'rgba(26,20,16,0.8)'
-            }}>
-              <div className="mb-6">{c.icon}</div>
-              <h3 className="font-display text-2xl font-bold mb-3" style={{color:'#F5F0E8'}}>{c.title}</h3>
-              <p className="font-body text-sm leading-relaxed" style={{color:'#8A7A6A', fontWeight:300}}>{c.body}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── POSSIBILITIES section ──────────────────────────────── */}
-      <section className="light-section py-32 px-8">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
-            <p className="section-label mb-4">The Possibilities</p>
-            <h2 className="font-display text-5xl font-bold mb-4" style={{color:'#1A1410'}}>
-              A membership can be<br /><span style={{color:'#8A6A20', fontStyle:'italic'}}>anything you can imagine.</span>
-            </h2>
-            <p className="font-body text-base max-w-2xl mx-auto" style={{color:'#6B5A3E', fontWeight:300}}>
-              Every business on Regly designs their own membership. There are no templates, no boxes to fit into. The only limit is your creativity. Here are just a few ideas to get you thinking.
+        <div style={{position:'absolute', inset:0, background:'linear-gradient(105deg, rgba(10,9,6,0.82) 0%, rgba(10,9,6,0.3) 100%)'}} />
+        <div style={{position:'absolute', inset:0, display:'flex', alignItems:'center', padding:'0 80px'}}>
+          <div style={{maxWidth:560}}>
+            <div style={{width:32, height:2, background:'#C9A84C', marginBottom:24}} />
+            <p style={{fontFamily:'Georgia, serif', fontSize:'clamp(1.6rem, 3.5vw, 2.8rem)', fontStyle:'italic', fontWeight:400, color:'#F5F0E8', lineHeight:1.3, marginBottom:20}}>
+              "Your regulars are already there. Regly gives them a reason to never go anywhere else."
             </p>
+            <p style={{fontSize:12, letterSpacing:'0.2em', textTransform:'uppercase', color:'rgba(201,168,76,0.7)', fontWeight:600}}>Regly, Chicago</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── THE POSSIBILITIES ───────────────────────────────────── */}
+      <section style={{padding:'120px 40px', background:'#FAFAF8'}}>
+        <div style={{maxWidth:1100, margin:'0 auto'}}>
+          <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:80, alignItems:'start', marginBottom:80}}>
+            <div>
+              <p style={{fontSize:11, letterSpacing:'0.25em', textTransform:'uppercase', color:'#C9A84C', fontWeight:600, marginBottom:16}}>The possibilities</p>
+              <h2 style={{fontFamily:'Georgia, serif', fontSize:'clamp(2rem, 4vw, 3.2rem)', fontWeight:700, color:'#111827', lineHeight:1.1}}>
+                A membership can be<br />
+                <span style={{fontStyle:'italic', color:'#8A6A20'}}>anything you imagine.</span>
+              </h2>
+            </div>
+            <div style={{paddingTop:8}}>
+              <p style={{fontSize:16, color:'#6B7280', lineHeight:1.7, fontWeight:300}}>
+                Every business on Regly designs their own membership from scratch. There are no templates and no boxes to fit into. The only limit is creativity. A few ideas to get you thinking:
+              </p>
+            </div>
           </div>
 
-          {/* Perk idea grid, polished SVG icons */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-16">
+          <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(220px, 1fr))', gap:16}}>
             {[
-              {
-                label:'Free item every visit', cat:'Restaurant',
-                icon: <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M4 20C4 20 6 14 14 14C22 14 24 20 24 20" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/><path d="M14 14V8" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/><circle cx="14" cy="6" r="2" stroke="#C9A84C" strokeWidth="1.5"/><path d="M4 22H24" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/></svg>
-              },
-              {
-                label:'Free coffee every morning', cat:'Coffee Shop',
-                icon: <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M6 12H20V22C20 23.1 19.1 24 18 24H8C6.9 24 6 23.1 6 22V12Z" stroke="#C9A84C" strokeWidth="1.5" strokeLinejoin="round"/><path d="M20 14H22C23.1 14 24 14.9 24 16V17C24 18.1 23.1 19 22 19H20" stroke="#C9A84C" strokeWidth="1.5" strokeLinejoin="round"/><path d="M10 6C10 6 10 4 12 4C14 4 14 2 14 2" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/></svg>
-              },
-              {
-                label:'Secret menu access', cat:'Any Business',
-                icon: <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="6" y="8" width="16" height="14" rx="2" stroke="#C9A84C" strokeWidth="1.5"/><path d="M10 8V6C10 4.9 10.9 4 12 4H16C17.1 4 18 4.9 18 6V8" stroke="#C9A84C" strokeWidth="1.5"/><circle cx="14" cy="15" r="2" stroke="#C9A84C" strokeWidth="1.5"/><path d="M14 17V19" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/></svg>
-              },
-              {
-                label:'Free branded merch on signup', cat:'Any Business',
-                icon: <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M10 4H18L20 8H24L22 12H18V24H10V12H6L4 8H8L10 4Z" stroke="#C9A84C" strokeWidth="1.5" strokeLinejoin="round"/><path d="M10 8H18" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/></svg>
-              },
-              {
-                label:'Reserved seating, always', cat:'Bar / Lounge',
-                icon: <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="6" y="10" width="16" height="10" rx="2" stroke="#C9A84C" strokeWidth="1.5"/><path d="M4 14H6M22 14H24" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/><path d="M10 20V24M18 20V24" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/><path d="M10 6H18" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/></svg>
-              },
-              {
-                label:'Birthday month bonus', cat:'Restaurant',
-                icon: <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="6" y="14" width="16" height="10" rx="1.5" stroke="#C9A84C" strokeWidth="1.5"/><path d="M8 14V12C8 10.9 8.9 10 10 10H18C19.1 10 20 10.9 20 12V14" stroke="#C9A84C" strokeWidth="1.5"/><path d="M10 10V8M14 10V6M18 10V8" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/><path d="M10 18H18" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/></svg>
-              },
-              {
-                label:'Free delivery every order', cat:'Restaurant',
-                icon: <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="4" y="10" width="14" height="10" rx="1.5" stroke="#C9A84C" strokeWidth="1.5"/><path d="M18 14H22L24 18H18V14Z" stroke="#C9A84C" strokeWidth="1.5" strokeLinejoin="round"/><circle cx="9" cy="22" r="2" stroke="#C9A84C" strokeWidth="1.5"/><circle cx="21" cy="22" r="2" stroke="#C9A84C" strokeWidth="1.5"/><path d="M4 14H2" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/></svg>
-              },
-              {
-                label:'Skip the line on event nights', cat:'Venue / Bar',
-                icon: <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M8 6H20L22 10H6L8 6Z" stroke="#C9A84C" strokeWidth="1.5" strokeLinejoin="round"/><path d="M6 10V22H22V10" stroke="#C9A84C" strokeWidth="1.5" strokeLinejoin="round"/><path d="M11 16L14 19L20 13" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-              },
-              {
-                label:'Free drink upgrade every visit', cat:'Cafe',
-                icon: <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M8 8H20L18 22H10L8 8Z" stroke="#C9A84C" strokeWidth="1.5" strokeLinejoin="round"/><path d="M6 8H22" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/><path d="M11 8V5M14 8V4M17 8V5" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/><path d="M11 14H17" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/></svg>
-              },
-              {
-                label:'Monthly exclusive merch drop', cat:'Retail / Brand',
-                icon: <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="6" y="10" width="16" height="14" rx="1.5" stroke="#C9A84C" strokeWidth="1.5"/><path d="M10 10V8C10 6.34 11.34 5 13 5H15C16.66 5 18 6.34 18 8V10" stroke="#C9A84C" strokeWidth="1.5"/><path d="M6 17H22" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/></svg>
-              },
-              {
-                label:'Members-only wine list', cat:'Wine Bar',
-                icon: <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M10 4H18L17 14C17 16.76 15.76 19 14 19C12.24 19 11 16.76 11 14L10 4Z" stroke="#C9A84C" strokeWidth="1.5" strokeLinejoin="round"/><path d="M14 19V24" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/><path d="M10 24H18" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/><path d="M11 9H17" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round"/></svg>
-              },
-              {
-                label:'Early access to new items', cat:'Any Business',
-                icon: <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="10" stroke="#C9A84C" strokeWidth="1.5"/><path d="M14 8V14L18 16" stroke="#C9A84C" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M8 5L6 3M20 5L22 3" stroke="#C9A84C" strokeWidth="1.2" strokeLinecap="round"/></svg>
-              },
+              { title:'Free item every visit',        sub:'Restaurant',       icon:<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 15C3 15 4.5 10 12 10C19.5 10 21 15 21 15" stroke="#C9A84C" strokeWidth="1.4" strokeLinecap="round"/><path d="M12 10V6" stroke="#C9A84C" strokeWidth="1.4" strokeLinecap="round"/><circle cx="12" cy="4.5" r="1.5" stroke="#C9A84C" strokeWidth="1.4"/><path d="M3 17H21" stroke="#C9A84C" strokeWidth="1.4" strokeLinecap="round"/></svg> },
+              { title:'Free coffee every morning',    sub:'Coffee Shop',      icon:<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 10H17V19C17 19.55 16.55 20 16 20H6C5.45 20 5 19.55 5 19V10Z" stroke="#C9A84C" strokeWidth="1.4" strokeLinejoin="round"/><path d="M17 12H19C19.83 12 20.5 12.67 20.5 13.5V14.5C20.5 15.33 19.83 16 19 16H17" stroke="#C9A84C" strokeWidth="1.4" strokeLinejoin="round"/><path d="M8 7C8 7 8 5.5 10 5.5C12 5.5 12 4 12 4" stroke="#C9A84C" strokeWidth="1.4" strokeLinecap="round"/></svg> },
+              { title:'Access to the secret menu',    sub:'Any Business',     icon:<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="5" y="7" width="14" height="12" rx="1.5" stroke="#C9A84C" strokeWidth="1.4"/><path d="M8 7V5C8 3.9 8.9 3 10 3H14C15.1 3 16 3.9 16 5V7" stroke="#C9A84C" strokeWidth="1.4"/><circle cx="12" cy="13" r="1.5" stroke="#C9A84C" strokeWidth="1.4"/></svg> },
+              { title:'Free merch on signup',         sub:'Any Business',     icon:<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M9 3H15L17 7H21L19 10H15V21H9V10H5L3 7H7L9 3Z" stroke="#C9A84C" strokeWidth="1.4" strokeLinejoin="round"/></svg> },
+              { title:'Reserved seating, always',     sub:'Bar / Lounge',     icon:<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="5" y="9" width="14" height="8" rx="1.5" stroke="#C9A84C" strokeWidth="1.4"/><path d="M3 13H5M19 13H21" stroke="#C9A84C" strokeWidth="1.4" strokeLinecap="round"/><path d="M9 17V21M15 17V21" stroke="#C9A84C" strokeWidth="1.4" strokeLinecap="round"/></svg> },
+              { title:'Birthday month bonus',         sub:'Restaurant',       icon:<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="5" y="12" width="14" height="9" rx="1.5" stroke="#C9A84C" strokeWidth="1.4"/><path d="M7 12V10C7 8.9 7.9 8 9 8H15C16.1 8 17 8.9 17 10V12" stroke="#C9A84C" strokeWidth="1.4"/><path d="M9 8V7M12 8V5M15 8V7" stroke="#C9A84C" strokeWidth="1.4" strokeLinecap="round"/></svg> },
+              { title:'Free delivery every order',    sub:'Restaurant',       icon:<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="9" width="12" height="8" rx="1.5" stroke="#C9A84C" strokeWidth="1.4"/><path d="M15 12H19.5L21 16H15V12Z" stroke="#C9A84C" strokeWidth="1.4" strokeLinejoin="round"/><circle cx="7.5" cy="19" r="1.5" stroke="#C9A84C" strokeWidth="1.4"/><circle cx="18.5" cy="19" r="1.5" stroke="#C9A84C" strokeWidth="1.4"/></svg> },
+              { title:'Skip the line on event nights',sub:'Venue / Bar',      icon:<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M7 5H18L20 9H5L7 5Z" stroke="#C9A84C" strokeWidth="1.4" strokeLinejoin="round"/><path d="M5 9V20H19V9" stroke="#C9A84C" strokeWidth="1.4" strokeLinejoin="round"/><path d="M10 14L12 16L16 12" stroke="#C9A84C" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg> },
+              { title:'Free drink upgrade every visit',sub:'Cafe',            icon:<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M7 7H17L15.5 19H8.5L7 7Z" stroke="#C9A84C" strokeWidth="1.4" strokeLinejoin="round"/><path d="M5 7H19" stroke="#C9A84C" strokeWidth="1.4" strokeLinecap="round"/><path d="M9 7V5M12 7V4M15 7V5" stroke="#C9A84C" strokeWidth="1.4" strokeLinecap="round"/></svg> },
+              { title:'Monthly exclusive merch drop',  sub:'Retail / Brand',  icon:<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="5" y="9" width="14" height="12" rx="1.5" stroke="#C9A84C" strokeWidth="1.4"/><path d="M9 9V7C9 5.34 10.34 4 12 4C13.66 4 15 5.34 15 7V9" stroke="#C9A84C" strokeWidth="1.4"/><path d="M5 14H19" stroke="#C9A84C" strokeWidth="1.4" strokeLinecap="round"/></svg> },
+              { title:'Members-only wine list',        sub:'Wine Bar',        icon:<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M9 3H15L14 12C14 14 13.1 16 12 16C10.9 16 10 14 10 12L9 3Z" stroke="#C9A84C" strokeWidth="1.4" strokeLinejoin="round"/><path d="M12 16V21" stroke="#C9A84C" strokeWidth="1.4" strokeLinecap="round"/><path d="M9 21H15" stroke="#C9A84C" strokeWidth="1.4" strokeLinecap="round"/><path d="M10 8H14" stroke="#C9A84C" strokeWidth="1.4" strokeLinecap="round"/></svg> },
+              { title:'Early access to new items',     sub:'Any Business',    icon:<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#C9A84C" strokeWidth="1.4"/><path d="M12 7V12L15 14" stroke="#C9A84C" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg> },
             ].map(p => (
-              <div key={p.label} className="hover-lift rounded-2xl p-6 border" style={{background:'white', borderColor:'rgba(138,106,32,0.12)', boxShadow:'0 2px 16px rgba(0,0,0,0.05)'}}>
-                <div style={{width:48, height:48, background:'rgba(201,168,76,0.08)', borderRadius:12, display:'flex', alignItems:'center', justifyContent:'center', marginBottom:14}}>
+              <div key={p.title} className="perk-card hover-lift" style={{background:'white', border:'1px solid #F3F4F6', borderRadius:12, padding:'24px', transition:'border-color 0.2s'}}>
+                <div style={{width:44, height:44, background:'rgba(201,168,76,0.07)', borderRadius:10, display:'flex', alignItems:'center', justifyContent:'center', marginBottom:16}}>
                   {p.icon}
                 </div>
-                <p className="font-body text-sm font-semibold mb-1" style={{color:'#1A1410', lineHeight:1.4}}>{p.label}</p>
-                <p className="font-body" style={{fontSize:'0.62rem', letterSpacing:'0.12em', textTransform:'uppercase', color:'#8A6A20', fontWeight:600}}>{p.cat}</p>
+                <p style={{fontSize:14, fontWeight:600, color:'#111827', lineHeight:1.35, marginBottom:6}}>{p.title}</p>
+                <p style={{fontSize:11, letterSpacing:'0.12em', textTransform:'uppercase', color:'#C9A84C', fontWeight:600}}>{p.sub}</p>
               </div>
             ))}
           </div>
 
-          {/* Bottom callout */}
-          <div className="rounded-2xl p-10 text-center border" style={{background:'#1A1410', borderColor:'rgba(201,168,76,0.2)'}}>
-            <p className="section-label mb-4" style={{color:'rgba(201,168,76,0.7)'}}>The point</p>
-            <h3 className="font-display text-3xl font-bold mb-4" style={{color:'#F5F0E8'}}>
-              Your membership is yours to define.<br />
-              <span style={{color:'#C9A84C', fontStyle:'italic'}}>Make it irresistible.</span>
-            </h3>
-            <p className="font-body text-sm max-w-xl mx-auto mb-8" style={{color:'#8A7A6A', fontWeight:300}}>
-              Regly gives you the platform. You bring the creativity. The businesses on Regly aren't just offering discounts, they are building relationships, creating habits, and giving customers a real reason to choose them over everyone else.
-            </p>
+          {/* Callout */}
+          <div style={{marginTop:48, padding:'48px', background:'#111827', borderRadius:16, display:'flex', alignItems:'center', justifyContent:'space-between', gap:40, flexWrap:'wrap'}}>
+            <div>
+              <h3 style={{fontFamily:'Georgia, serif', fontSize:28, fontWeight:700, color:'#F5F0E8', marginBottom:10}}>
+                Your membership. Your rules.<br />
+                <span style={{color:'#C9A84C', fontStyle:'italic'}}>Make it irresistible.</span>
+              </h3>
+              <p style={{fontSize:14, color:'rgba(255,255,255,0.5)', fontWeight:300, maxWidth:480, lineHeight:1.65}}>
+                Regly gives you the platform. You bring the creativity. Build a membership your regulars will talk about.
+              </p>
+            </div>
             <button onClick={() => router.push('/auth?role=business')}
-              className="font-body text-xs tracking-widest uppercase px-10 py-4 rounded transition-all"
-              style={{background:'#C9A84C', color:'#0A0906', fontWeight:600}}>
-              Build My Membership Program
+              style={{display:'flex', alignItems:'center', gap:10, padding:'14px 28px', background:'#C9A84C', color:'#0A0906', border:'none', borderRadius:8, fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:'inherit', whiteSpace:'nowrap', transition:'opacity 0.2s'}}
+              onMouseEnter={e => e.currentTarget.style.opacity='0.88'}
+              onMouseLeave={e => e.currentTarget.style.opacity='1'}>
+              Build my membership program <ArrowRight />
             </button>
           </div>
         </div>
       </section>
 
-      {/* ── FINAL CTA dark with photo tint ─────────────────────── */}
-      <section className="py-32 px-8 text-center relative overflow-hidden" style={{background:'#0F0D0A'}}>
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
-          <span className="font-display font-black shimmer" style={{fontSize:'40vw', color:'#C9A84C', lineHeight:1}}>R</span>
+      {/* ── WHY REGLY ───────────────────────────────────────────── */}
+      <section style={{padding:'120px 40px', background:'#FFFFFF'}}>
+        <div style={{maxWidth:1100, margin:'0 auto'}}>
+          <div style={{textAlign:'center', marginBottom:72}}>
+            <p style={{fontSize:11, letterSpacing:'0.25em', textTransform:'uppercase', color:'#C9A84C', fontWeight:600, marginBottom:16}}>Why Regly</p>
+            <h2 style={{fontFamily:'Georgia, serif', fontSize:'clamp(2rem, 4vw, 3.2rem)', fontWeight:700, color:'#111827', lineHeight:1.1}}>
+              Real perks. Real value.<br />
+              <span style={{fontStyle:'italic', color:'#8A6A20'}}>Every single visit.</span>
+            </h2>
+          </div>
+
+          <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(280px, 1fr))', gap:24}}>
+            {[
+              {
+                title:'Immediate value, not deferred rewards',
+                body:'Punch cards give you a free coffee after 10 visits. A Regly membership gives you a free coffee every visit from day one. The value is immediate, defined, and guaranteed.',
+                accent:'#C9A84C',
+              },
+              {
+                title:'No app. No hardware. No friction.',
+                body:'Members verify with their phone number at the counter. No downloads, no scanning, no extra devices. The simplest possible experience for customers and staff alike.',
+                accent:'#C9A84C',
+              },
+              {
+                title:'Cancel anytime. No questions asked.',
+                body:'No cancellation fees, no contracts, no commitments. Members stay because the value is real, not because leaving is hard.',
+                accent:'#C9A84C',
+              },
+            ].map((c, i) => (
+              <div key={c.title} style={{padding:'36px', background: i === 1 ? '#111827' : '#FAFAF8', borderRadius:16, border: i === 1 ? 'none' : '1px solid #F3F4F6'}}>
+                <div style={{width:4, height:32, background:'#C9A84C', borderRadius:2, marginBottom:24}} />
+                <h3 style={{fontFamily:'Georgia, serif', fontSize:20, fontWeight:700, color: i === 1 ? '#F5F0E8' : '#111827', marginBottom:14, lineHeight:1.3}}>{c.title}</h3>
+                <p style={{fontSize:14, color: i === 1 ? 'rgba(245,240,232,0.6)' : '#6B7280', lineHeight:1.7, fontWeight:300}}>{c.body}</p>
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="max-w-2xl mx-auto relative z-10">
-          <p className="section-label mb-6">Join Regly</p>
-          <h2 className="font-display text-6xl font-bold leading-tight mb-6" style={{color:'#F5F0E8'}}>
-            Start getting<br /><span style={{color:'#C9A84C', fontStyle:'italic'}}>more.</span>
+      </section>
+
+      {/* ── FOR BUSINESSES ──────────────────────────────────────── */}
+      <section style={{padding:'120px 40px', background:'#0A0906', position:'relative', overflow:'hidden'}}>
+        <div className="shimmer" style={{position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', pointerEvents:'none'}}>
+          <span style={{fontFamily:'Georgia, serif', fontSize:'60vw', fontWeight:700, color:'#C9A84C', lineHeight:1}}>R</span>
+        </div>
+        <div style={{maxWidth:1100, margin:'0 auto', position:'relative', zIndex:2}}>
+          <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:80, alignItems:'center'}}>
+            <div>
+              <p style={{fontSize:11, letterSpacing:'0.25em', textTransform:'uppercase', color:'rgba(201,168,76,0.7)', fontWeight:600, marginBottom:16}}>For business owners</p>
+              <h2 style={{fontFamily:'Georgia, serif', fontSize:'clamp(2rem, 4vw, 3.2rem)', fontWeight:700, color:'#F5F0E8', lineHeight:1.1, marginBottom:24}}>
+                Give your regulars a reason<br />
+                to <span style={{color:'#C9A84C', fontStyle:'italic'}}>always choose you.</span>
+              </h2>
+              <p style={{fontSize:16, color:'rgba(245,240,232,0.55)', fontWeight:300, lineHeight:1.7, marginBottom:40, maxWidth:440}}>
+                Regly powers your membership program. You design the experience. Regly handles payments, member tracking, and monthly payouts directly to your bank. No hardware. No upfront cost. Live in 48 hours.
+              </p>
+              <button onClick={() => router.push('/auth?role=business')}
+                style={{display:'flex', alignItems:'center', gap:10, padding:'14px 28px', background:'#C9A84C', color:'#0A0906', border:'none', borderRadius:8, fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:'inherit', transition:'opacity 0.2s'}}
+                onMouseEnter={e => e.currentTarget.style.opacity='0.88'}
+                onMouseLeave={e => e.currentTarget.style.opacity='1'}>
+                List my business <ArrowRight />
+              </button>
+            </div>
+            <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:16}}>
+              {[
+                { n:'$0',     l:'Setup cost' },
+                { n:'85%',    l:'Revenue you keep' },
+                { n:'48 hrs', l:'Time to go live' },
+                { n:'Monthly',l:'Payouts via Stripe' },
+              ].map(s => (
+                <div key={s.n} style={{background:'rgba(255,255,255,0.04)', border:'1px solid rgba(201,168,76,0.15)', borderRadius:12, padding:'28px', textAlign:'center'}}>
+                  <p style={{fontFamily:'Georgia, serif', fontSize:30, fontWeight:700, color:'#C9A84C', marginBottom:6}}>{s.n}</p>
+                  <p style={{fontSize:12, color:'rgba(255,255,255,0.4)', fontWeight:400}}>{s.l}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FINAL CTA ───────────────────────────────────────────── */}
+      <section style={{padding:'120px 40px', background:'#FAFAF8', textAlign:'center'}}>
+        <div style={{maxWidth:680, margin:'0 auto'}}>
+          <p style={{fontSize:11, letterSpacing:'0.25em', textTransform:'uppercase', color:'#C9A84C', fontWeight:600, marginBottom:20}}>Start today</p>
+          <h2 style={{fontFamily:'Georgia, serif', fontSize:'clamp(2.5rem, 5vw, 4rem)', fontWeight:700, color:'#111827', lineHeight:1.05, marginBottom:24}}>
+            Your neighborhood spots.<br />
+            <span style={{fontStyle:'italic', color:'#8A6A20'}}>Waiting for you.</span>
           </h2>
-          <p className="font-body text-base mb-12 leading-relaxed" style={{color:'#8A7A6A', fontWeight:300}}>
-            Browse local businesses on Regly, choose a membership that fits how you already spend, and start getting real perks from day one. No points. No waiting. Cancel anytime.
+          <p style={{fontSize:16, color:'#6B7280', fontWeight:300, lineHeight:1.7, marginBottom:40}}>
+            Browse local businesses on Regly, choose a membership that fits how you already spend, and start getting real perks from day one.
           </p>
           <button onClick={() => router.push('/auth?role=customer')}
-            className="font-body inline-flex items-center gap-4 px-14 py-5 rounded text-sm tracking-widest uppercase transition-all"
-            style={{background:'#C9A84C', color:'#0A0906', fontWeight:600}}>
-            See What's Near Me <IconArrow />
+            style={{display:'inline-flex', alignItems:'center', gap:10, padding:'16px 36px', background:'#111827', color:'white', border:'none', borderRadius:8, fontSize:15, fontWeight:600, cursor:'pointer', fontFamily:'inherit', transition:'background 0.2s'}}
+            onMouseEnter={e => e.currentTarget.style.background='#C9A84C'}
+            onMouseLeave={e => e.currentTarget.style.background='#111827'}>
+            Browse memberships near me <ArrowRight />
           </button>
         </div>
       </section>
 
-      {/* ── FOR BUSINESSES ────────────────────────────────────────── */}
-      <section className="py-24 px-8 border-t" style={{borderColor:'rgba(201,168,76,0.1)'}}>
-        <div className="max-w-4xl mx-auto grid sm:grid-cols-2 gap-16 items-center">
-          <div>
-            <p className="section-label mb-4">For Business Owners</p>
-            <h2 className="font-display text-4xl font-bold mb-4" style={{color:'#F5F0E8'}}>
-              Give your regulars a reason<br />to <span style={{color:'#C9A84C', fontStyle:'italic'}}>always choose you.</span>
-            </h2>
-            <p className="font-body text-sm leading-relaxed mb-8" style={{color:'#8A7A6A', fontWeight:300}}>
-              Regly is the platform that powers your membership program. You design the experience, the perks, the tiers, the price. Regly handles payments, member tracking, and monthly payouts directly to your bank. No hardware. No upfront cost. Live in 48 hours.
-            </p>
-            <button onClick={() => router.push('/auth?role=business')}
-              className="font-body text-xs tracking-widest uppercase px-8 py-3.5 rounded border transition-all"
-              style={{borderColor:'#C9A84C', color:'#C9A84C', background:'transparent'}}
-              onMouseEnter={e => { e.currentTarget.style.background='#C9A84C'; e.currentTarget.style.color='#0A0906'; }}
-              onMouseLeave={e => { e.currentTarget.style.background='transparent'; e.currentTarget.style.color='#C9A84C'; }}>
-              List My Business
-            </button>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
+      {/* ── FOOTER ──────────────────────────────────────────────── */}
+      <footer style={{background:'#0A0906', borderTop:'1px solid rgba(201,168,76,0.1)', padding:'64px 40px 40px'}}>
+        <div style={{maxWidth:1100, margin:'0 auto'}}>
+          <div style={{display:'grid', gridTemplateColumns:'2fr 1fr 1fr 1fr', gap:'48px 32px', marginBottom:64}}>
+            <div>
+              <p style={{fontFamily:'Georgia, serif', fontSize:22, fontWeight:700, color:'#F5F0E8', marginBottom:12}}>
+                REGL<span style={{color:'#C9A84C'}}>Y</span>
+              </p>
+              <p style={{fontSize:13, color:'rgba(255,255,255,0.35)', lineHeight:1.7, maxWidth:260, fontWeight:300, marginBottom:20}}>
+                Monthly memberships for the local businesses you already love.
+              </p>
+              <a href="mailto:getregly@gmail.com" style={{fontSize:13, color:'#C9A84C', textDecoration:'none'}}>getregly@gmail.com</a>
+            </div>
             {[
-              { n:'Low', l:'Flat monthly fee' },
-              { n:'$0',  l:'Setup cost' },
-              { n:'10 min', l:'To go live' },
-              { n:'∞',   l:'Members possible' },
-            ].map(s => (
-              <div key={s.n} className="rounded-xl p-5 border text-center hover-lift" style={{borderColor:'rgba(201,168,76,0.15)', background:'rgba(26,20,16,0.6)'}}>
-                <p className="font-display text-3xl font-bold" style={{color:'#C9A84C'}}>{s.n}</p>
-                <p className="font-body text-xs mt-1" style={{color:'#8A7A6A', fontWeight:300}}>{s.l}</p>
+              { heading:'Members', links:[
+                { label:'Browse memberships', href:'/auth?role=customer' },
+                { label:'Sign in', href:'/auth' },
+                { label:'Create account', href:'/auth' },
+                { label:'Customer terms', href:'/terms' },
+              ]},
+              { heading:'Businesses', links:[
+                { label:'Apply to join', href:'/auth?role=business' },
+                { label:'Merchant sign in', href:'/auth?role=business' },
+                { label:'How it works', href:'#how' },
+                { label:'Merchant agreement', href:'/merchant-terms' },
+              ]},
+              { heading:'Legal', links:[
+                { label:'Privacy policy', href:'/privacy' },
+                { label:'Customer terms', href:'/terms' },
+                { label:'Merchant agreement', href:'/merchant-terms' },
+              ]},
+            ].map(col => (
+              <div key={col.heading}>
+                <p style={{fontSize:11, letterSpacing:'0.2em', textTransform:'uppercase', color:'rgba(201,168,76,0.7)', fontWeight:600, marginBottom:20}}>{col.heading}</p>
+                {col.links.map(l => (
+                  <a key={l.label} href={l.href} style={{display:'block', fontSize:13, color:'rgba(255,255,255,0.4)', textDecoration:'none', marginBottom:12, fontWeight:300, transition:'color 0.2s'}}
+                    onMouseEnter={e => e.target.style.color='rgba(255,255,255,0.8)'}
+                    onMouseLeave={e => e.target.style.color='rgba(255,255,255,0.4)'}>
+                    {l.label}
+                  </a>
+                ))}
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* FOOTER */}
-      <footer style={{background:'#0A0906', borderTop:'1px solid rgba(201,168,76,0.15)', padding:'48px 24px 32px'}}>
-        <div style={{maxWidth:1100, margin:'0 auto'}}>
-
-          {/* Top row */}
-          <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(180px, 1fr))', gap:'40px 32px', marginBottom:48}}>
-
-            {/* Brand */}
-            <div>
-              <p style={{fontFamily:'Georgia, serif', fontSize:22, fontWeight:700, color:'#F5F0E8', marginBottom:8}}>
-                REGL<span style={{color:'#C9A84C'}}>Y</span>
-              </p>
-              <p style={{fontSize:13, color:'#8A7A6A', lineHeight:1.6, marginBottom:16}}>
-                Monthly memberships for the local businesses you already love.
-              </p>
-              <a href="mailto:getregly@gmail.com" style={{fontSize:13, color:'#C9A84C', textDecoration:'none'}}>
-                getregly@gmail.com
-              </a>
-            </div>
-
-            {/* Members */}
-            <div>
-              <p style={{fontSize:11, fontWeight:600, letterSpacing:'0.2em', textTransform:'uppercase', color:'#C9A84C', marginBottom:16}}>Members</p>
-              {[
-                { label:'Browse Memberships', href:'/auth?role=customer' },
-                { label:'Sign In', href:'/auth' },
-                { label:'Create Account', href:'/auth' },
-                { label:'Customer Terms', href:'/terms' },
-              ].map(l => (
-                <a key={l.label} href={l.href} style={{display:'block', fontSize:14, color:'#8A7A6A', textDecoration:'none', marginBottom:10, transition:'color 0.2s'}}
-                  onMouseEnter={e => e.target.style.color='#F5F0E8'}
-                  onMouseLeave={e => e.target.style.color='#8A7A6A'}>
-                  {l.label}
-                </a>
-              ))}
-            </div>
-
-            {/* Businesses */}
-            <div>
-              <p style={{fontSize:11, fontWeight:600, letterSpacing:'0.2em', textTransform:'uppercase', color:'#C9A84C', marginBottom:16}}>Businesses</p>
-              {[
-                { label:'Apply to Join', href:'/auth?role=business' },
-                { label:'Merchant Sign In', href:'/auth?role=business' },
-                { label:'How It Works', href:'/#how-it-works' },
-                { label:'Merchant Agreement', href:'/merchant-terms' },
-              ].map(l => (
-                <a key={l.label} href={l.href} style={{display:'block', fontSize:14, color:'#8A7A6A', textDecoration:'none', marginBottom:10, transition:'color 0.2s'}}
-                  onMouseEnter={e => e.target.style.color='#F5F0E8'}
-                  onMouseLeave={e => e.target.style.color='#8A7A6A'}>
-                  {l.label}
-                </a>
-              ))}
-            </div>
-
-            {/* Legal */}
-            <div>
-              <p style={{fontSize:11, fontWeight:600, letterSpacing:'0.2em', textTransform:'uppercase', color:'#C9A84C', marginBottom:16}}>Legal</p>
-              {[
-                { label:'Privacy Policy', href:'/privacy' },
-                { label:'Customer Terms', href:'/terms' },
-                { label:'Merchant Agreement', href:'/merchant-terms' },
-              ].map(l => (
-                <a key={l.label} href={l.href} style={{display:'block', fontSize:14, color:'#8A7A6A', textDecoration:'none', marginBottom:10, transition:'color 0.2s'}}
-                  onMouseEnter={e => e.target.style.color='#F5F0E8'}
-                  onMouseLeave={e => e.target.style.color='#8A7A6A'}>
-                  {l.label}
-                </a>
-              ))}
-            </div>
-
-          </div>
-
-          {/* Bottom bar */}
-          <div style={{borderTop:'1px solid rgba(201,168,76,0.1)', paddingTop:24, display:'flex', flexWrap:'wrap', alignItems:'center', justifyContent:'space-between', gap:12}}>
-            <p style={{fontSize:12, color:'#5A4A3A'}}>© 2026 Regly · Chicago, IL · All rights reserved</p>
-            <div style={{display:'flex', gap:20}}>
-              {[
-                { label:'Privacy', href:'/privacy' },
-                { label:'Terms', href:'/terms' },
-                { label:'Merchant Agreement', href:'/merchant-terms' },
-              ].map(l => (
-                <a key={l.label} href={l.href} style={{fontSize:12, color:'#5A4A3A', textDecoration:'none', transition:'color 0.2s'}}
-                  onMouseEnter={e => e.target.style.color='#8A7A6A'}
-                  onMouseLeave={e => e.target.style.color='#5A4A3A'}>
-                  {l.label}
+          <div style={{borderTop:'1px solid rgba(255,255,255,0.06)', paddingTop:24, display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:12}}>
+            <p style={{fontSize:12, color:'rgba(255,255,255,0.2)'}}>2026 Regly. Chicago, IL. All rights reserved.</p>
+            <div style={{display:'flex', gap:24}}>
+              {[['Privacy', '/privacy'],['Terms', '/terms'],['Merchant Agreement', '/merchant-terms']].map(([l,h]) => (
+                <a key={l} href={h} style={{fontSize:12, color:'rgba(255,255,255,0.2)', textDecoration:'none', transition:'color 0.2s'}}
+                  onMouseEnter={e => e.target.style.color='rgba(255,255,255,0.5)'}
+                  onMouseLeave={e => e.target.style.color='rgba(255,255,255,0.2)'}>
+                  {l}
                 </a>
               ))}
             </div>
           </div>
-
         </div>
       </footer>
     </div>
