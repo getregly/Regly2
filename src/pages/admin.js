@@ -30,7 +30,7 @@ export default function Admin() {
     const { data: { user }, error } = await supabase.auth.getUser()
     if (!user || error) { router.push('/'); return }
 
-    // 2. Server-side verification — cannot be bypassed by client manipulation
+    // 2. Server-side verification, cannot be bypassed by client manipulation
     try {
       const { data: { session } } = await supabase.auth.getSession()
       const verifyRes = await fetch('/api/verify-admin', {
@@ -47,11 +47,21 @@ export default function Admin() {
   }
 
   async function loadSubmissions() {
-    const { data } = await supabase.from('onboarding_submissions').select('*').order('created_at', { ascending: false })
+    const { data } = await supabase
+      .from('onboarding_submissions')
+      .select('*')
+      .eq('status', 'pending')
+      .order('created_at', { ascending: false })
     setSubmissions(data || [])
   }
 
   async function handleApprove(sub) {
+    // Guard: prevent double approval
+    if (approving) return
+    if (sub.status === 'approved') {
+      setMessage({ type:'error', text:'This business has already been approved.' })
+      return
+    }
     setApproving(sub.id)
     setMessage(null)
     try {
@@ -62,13 +72,13 @@ export default function Admin() {
       }).select().single()
       if (restErr) throw restErr
 
-      // 2. Parse tiers — support both old (string perks) and new (perks_config) format
+      // 2. Parse tiers, support both old (string perks) and new (perks_config) format
       const tiers = JSON.parse(sub.tiers)
       const stripeResults = []
       const tierErrors = []
 
       for (const t of tiers) {
-        // Build perks_config — handle both old and new onboarding format
+        // Build perks_config, handle both old and new onboarding format
         let perksConfig = []
         let perksText = ''
         if (Array.isArray(t.perks) && t.perks.length > 0 && typeof t.perks[0] === 'object') {
@@ -123,13 +133,13 @@ export default function Admin() {
         }
       }
 
-      // 5. Mark submission as approved
+      // 5. Mark submission as approved and remove from local state immediately
       await supabase.from('onboarding_submissions').update({ status: 'approved' }).eq('id', sub.id)
+      setSubmissions(prev => prev.filter(s => s.id !== sub.id))
 
       const successMsg = `${sub.business_name} is live on Regly. ${stripeResults.length} of ${tiers.length} Stripe price${tiers.length !== 1 ? 's' : ''} created automatically.`
       const errorSuffix = tierErrors.length > 0 ? ` Issues: ${tierErrors.join(', ')}` : ''
       setMessage({ type: tierErrors.length > 0 ? 'warning' : 'success', text: successMsg + errorSuffix })
-      await loadSubmissions()
     } catch (err) {
       setMessage({ type:'error', text: err.message })
     } finally {
@@ -308,8 +318,8 @@ export default function Admin() {
                         </div>
 
                         <div style={{display:'flex', gap:12}}>
-                          <button onClick={() => handleApprove(sub)} disabled={approving===sub.id}
-                            style={{...S.btn, background: approving===sub.id ? '#D1D5DB' : '#111827', color:'white', flex:1}}>
+                          <button onClick={() => handleApprove(sub)} disabled={!!approving}
+                            style={{...S.btn, background: approving ? '#D1D5DB' : '#111827', color:'white', flex:1}}>
                             {approving===sub.id ? 'Approving...' : 'Approve and Go Live'}
                           </button>
                           <button onClick={() => handleReject(sub)}
