@@ -1,6 +1,6 @@
 // src/pages/api/checkout.js
 // Creates a Stripe Checkout session with automatic transfer to merchant
-// Regly keeps 15%, merchant receives 85% automatically via Stripe Connect
+// Regly keeps 15%, merchant receives 85% via Stripe Connect
 
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
@@ -12,7 +12,7 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 )
 
-const REGLY_FEE_PERCENT = 15 // Regly takes 15%
+const REGLY_FEE_PERCENT = 15
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -27,38 +27,22 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Missing Stripe price ID' })
     }
 
-    // 1. Get and verify the authenticated user
+    // 1. Verify authenticated user
     const token = req.headers.authorization?.replace('Bearer ', '')
     if (!token) return res.status(401).json({ error: 'Unauthorized' })
     const { data: { user }, error: authErr } = await supabase.auth.getUser(token)
     if (!user || authErr) return res.status(401).json({ error: 'Unauthorized' })
-    const userId = user.id
 
-    // 2. Fetch the restaurant's Stripe Connect account ID
+    // 2. Fetch restaurant Stripe Connect details
     const { data: restaurant, error: restErr } = await supabase
       .from('restaurants')
       .select('stripe_account_id, stripe_onboarding_complete, name')
       .eq('id', restaurantId)
       .single()
-
     if (restErr) throw restErr
 
-    // 3. Fetch the tier price to calculate the application fee
-    const { data: tier, error: tierErr } = await supabase
-      .from('membership_tiers')
-      .select('price_monthly')
-      .eq('id', tierId)
-      .single()
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://getregly.com'
 
-    if (tierErr) throw tierErr
-
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-
-    // 4. Calculate Regly's fee in cents
-    const priceInCents = Math.round(tier.price_monthly * 100)
-    const reglyFeeCents = Math.round(priceInCents * (REGLY_FEE_PERCENT / 100))
-
-    // 5. Build the session, with or without Connect depending on setup status
     const sessionParams = {
       mode: 'subscription',
       payment_method_types: ['card'],
@@ -68,41 +52,42 @@ export default async function handler(req, res) {
       metadata: {
         tierId,
         restaurantId,
-        userId: userId || '',
+        userId: user.id,
       },
     }
 
-    // 6. If merchant has completed Stripe Connect onboarding, route through their account
     if (restaurant.stripe_account_id && restaurant.stripe_onboarding_complete) {
-      // application_fee_amount tells Stripe to keep this amount for Regly
-      // The rest (85%) transfers automatically to the merchant's connected account
+      // Stripe recommended approach for platforms:
+      // - on_behalf_of: charges appear as being made by the merchant
+      // - application_fee_percent: Regly keeps 15% automatically
+      // - transfer_data.destination: remaining 85% routes to merchant's bank
       sessionParams.subscription_data = {
         application_fee_percent: REGLY_FEE_PERCENT,
+        on_behalf_of: restaurant.stripe_account_id,
         transfer_data: {
           destination: restaurant.stripe_account_id,
         },
         metadata: {
           tierId,
           restaurantId,
-          userId: userId || '',
+          userId: user.id,
         },
       }
     } else {
-      // Merchant not yet connected, payments go to Regly account only
-      // Flag this so we can handle it manually or prompt merchant to connect
-      console.warn(`Restaurant ${restaurant.name} (${restaurantId}) does not have Stripe Connect set up. Payment will go to Regly account.`)
+      // Merchant has not completed Connect onboarding yet
+      // Payment goes to Regly account — flag for manual reconciliation
+      console.warn(`Restaurant ${restaurant.name} (${restaurantId}) missing Stripe Connect. Payment going to Regly account.`)
       sessionParams.subscription_data = {
         metadata: {
           tierId,
           restaurantId,
-          userId: userId || '',
+          userId: user.id,
           connect_missing: 'true',
         },
       }
     }
 
     const session = await stripe.checkout.sessions.create(sessionParams)
-
     return res.status(200).json({ url: session.url })
 
   } catch (err) {
