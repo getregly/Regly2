@@ -99,10 +99,14 @@ export default function BusinessDashboard() {
 
         // Avg tenure in months
         const now = new Date()
-        const tenures = subs.map(s => {
-          const start = new Date(s.start_date)
-          return (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth())
-        })
+        const tenures = subs
+          .filter(s => s.start_date)
+          .map(s => {
+            const start = new Date(s.start_date)
+            const months = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth())
+            return isNaN(months) ? null : months
+          })
+          .filter(t => t !== null)
         const avgTenureMonths = tenures.length > 0
           ? Math.round(tenures.reduce((a, b) => a + b, 0) / tenures.length * 10) / 10
           : null
@@ -731,13 +735,13 @@ export default function BusinessDashboard() {
               {[
                 {
                   label:'Retention Rate',
-                  value: stats.retentionRate !== null ? `${stats.retentionRate}%` : 'N/A',
+                  value: (stats.retentionRate !== null && stats.retentionRate !== undefined) ? `${stats.retentionRate}%` : 'N/A',
                   sub: 'members who renewed last month',
                   color: stats.retentionRate === null ? '#111827' : stats.retentionRate >= 80 ? '#059669' : stats.retentionRate >= 60 ? '#F59E0B' : '#EF4444',
                 },
                 {
                   label:'Avg Member Tenure',
-                  value: stats.avgTenureMonths !== null ? `${stats.avgTenureMonths}mo` : 'N/A',
+                  value: (stats.avgTenureMonths !== null && stats.avgTenureMonths !== undefined) ? `${stats.avgTenureMonths}mo` : 'N/A',
                   sub: 'average months a member stays',
                   color: '#111827',
                 },
