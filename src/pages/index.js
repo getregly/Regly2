@@ -1,7 +1,6 @@
+import Head from 'next/head'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
-
-const PASSCODE = 'PERKS'
 
 // ─── Responsive hook ──────────────────────────────────────────────
 function useWindowWidth() {
@@ -22,64 +21,27 @@ const ArrowRight = () => (
   </svg>
 )
 
-// ─── Passcode Gate ────────────────────────────────────────────────
-function PasscodeGate({ onUnlock }) {
-  const [input, setInput] = useState('')
-  const [error, setError] = useState(false)
-
-  function handle(e) {
-    e.preventDefault()
-    if (input.toUpperCase() === PASSCODE) { onUnlock() }
-    else { setError(true); setTimeout(() => setError(false), 1200); setInput('') }
-  }
-
-  return (
-    <div style={{minHeight:'100vh', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', background:'#0A0906', fontFamily:'system-ui, sans-serif'}}>
-      <p style={{fontFamily:'Georgia, serif', fontSize:32, fontWeight:700, color:'#F5F0E8', marginBottom:4}}>REGL<span style={{color:'#C9A84C'}}>Y</span></p>
-      <p style={{color:'#8A7A6A', fontSize:13, marginBottom:32, letterSpacing:'0.15em', textTransform:'uppercase'}}>Enter passcode to continue</p>
-      <form onSubmit={handle} style={{display:'flex', flexDirection:'column', gap:12, alignItems:'center'}}>
-        <input
-          value={input} onChange={e => setInput(e.target.value)}
-          placeholder="Passcode"
-          style={{padding:'14px 20px', background:'#1A1410', border:`1px solid ${error ? '#EF4444' : 'rgba(201,168,76,0.3)'}`, borderRadius:8, color:'#F5F0E8', fontSize:16, textAlign:'center', letterSpacing:'0.2em', outline:'none', width:220, fontFamily:'inherit', transition:'border 0.2s'}}
-        />
-        <button type="submit"
-          style={{padding:'12px 32px', background:'#C9A84C', color:'#0A0906', border:'none', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer', letterSpacing:'0.1em', fontFamily:'inherit'}}>
-          Continue
-        </button>
-      </form>
-      {error && <p style={{color:'#EF4444', fontSize:12, marginTop:12}}>Incorrect passcode</p>}
-    </div>
-  )
-}
-
 // ─── Main Landing Page ────────────────────────────────────────────
 export default function Home() {
   const router = useRouter()
   const width = useWindowWidth()
   const isMobile = width < 768
-  const [unlocked, setUnlocked] = useState(false)
-  const [checking, setChecking] = useState(true)
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
-    if (sessionStorage.getItem('regly_unlocked') === 'true') setUnlocked(true)
-    setChecking(false)
     const onScroll = () => setScrolled(window.scrollY > 60)
     window.addEventListener('scroll', onScroll)
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  function unlock() {
-    sessionStorage.setItem('regly_unlocked', 'true')
-    setUnlocked(true)
-  }
-
-  if (checking) return null
-  if (!unlocked) return <PasscodeGate onUnlock={unlock} />
-
   return (
     <div style={{minHeight:'100vh', background:'#FFFFFF', fontFamily:"'Inter', system-ui, sans-serif", overflowX:'hidden'}}>
+    <Head>
+      <title>Regly — Monthly Memberships for Local Businesses</title>
+      <meta name="description" content="Regly is the membership platform for local businesses. Offer monthly memberships to your regulars. They get real perks. You get paid every month." />
+      <meta property="og:title" content="Regly — Monthly Memberships for Local Businesses" />
+      <meta property="og:description" content="Regly is the membership platform for local businesses. Offer monthly memberships to your regulars. They get real perks. You get paid every month." />
+    </Head>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,700;0,900;1,600&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
