@@ -1,3 +1,4 @@
+import Head from 'next/head'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { supabase } from '../../lib/supabase'
@@ -367,6 +368,12 @@ export default function BusinessDashboard() {
 
   return (
     <div style={S.page}>
+    <Head>
+      <title>Business Dashboard — Regly</title>
+      <meta name="description" content="Manage your Regly membership program, members, and payouts." />
+      <meta property="og:title" content="Business Dashboard — Regly" />
+      <meta property="og:description" content="Manage your Regly membership program, members, and payouts." />
+    </Head>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap'); *{box-sizing:border-box;} .hover-row:hover{background:#F9FAFB;} .search-btn:hover{opacity:0.88;} .logout-btn:hover{color:#111827;} @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
 
       {/* NAV */}
