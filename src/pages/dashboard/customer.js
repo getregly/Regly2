@@ -143,13 +143,27 @@ export default function CustomerDashboard() {
   }
 
   async function handleCancel(sub) {
-    if (!confirm('Cancel this membership?')) return
-    await fetch('/api/cancel', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ subscriptionId: sub.stripe_subscription_id, subId: sub.id }),
-    })
-    setMyMemberships(m => m.filter(s => s.id !== sub.id))
+    const confirmed = confirm(`Cancel your ${sub.membership_tiers?.name} membership at ${sub.restaurants?.name}? You will keep access until the end of your current billing period.`)
+    if (!confirmed) return
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const res = await fetch('/api/cancel', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token}`,
+        },
+        body: JSON.stringify({ subscriptionId: sub.stripe_subscription_id, subId: sub.id }),
+      })
+      const data = await res.json()
+      if (data.ok) {
+        setMyMemberships(m => m.filter(s => s.id !== sub.id))
+      } else {
+        alert('Could not cancel membership: ' + (data.error || 'Unknown error'))
+      }
+    } catch (err) {
+      alert('Something went wrong. Please try again.')
+    }
   }
 
   async function logout() {
