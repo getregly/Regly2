@@ -112,9 +112,13 @@ export default function Admin() {
 
         // 4. Auto-create Stripe Product + Price
         try {
+          const { data: { session } } = await supabase.auth.getSession()
           const stripeRes = await fetch('/api/create-stripe-price', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session?.access_token}`,
+            },
             body: JSON.stringify({
               tier_id: tierRow.id,
               tier_name: t.name,
