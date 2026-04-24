@@ -1,3 +1,4 @@
+import Head from 'next/head'
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import { supabase } from '../lib/supabase'
@@ -81,6 +82,12 @@ export default function Auth() {
 
   return (
     <div style={{minHeight:'100vh', fontFamily:'system-ui, -apple-system, sans-serif', background:'#F9FAFB'}}>
+    <Head>
+      <title>Sign In — Regly</title>
+      <meta name="description" content="Sign in or create your Regly account." />
+      <meta property="og:title" content="Sign In — Regly" />
+      <meta property="og:description" content="Sign in or create your Regly account." />
+    </Head>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600&display=swap');
         * { box-sizing: border-box; }
