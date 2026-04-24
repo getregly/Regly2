@@ -124,6 +124,7 @@ export default function Admin() {
               tier_name: t.name,
               price_monthly: Number(t.price),
               business_name: sub.business_name,
+              restaurant_id: restaurant.id,
             }),
           })
           const stripeData = await stripeRes.json()
