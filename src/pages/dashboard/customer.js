@@ -1,3 +1,4 @@
+import Head from 'next/head'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { supabase } from '../../lib/supabase'
@@ -171,6 +172,12 @@ export default function CustomerDashboard() {
 
   return (
     <div style={{minHeight:'100vh', background:'#F9FAFB', fontFamily:"'Inter', system-ui, sans-serif"}}>
+    <Head>
+      <title>My Memberships — Regly</title>
+      <meta name="description" content="Manage your Regly memberships and browse local businesses." />
+      <meta property="og:title" content="My Memberships — Regly" />
+      <meta property="og:description" content="Manage your Regly memberships and browse local businesses." />
+    </Head>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700&display=swap');
         * { box-sizing: border-box; }
@@ -212,12 +219,13 @@ export default function CustomerDashboard() {
             <div style={{position:'absolute', right:-40, top:-40, width:240, height:240, borderRadius:'50%', background:'rgba(201,168,76,0.08)'}} />
             <div style={{position:'absolute', right:40, bottom:-60, width:160, height:160, borderRadius:'50%', background:'rgba(201,168,76,0.05)'}} />
             <div style={{position:'relative', zIndex:1}}>
-              <p style={{color:'#C9A84C', fontSize:11, letterSpacing:'0.3em', textTransform:'uppercase', fontWeight:600, marginBottom:12}}>Get Started</p>
+              <p style={{color:'#C9A84C', fontSize:11, letterSpacing:'0.3em', textTransform:'uppercase', fontWeight:600, marginBottom:12}}>Welcome to Regly</p>
               <h2 style={{fontFamily:'Georgia, serif', fontSize:36, fontWeight:700, color:'#F5F0E8', marginBottom:12, lineHeight:1.2}}>
-                Become a member at<br /><span style={{color:'#C9A84C', fontStyle:'italic'}}>your favorite places.</span>
+                {user?.name?.split(' ')[0] ? `Hi, ${user.name.split(' ')[0]}.` : 'Welcome.'}<br />
+                <span style={{color:'#C9A84C', fontStyle:'italic'}}>Your memberships are waiting.</span>
               </h2>
               <p style={{color:'rgba(245,240,232,0.6)', fontSize:15, maxWidth:480, lineHeight:1.6, marginBottom:28, fontWeight:300}}>
-                Pick a spot below, choose a membership tier, and start getting real perks every time you visit. Cancel anytime.
+                Browse the local businesses below and subscribe to your first membership. Real perks, every visit, starting today.
               </p>
               <button onClick={() => document.getElementById('browse')?.scrollIntoView({behavior:'smooth'})}
                 style={{background:'#C9A84C', color:'#0A0906', border:'none', borderRadius:10, padding:'14px 28px', fontSize:14, fontWeight:700, cursor:'pointer', letterSpacing:'0.05em', display:'inline-flex', alignItems:'center', gap:8}}>
