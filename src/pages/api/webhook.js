@@ -155,7 +155,39 @@ export default async function handler(req, res) {
           .eq('stripe_subscription_id', invoice.subscription)
 
         if (error) console.error('Supabase renewal error:', error)
-        else console.log(`✓ Subscription renewed: ${invoice.subscription}`)
+        else console.log(`Subscription renewed: ${invoice.subscription}`)
+      }
+    }
+
+    // ── Chargeback / dispute created ─────────────────────────────
+    // Fires when a customer disputes a charge with their bank
+    // Marks the subscription as disputed for manual review
+    if (event.type === 'charge.dispute.created') {
+      const dispute = event.data.object
+
+      console.error(
+        `DISPUTE CREATED: charge ${dispute.charge}, ` +
+        `amount $${(dispute.amount / 100).toFixed(2)}, ` +
+        `reason: ${dispute.reason}. Manual review required.`
+      )
+
+      try {
+        // Trace back from charge to subscription
+        const charge = await stripe.charges.retrieve(dispute.charge)
+        if (charge.invoice) {
+          const invoice = await stripe.invoices.retrieve(charge.invoice)
+          if (invoice.subscription) {
+            const { error } = await supabase
+              .from('subscriptions')
+              .update({ status: 'disputed' })
+              .eq('stripe_subscription_id', invoice.subscription)
+
+            if (error) console.error('Supabase dispute update error:', error)
+            else console.log(`Subscription marked disputed: ${invoice.subscription}`)
+          }
+        }
+      } catch (disputeErr) {
+        console.error('Error processing dispute:', disputeErr.message)
       }
     }
 
