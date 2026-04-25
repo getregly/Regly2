@@ -255,7 +255,14 @@ export default function Admin() {
                     <div style={{display:'flex', alignItems:'flex-start', justifyContent:'space-between'}}>
                       <div style={{flex:1}}>
                         <div style={{display:'flex', alignItems:'center', gap:10, marginBottom:6}}>
-                          <h3 style={{fontFamily:'Georgia, serif', fontSize:20, fontWeight:700, color:'#111827', margin:0}}>{sub.business_name}</h3>
+                          <div style={{display:'flex', alignItems:'center', gap:8, flexWrap:'wrap'}}>
+                            <h3 style={{fontFamily:'Georgia, serif', fontSize:20, fontWeight:700, color:'#111827', margin:0}}>{sub.business_name}</h3>
+                            {submissions.filter(s => s.business_name.toLowerCase().trim() === sub.business_name.toLowerCase().trim() && s.id !== sub.id).length > 0 && (
+                              <span style={{fontSize:10, fontWeight:700, padding:'3px 8px', borderRadius:20, background:'#FEF3C7', color:'#92400E', letterSpacing:'0.05em'}}>
+                                POSSIBLE DUPLICATE
+                              </span>
+                            )}
+                          </div>
                           {statusChip(sub.status)}
                         </div>
                         <p style={{color:'#6B7280', fontSize:14, marginBottom:2}}>{sub.address}, {sub.city}</p>
