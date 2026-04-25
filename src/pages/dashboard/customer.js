@@ -77,7 +77,11 @@ export default function CustomerDashboard() {
     const { data: profile } = await supabase.from('profiles').select('*').eq('id', u.id).single()
     if (profile?.role !== 'customer') { router.push('/'); return }
     setUser(profile)
-    const { data: rests } = await supabase.from('restaurants').select('*').order('name')
+    const { data: rests } = await supabase
+      .from('restaurants')
+      .select('*')
+      .eq('stripe_onboarding_complete', true)
+      .order('name')
     setRestaurants(rests || [])
     const { data: subs } = await supabase
       .from('subscriptions')
@@ -117,7 +121,13 @@ export default function CustomerDashboard() {
   }
 
   async function selectRestaurant(rest) {
-    setSelected(rest)
+    // Fetch full restaurant details including Connect status
+    const { data: fullRest } = await supabase
+      .from('restaurants')
+      .select('*, stripe_account_id, stripe_onboarding_complete')
+      .eq('id', rest.id)
+      .single()
+    setSelected(fullRest || rest)
     const { data } = await supabase.from('membership_tiers').select('*, perks_config').eq('restaurant_id', rest.id).order('price_monthly')
     setTiers(data || [])
     setTimeout(() => document.getElementById('tiers-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100)
@@ -132,7 +142,11 @@ export default function CustomerDashboard() {
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
         body: JSON.stringify({ tierId: tier.id, restaurantId: selected.id, stripePriceId: tier.stripe_price_id }),
       })
-      const { url, error } = await res.json()
+      const { url, error, code } = await res.json()
+      if (code === 'CONNECT_INCOMPLETE' || code === 'CONNECT_NOT_READY') {
+        alert('This business is still completing their payment setup and is not yet accepting memberships. Please check back soon.')
+        return
+      }
       if (error) throw new Error(error)
       window.location.href = url
     } catch (err) {
@@ -416,6 +430,7 @@ export default function CustomerDashboard() {
         {/* TIERS */}
         {selected && (
           <div id="tiers-section" style={{marginTop:48}}>
+
             <div style={{display:'flex', alignItems:'center', gap:16, marginBottom:8}}>
               <div style={{width:48, height:48, borderRadius:14, background: getCardAccent(getCategoryType(selected.name)).light, display:'flex', alignItems:'center', justifyContent:'center'}}>
                 <CategoryIcon type={getCategoryType(selected.name)} />
