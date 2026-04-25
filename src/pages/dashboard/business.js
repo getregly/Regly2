@@ -156,23 +156,18 @@ export default function BusinessDashboard() {
     if (!restaurant) return
     setSearching(true)
     setLookup(null)
+    // Normalize — strip everything except digits, use last 10 to handle +1 prefix
     const cleaned = phone.replace(/\D/g, '')
-    // Query only the specific phone number, never fetch all profiles
+    const last10 = cleaned.slice(-10)
+
+    // Single query using last 10 digits handles all formatting variants
     const { data: profiles } = await supabase
       .from('profiles')
       .select('id, name, phone')
       .eq('role', 'customer')
-      .eq('phone', phone.trim())
-    // Also try cleaned version in case formatting differs
+      .ilike('phone', `%${last10}%`)
+
     let matchedProfile = profiles?.[0] || null
-    if (!matchedProfile) {
-      const { data: profiles2 } = await supabase
-        .from('profiles')
-        .select('id, name, phone')
-        .eq('role', 'customer')
-        .ilike('phone', `%${cleaned.slice(-10)}%`)
-      matchedProfile = profiles2?.[0] || null
-    }
     if (!matchedProfile) { setLookup(false); setSearching(false); return }
 
     const { data: subs } = await supabase
@@ -206,14 +201,36 @@ export default function BusinessDashboard() {
       .eq('billing_month', billingMonth)
 
     const perksConfig = tierData?.perks_config || []
-    setLookup({ ...subs[0], profile: matchedProfile, stripeInfo, perksConfig, perkUsage: usageData || [] })
+    setLookup({
+      ...subs[0],
+      profile: matchedProfile,
+      stripeInfo,
+      perksConfig,
+      perkUsage: usageData || [],
+      cancel_at_period_end: subs[0].cancel_at_period_end || false,
+      current_period_end: subs[0].current_period_end || null,
+    })
     setSearching(false)
   }
 
   async function logPerkUsage(perkIndex, perkDescription) {
     if (!lookup || !restaurant) return
     setLookup(prev => ({ ...prev, loggingPerk: perkIndex }))
-    const billingMonth = new Date().toISOString().slice(0, 7)
+
+    // Use the subscription's actual billing period start as the month key
+    // This ensures perk resets align with the customer's billing date
+    // not the calendar month (e.g. a member who pays on the 15th
+    // gets their perks reset on the 15th, not the 1st)
+    let billingMonth
+    if (lookup.current_period_end) {
+      // current_period_end is end of this period, subtract 1 month to get start
+      const periodEnd = new Date(lookup.current_period_end)
+      const periodStart = new Date(periodEnd)
+      periodStart.setMonth(periodStart.getMonth() - 1)
+      billingMonth = periodStart.toISOString().slice(0, 7)
+    } else {
+      billingMonth = new Date().toISOString().slice(0, 7)
+    }
     const { data: { user } } = await supabase.auth.getUser()
     const { error } = await supabase.from('perk_usage').insert({
       subscription_id: lookup.id,
@@ -574,6 +591,24 @@ export default function BusinessDashboard() {
                           : 'Cancelled Membership'}
                       </span>
                     </div>
+                    {/* Status banners */}
+                    {lookup.cancel_at_period_end && (
+                      <div style={{marginBottom:8, background:'#FFFBEB', border:'1px solid #FCD34D', borderRadius:8, padding:'10px 14px'}}>
+                        <p style={{fontSize:12, color:'#92400E', fontWeight:500, margin:0}}>
+                          Member cancelled. Perks active until{' '}
+                          {lookup.current_period_end
+                            ? new Date(lookup.current_period_end).toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'})
+                            : 'end of billing period'}.
+                        </p>
+                      </div>
+                    )}
+                    {lookup.status === 'past_due' && (
+                      <div style={{marginBottom:8, background:'#FEF2F2', border:'1px solid #FECACA', borderRadius:8, padding:'10px 14px'}}>
+                        <p style={{fontSize:12, color:'#991B1B', fontWeight:500, margin:0}}>
+                          Payment failed. Perks suspended until payment is resolved.
+                        </p>
+                      </div>
+                    )}
                     <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'6px 20px'}}>
                       {[
                         ['Name', lookup.profile.name],
@@ -591,7 +626,14 @@ export default function BusinessDashboard() {
                   </div>
 
                   {/* Perk usage, only show for active members */}
-                  {lookup.status === 'active' && lookup.perksConfig && lookup.perksConfig.length > 0 && (
+                  {(() => {
+                    // Allow perks if active, OR if cancelled but still within paid period
+                    const periodEnd = lookup.current_period_end ? new Date(lookup.current_period_end) : null
+                    const withinPeriod = periodEnd && periodEnd > new Date()
+                    const canUsePerks = lookup.status === 'active' ||
+                      (lookup.cancel_at_period_end && withinPeriod)
+                    return canUsePerks
+                  })() && lookup.perksConfig && lookup.perksConfig.length > 0 && (
                     <div style={{background:'white', border:'1px solid #E5E7EB', borderRadius:12, overflow:'hidden'}}>
                       {/* Header */}
                       <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 18px', borderBottom:'1px solid #F3F4F6', background:'#FAFAFA'}}>
