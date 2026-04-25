@@ -16,22 +16,30 @@ export default function Success() {
   async function recordSubscription() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    const { data: existing } = await supabase
-      .from('subscriptions').select('id').eq('customer_id', user.id).eq('tier_id', tier).eq('status', 'active').single()
-    if (!existing) {
-      await supabase.from('subscriptions').insert({
-        customer_id: user.id,
-        restaurant_id: restaurant,
-        tier_id: tier,
-        stripe_subscription_id: session_id,
-        status: 'active',
-        start_date: new Date().toISOString(),
-      })
-    }
+
+    // Fetch tier info immediately for display
     const { data: tierData } = await supabase
       .from('membership_tiers').select('name, perks, perks_config, restaurants(name)').eq('id', tier).single()
     setInfo(tierData)
-    setDone(true)
+
+    // Poll for subscription created by webhook — may take a few seconds
+    let attempts = 0
+    const poll = async () => {
+      const { data: sub } = await supabase
+        .from('subscriptions')
+        .select('id, status')
+        .eq('customer_id', user.id)
+        .eq('tier_id', tier)
+        .in('status', ['active', 'past_due'])
+        .maybeSingle()
+      if (sub || attempts >= 8) {
+        setDone(true)
+      } else {
+        attempts++
+        setTimeout(poll, 2000)
+      }
+    }
+    poll()
   }
 
   // Use perks_config if available, fall back to plain text
