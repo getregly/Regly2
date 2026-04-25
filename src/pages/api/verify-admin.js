@@ -14,12 +14,17 @@ const supabase = createClient(
 export default async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
 
-  const token = req.headers.authorization?.replace('Bearer ', '')
-  if (!token) return res.status(401).json({ error: 'Unauthorized' })
+  try {
+    const token = req.headers.authorization?.replace('Bearer ', '')
+    if (!token) return res.status(401).json({ error: 'Unauthorized' })
 
-  const { data: { user }, error } = await supabase.auth.getUser(token)
-  if (!user || error) return res.status(401).json({ error: 'Unauthorized' })
-  if (user.email !== ADMIN_EMAIL) return res.status(403).json({ error: 'Forbidden' })
+    const { data: { user }, error } = await supabase.auth.getUser(token)
+    if (!user || error) return res.status(401).json({ error: 'Unauthorized' })
+    if (user.email !== ADMIN_EMAIL) return res.status(403).json({ error: 'Forbidden' })
 
-  return res.status(200).json({ authorized: true })
+    return res.status(200).json({ authorized: true })
+  } catch (err) {
+    console.error('verify-admin error:', err)
+    return res.status(500).json({ error: 'Internal server error' })
+  }
 }
