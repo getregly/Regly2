@@ -627,11 +627,15 @@ export default function BusinessDashboard() {
 
                   {/* Perk usage, only show for active members */}
                   {(() => {
-                    // Allow perks if active, OR if cancelled but still within paid period
+                    // Allow perks if:
+                    // 1. Status is active (includes pending cancellation)
+                    // 2. Status is cancelled but period end is in the future (already paid)
+                    // 3. current_period_end is null — give benefit of the doubt, allow perks
                     const periodEnd = lookup.current_period_end ? new Date(lookup.current_period_end) : null
-                    const withinPeriod = periodEnd && periodEnd > new Date()
-                    const canUsePerks = lookup.status === 'active' ||
-                      (lookup.cancel_at_period_end && withinPeriod)
+                    const withinPeriod = !periodEnd || periodEnd > new Date()
+                    const isFullyExpired = lookup.status === 'cancelled' && periodEnd && periodEnd < new Date()
+                    const isPastDue = lookup.status === 'past_due'
+                    const canUsePerks = !isFullyExpired && !isPastDue
                     return canUsePerks
                   })() && lookup.perksConfig && lookup.perksConfig.length > 0 && (
                     <div style={{background:'white', border:'1px solid #E5E7EB', borderRadius:12, overflow:'hidden'}}>
