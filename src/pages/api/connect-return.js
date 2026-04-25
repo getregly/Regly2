@@ -13,6 +13,9 @@ const supabase = createClient(
 )
 
 export default async function handler(req, res) {
+  // This endpoint is called by Stripe redirect — GET only
+  if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' })
+
   const { restaurant_id } = req.query
 
   if (!restaurant_id) {
@@ -50,7 +53,7 @@ export default async function handler(req, res) {
     if (isComplete) {
       return res.redirect('/dashboard/business?connect=success')
     } else {
-      // Account created but not fully verified yet — Stripe may need more info
+      // Account created but not fully verified yet, Stripe may need more info
       return res.redirect('/dashboard/business?connect=pending')
     }
 
