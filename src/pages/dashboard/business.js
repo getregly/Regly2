@@ -567,8 +567,11 @@ export default function BusinessDashboard() {
                             : <path d="M4 4L10 10M10 4L4 10" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>}
                         </svg>
                       </div>
-                      <span style={{fontSize:14, fontWeight:600, color: lookup.status === 'active' ? '#065F46' : '#991B1B'}}>
-                        {lookup.status === 'active' ? 'Active Member' : 'Cancelled Membership'}
+                      <span style={{fontSize:14, fontWeight:600, color: lookup.status === 'active' && !lookup.cancel_at_period_end ? '#065F46' : lookup.status === 'past_due' ? '#92400E' : lookup.cancel_at_period_end ? '#B45309' : '#991B1B'}}>
+                        {lookup.status === 'active' && !lookup.cancel_at_period_end ? 'Active Member'
+                          : lookup.cancel_at_period_end ? 'Member — Cancels Soon'
+                          : lookup.status === 'past_due' ? 'Payment Failed'
+                          : 'Cancelled Membership'}
                       </span>
                     </div>
                     <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'6px 20px'}}>
