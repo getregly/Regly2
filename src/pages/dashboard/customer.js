@@ -86,6 +86,7 @@ export default function CustomerDashboard() {
     const { data: subs } = await supabase
       .from('subscriptions')
       .select('*, restaurants(name), membership_tiers(name, price_monthly, perks, perks_config)')
+      .in('status', ['active', 'past_due'])
       .eq('customer_id', u.id)
       .eq('status', 'active')
     const activeSubs = subs || []
@@ -157,7 +158,10 @@ export default function CustomerDashboard() {
   }
 
   async function handleCancel(sub) {
-    const confirmed = confirm(`Cancel your ${sub.membership_tiers?.name} membership at ${sub.restaurants?.name}? You will keep access until the end of your current billing period.`)
+    const endDate = sub.current_period_end
+      ? new Date(sub.current_period_end).toLocaleDateString('en-US', { month:'long', day:'numeric', year:'numeric' })
+      : 'the end of your billing period'
+    const confirmed = confirm(`Cancel your ${sub.membership_tiers?.name} membership at ${sub.restaurants?.name}? You will keep full access to all your perks until ${endDate}.`)
     if (!confirmed) return
     try {
       const { data: { session } } = await supabase.auth.getSession()
@@ -171,7 +175,8 @@ export default function CustomerDashboard() {
       })
       const data = await res.json()
       if (data.ok) {
-        setMyMemberships(m => m.filter(s => s.id !== sub.id))
+        // Update local state to show pending cancellation — do not remove the card
+        setMyMemberships(m => m.map(s => s.id === sub.id ? { ...s, cancel_at_period_end: true } : s))
       } else {
         alert('Could not cancel membership: ' + (data.error || 'Unknown error'))
       }
@@ -331,10 +336,21 @@ export default function CustomerDashboard() {
                       })()}
                       <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', paddingTop:12, borderTop:`1px solid ${isRecord ? 'rgba(201,168,76,0.15)' : '#F3F4F6'}`}}>
                         <span style={{fontFamily:'Georgia, serif', fontSize:22, fontWeight:700, color: isRecord ? '#C9A84C' : '#111827'}}>${sub.membership_tiers?.price_monthly}<span style={{fontSize:12, fontWeight:400, color: isRecord ? 'rgba(245,240,232,0.4)' : '#9CA3AF'}}>/mo</span></span>
-                        <button onClick={() => handleCancel(sub)} className="cancel-btn"
-                          style={{color:'#D1D5DB', background:'none', border:'none', cursor:'pointer', fontSize:12, fontFamily:'inherit', padding:0}}>
-                          Cancel
-                        </button>
+                        {sub.cancel_at_period_end ? (
+                          <div style={{textAlign:'right'}}>
+                            <p style={{fontSize:11, color:'#EF4444', fontWeight:600, marginBottom:1}}>Cancels on</p>
+                            <p style={{fontSize:11, color:'#EF4444'}}>
+                              {sub.current_period_end
+                                ? new Date(sub.current_period_end).toLocaleDateString('en-US', {month:'short', day:'numeric'})
+                                : 'period end'}
+                            </p>
+                          </div>
+                        ) : (
+                          <button onClick={() => handleCancel(sub)} className="cancel-btn"
+                            style={{color:'#D1D5DB', background:'none', border:'none', cursor:'pointer', fontSize:12, fontFamily:'inherit', padding:0}}>
+                            Cancel
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
