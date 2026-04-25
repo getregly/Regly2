@@ -156,38 +156,48 @@ export default function BusinessDashboard() {
     if (!restaurant) return
     setSearching(true)
     setLookup(null)
-    // Normalize — strip everything except digits
-    const cleaned = phone.replace(/\D/g, '')
-    const last10 = cleaned.slice(-10)
+    // Phones stored as plain digits — normalize input and match exactly
+    const cleaned = phone.trim().replace(/[^0-9]/g, '')
 
-    // Strategy 1: exact match on what was typed
+    if (!cleaned) { setLookup(false); setSearching(false); return }
+
+    // Try exact match first
     let { data: profiles } = await supabase
       .from('profiles')
       .select('id, name, phone')
       .eq('role', 'customer')
-      .eq('phone', phone.trim())
+      .eq('phone', cleaned)
 
-    // Strategy 2: match on cleaned digits
-    if (!profiles?.length && cleaned) {
+    // Fallback: try with what the user typed as-is
+    if (!profiles?.length) {
       const { data: p2 } = await supabase
         .from('profiles')
         .select('id, name, phone')
         .eq('role', 'customer')
-        .eq('phone', cleaned)
+        .eq('phone', phone.trim())
       if (p2?.length) profiles = p2
     }
 
-    // Strategy 3: partial match on last 10 digits
-    if (!profiles?.length && last10.length >= 7) {
-      const { data: p3 } = await supabase
-        .from('profiles')
-        .select('id, name, phone')
-        .eq('role', 'customer')
-        .ilike('phone', `%${last10}%`)
-      if (p3?.length) profiles = p3
-    }
+    let matchedProfile = null
 
-    let matchedProfile = profiles?.[0] || null
+    // If multiple profiles share the same phone, find the one
+    // with an active subscription at this restaurant
+    if (profiles && profiles.length > 1) {
+      for (const profile of profiles) {
+        const { data: testSub } = await supabase
+          .from('subscriptions')
+          .select('id')
+          .eq('customer_id', profile.id)
+          .eq('restaurant_id', restaurant.id)
+          .in('status', ['active', 'past_due'])
+          .maybeSingle()
+        if (testSub) { matchedProfile = profile; break }
+      }
+      // Fall back to first profile if none have a subscription
+      if (!matchedProfile) matchedProfile = profiles[0]
+    } else {
+      matchedProfile = profiles?.[0] || null
+    }
     if (!matchedProfile) { setLookup(false); setSearching(false); return }
 
     const { data: subs } = await supabase
