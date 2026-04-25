@@ -156,16 +156,36 @@ export default function BusinessDashboard() {
     if (!restaurant) return
     setSearching(true)
     setLookup(null)
-    // Normalize — strip everything except digits, use last 10 to handle +1 prefix
+    // Normalize — strip everything except digits
     const cleaned = phone.replace(/\D/g, '')
     const last10 = cleaned.slice(-10)
 
-    // Single query using last 10 digits handles all formatting variants
-    const { data: profiles } = await supabase
+    // Strategy 1: exact match on what was typed
+    let { data: profiles } = await supabase
       .from('profiles')
       .select('id, name, phone')
       .eq('role', 'customer')
-      .ilike('phone', `%${last10}%`)
+      .eq('phone', phone.trim())
+
+    // Strategy 2: match on cleaned digits
+    if (!profiles?.length && cleaned) {
+      const { data: p2 } = await supabase
+        .from('profiles')
+        .select('id, name, phone')
+        .eq('role', 'customer')
+        .eq('phone', cleaned)
+      if (p2?.length) profiles = p2
+    }
+
+    // Strategy 3: partial match on last 10 digits
+    if (!profiles?.length && last10.length >= 7) {
+      const { data: p3 } = await supabase
+        .from('profiles')
+        .select('id, name, phone')
+        .eq('role', 'customer')
+        .ilike('phone', `%${last10}%`)
+      if (p3?.length) profiles = p3
+    }
 
     let matchedProfile = profiles?.[0] || null
     if (!matchedProfile) { setLookup(false); setSearching(false); return }
