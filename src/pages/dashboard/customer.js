@@ -19,7 +19,7 @@ const CategoryIcon = ({ type }) => {
   }
   const d = icons[type] || icons.default
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{color:'#C9A84C'}}>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{color:'#C0442B'}}>
       {d}
     </svg>
   )
@@ -48,7 +48,7 @@ function getCardAccent(type) {
     taco:     { bg:'#F0FDF4', accent:'#15803D', light:'#DCFCE7' },
     bar:      { bg:'#F5F3FF', accent:'#6D28D9', light:'#EDE9FE' },
     book:     { bg:'#EFF6FF', accent:'#1D4ED8', light:'#DBEAFE' },
-    record:   { bg:'#0A0906', accent:'#C9A84C', light:'#1A1410' },
+    record:   { bg:'#1A0A06', accent:'#C0442B', light:'#1A1410' },
     smoothie: { bg:'#F0FDF4', accent:'#059669', light:'#D1FAE5' },
     bakery:   { bg:'#FDF4FF', accent:'#9333EA', light:'#F3E8FF' },
     default:  { bg:'#F9FAFB', accent:'#374151', light:'#F3F4F6' },
@@ -197,7 +197,7 @@ export default function CustomerDashboard() {
   if (loading) return (
     <div style={{minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'#F9FAFB'}}>
       <div style={{textAlign:'center'}}>
-        <p style={{fontFamily:'Georgia, serif', fontSize:28, fontWeight:700, color:'#111827', marginBottom:8}}>REGL<span style={{color:'#C9A84C'}}>Y</span></p>
+        <p style={{fontFamily:'Georgia, serif', fontSize:28, fontWeight:700, color:'#1A0A06', marginBottom:8}}><span style={{fontFamily:"'Playfair Display',Georgia,serif",fontWeight:700,fontStyle:"italic",fontSize:"inherit",letterSpacing:"-0.01em"}}>Regly</span></p>
         <p style={{color:'#9CA3AF', fontSize:14}}>Loading your memberships...</p>
       </div>
     </div>
@@ -229,12 +229,12 @@ export default function CustomerDashboard() {
       {/* TOP NAV */}
       <nav style={{background:'white', borderBottom:'1px solid #F3F4F6', position:'sticky', top:0, zIndex:40, padding:'0 24px'}}>
         <div style={{maxWidth:1100, margin:'0 auto', display:'flex', alignItems:'center', justifyContent:'space-between', height:64}}>
-          <p style={{fontFamily:'Georgia, serif', fontSize:22, fontWeight:700, color:'#111827', margin:0}}>
-            REGL<span style={{color:'#C9A84C'}}>Y</span>
+          <p style={{fontFamily:'Georgia, serif', fontSize:22, fontWeight:700, color:'#1A0A06', margin:0}}>
+            <span style={{fontFamily:"'Playfair Display',Georgia,serif",fontWeight:700,fontStyle:"italic",fontSize:"inherit",letterSpacing:"-0.01em"}}>Regly</span>
           </p>
           <div style={{display:'flex', alignItems:'center', gap:20}}>
             <p style={{color:'#6B7280', fontSize:14, margin:0}}>
-              Hi, <span style={{color:'#111827', fontWeight:600}}>{user?.name?.split(' ')[0]}</span>
+              Hi, <span style={{color:'#1A0A06', fontWeight:600}}>{user?.name?.split(' ')[0]}</span>
             </p>
             <button onClick={logout} className="nav-link"
               style={{color:'#9CA3AF', background:'none', border:'1px solid #E5E7EB', borderRadius:8, padding:'8px 16px', fontSize:14, cursor:'pointer', fontFamily:'inherit'}}>
@@ -249,19 +249,19 @@ export default function CustomerDashboard() {
         {/* HERO PROMPT, no memberships */}
         {hasNoMemberships && (
           <div style={{background:'linear-gradient(135deg, #0A0906 0%, #1A1410 100%)', borderRadius:24, padding:'48px 40px', marginBottom:40, position:'relative', overflow:'hidden'}}>
-            <div style={{position:'absolute', right:-40, top:-40, width:240, height:240, borderRadius:'50%', background:'rgba(201,168,76,0.08)'}} />
+            <div style={{position:'absolute', right:-40, top:-40, width:240, height:240, borderRadius:'50%', background:'rgba(192,68,43,0.08)'}} />
             <div style={{position:'absolute', right:40, bottom:-60, width:160, height:160, borderRadius:'50%', background:'rgba(201,168,76,0.05)'}} />
             <div style={{position:'relative', zIndex:1}}>
-              <p style={{color:'#C9A84C', fontSize:11, letterSpacing:'0.3em', textTransform:'uppercase', fontWeight:600, marginBottom:12}}>Welcome to Regly</p>
+              <p style={{color:'#C0442B', fontSize:11, letterSpacing:'0.3em', textTransform:'uppercase', fontWeight:600, marginBottom:12}}>Welcome to Regly</p>
               <h2 style={{fontFamily:'Georgia, serif', fontSize:36, fontWeight:700, color:'#F5F0E8', marginBottom:12, lineHeight:1.2}}>
                 {user?.name?.split(' ')[0] ? `Hi, ${user.name.split(' ')[0]}.` : 'Welcome.'}<br />
-                <span style={{color:'#C9A84C', fontStyle:'italic'}}>Your memberships are waiting.</span>
+                <span style={{color:'#C0442B', fontStyle:'italic'}}>Your memberships are waiting.</span>
               </h2>
               <p style={{color:'rgba(245,240,232,0.6)', fontSize:15, maxWidth:480, lineHeight:1.6, marginBottom:28, fontWeight:300}}>
                 Browse the local businesses below and subscribe to your first membership. Real perks, every visit, starting today.
               </p>
               <button onClick={() => document.getElementById('browse')?.scrollIntoView({behavior:'smooth'})}
-                style={{background:'#C9A84C', color:'#0A0906', border:'none', borderRadius:10, padding:'14px 28px', fontSize:14, fontWeight:700, cursor:'pointer', letterSpacing:'0.05em', display:'inline-flex', alignItems:'center', gap:8}}>
+                style={{background:'#C0442B', color:'#1A0A06', border:'none', borderRadius:10, padding:'14px 28px', fontSize:14, fontWeight:700, cursor:'pointer', letterSpacing:'0.05em', display:'inline-flex', alignItems:'center', gap:8}}>
                 Browse Spots Near Me
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                   <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -276,7 +276,7 @@ export default function CustomerDashboard() {
           <div style={{marginBottom:40}}>
             <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:20}}>
               <div>
-                <h2 style={{fontFamily:'Georgia, serif', fontSize:24, fontWeight:700, color:'#111827', margin:0}}>Your Memberships</h2>
+                <h2 style={{fontFamily:'Georgia, serif', fontSize:24, fontWeight:700, color:'#1A0A06', margin:0}}>Your Memberships</h2>
                 <p style={{color:'#9CA3AF', fontSize:14, marginTop:4}}>{myMemberships.length} active membership{myMemberships.length !== 1 ? 's' : ''}</p>
               </div>
             </div>
@@ -286,19 +286,19 @@ export default function CustomerDashboard() {
                 const accent = getCardAccent(type)
                 const isRecord = type === 'record'
                 return (
-                  <div key={sub.id} style={{background: isRecord ? '#0A0906' : 'white', borderRadius:20, padding:'24px', border:`1px solid ${isRecord ? 'rgba(201,168,76,0.3)' : '#F3F4F6'}`, boxShadow:'0 2px 12px rgba(0,0,0,0.06)', position:'relative', overflow:'hidden'}}>
-                    <div style={{position:'absolute', top:0, right:0, width:80, height:80, borderRadius:'0 20px 0 80px', background: isRecord ? 'rgba(201,168,76,0.1)' : accent.light, opacity:0.8}} />
+                  <div key={sub.id} style={{background: isRecord ? '#1A0A06' : 'white', borderRadius:20, padding:'24px', border:`1px solid ${isRecord ? 'rgba(192,68,43,0.3)' : '#F3F4F6'}`, boxShadow:'0 2px 12px rgba(0,0,0,0.06)', position:'relative', overflow:'hidden'}}>
+                    <div style={{position:'absolute', top:0, right:0, width:80, height:80, borderRadius:'0 20px 0 80px', background: isRecord ? 'rgba(192,68,43,0.1)' : accent.light, opacity:0.8}} />
                     <div style={{position:'relative', zIndex:1}}>
                       <div style={{display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:16}}>
-                        <div style={{width:40, height:40, borderRadius:10, background: isRecord ? 'rgba(201,168,76,0.15)' : accent.light, display:'flex', alignItems:'center', justifyContent:'center'}}>
+                        <div style={{width:40, height:40, borderRadius:10, background: isRecord ? 'rgba(192,68,43,0.15)' : accent.light, display:'flex', alignItems:'center', justifyContent:'center'}}>
                           <CategoryIcon type={type} />
                         </div>
-                        <span style={{fontSize:11, color: isRecord ? '#C9A84C' : accent.accent, background: isRecord ? 'rgba(201,168,76,0.1)' : accent.light, padding:'4px 10px', borderRadius:20, fontWeight:600, letterSpacing:'0.05em', textTransform:'uppercase'}}>
+                        <span style={{fontSize:11, color: isRecord ? '#C0442B' : accent.accent, background: isRecord ? 'rgba(192,68,43,0.1)' : accent.light, padding:'4px 10px', borderRadius:20, fontWeight:600, letterSpacing:'0.05em', textTransform:'uppercase'}}>
                           Active
                         </span>
                       </div>
-                      <p style={{fontFamily:'Georgia, serif', fontSize:18, fontWeight:700, color: isRecord ? '#F5F0E8' : '#111827', marginBottom:4}}>{sub.restaurants?.name}</p>
-                      <p style={{color: isRecord ? '#C9A84C' : accent.accent, fontSize:13, fontWeight:500, marginBottom:8}}>{sub.membership_tiers?.name}</p>
+                      <p style={{fontFamily:'Georgia, serif', fontSize:18, fontWeight:700, color: isRecord ? '#F5F0E8' : '#1A0A06', marginBottom:4}}>{sub.restaurants?.name}</p>
+                      <p style={{color: isRecord ? '#C0442B' : accent.accent, fontSize:13, fontWeight:500, marginBottom:8}}>{sub.membership_tiers?.name}</p>
                       {/* Perk usage tracker */}
                       {(() => {
                         const perksConfig = sub.membership_tiers?.perks_config
@@ -313,7 +313,7 @@ export default function CustomerDashboard() {
                                 const remaining = isLimited ? Math.max(0, limit - used) : null
                                 const exhausted = isLimited && remaining === 0
                                 return (
-                                  <div key={pi} style={{display:'flex', alignItems:'center', justifyContent:'space-between', padding:'7px 0', borderBottom:`1px solid ${isRecord ? 'rgba(201,168,76,0.1)' : '#F9FAFB'}`}}>
+                                  <div key={pi} style={{display:'flex', alignItems:'center', justifyContent:'space-between', padding:'7px 0', borderBottom:`1px solid ${isRecord ? 'rgba(192,68,43,0.1)' : '#F9FAFB'}`}}>
                                     <div style={{display:'flex', alignItems:'center', gap:8}}>
                                       <div style={{width:16, height:16, borderRadius:'50%', background: exhausted ? '#FEE2E2' : '#D1FAE5', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0}}>
                                         <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
@@ -322,7 +322,7 @@ export default function CustomerDashboard() {
                                       </div>
                                       <span style={{fontSize:12, color: exhausted ? '#9CA3AF' : isRecord ? 'rgba(245,240,232,0.8)' : '#374151', textDecoration: exhausted ? 'line-through' : 'none'}}>{perk.description}</span>
                                     </div>
-                                    <span style={{fontSize:11, fontWeight:600, color: exhausted ? '#EF4444' : isLimited ? (isRecord ? '#C9A84C' : '#6B7280') : '#059669', whiteSpace:'nowrap', marginLeft:8}}>
+                                    <span style={{fontSize:11, fontWeight:600, color: exhausted ? '#EF4444' : isLimited ? (isRecord ? '#C0442B' : '#6B7280') : '#059669', whiteSpace:'nowrap', marginLeft:8}}>
                                       {isLimited ? (exhausted ? `Used up (${limit} total)` : `${remaining} of ${limit} left`) : 'Unlimited'}
                                     </span>
                                   </div>
@@ -334,8 +334,8 @@ export default function CustomerDashboard() {
                         // Fallback to plain text perks
                         return <p style={{color: isRecord ? 'rgba(245,240,232,0.75)' : '#9CA3AF', fontSize:12, marginBottom:16, lineHeight:1.5}}>{sub.membership_tiers?.perks?.split(' | ')[0]}</p>
                       })()}
-                      <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', paddingTop:12, borderTop:`1px solid ${isRecord ? 'rgba(201,168,76,0.15)' : '#F3F4F6'}`}}>
-                        <span style={{fontFamily:'Georgia, serif', fontSize:22, fontWeight:700, color: isRecord ? '#C9A84C' : '#111827'}}>${sub.membership_tiers?.price_monthly}<span style={{fontSize:12, fontWeight:400, color: isRecord ? 'rgba(245,240,232,0.4)' : '#9CA3AF'}}>/mo</span></span>
+                      <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', paddingTop:12, borderTop:`1px solid ${isRecord ? 'rgba(192,68,43,0.15)' : '#F3F4F6'}`}}>
+                        <span style={{fontFamily:'Georgia, serif', fontSize:22, fontWeight:700, color: isRecord ? '#C0442B' : '#1A0A06'}}>${sub.membership_tiers?.price_monthly}<span style={{fontSize:12, fontWeight:400, color: isRecord ? 'rgba(245,240,232,0.4)' : '#9CA3AF'}}>/mo</span></span>
                         {sub.cancel_at_period_end ? (
                           <div style={{textAlign:'right'}}>
                             <p style={{fontSize:11, color:'#EF4444', fontWeight:600, marginBottom:1}}>Cancels on</p>
@@ -364,7 +364,7 @@ export default function CustomerDashboard() {
         {visitLog.length > 0 && (
             <div style={{marginBottom:40}}>
               <div style={{marginBottom:20}}>
-                <h2 style={{fontFamily:'Georgia, serif', fontSize:24, fontWeight:700, color:'#111827', margin:0}}>Visit History</h2>
+                <h2 style={{fontFamily:'Georgia, serif', fontSize:24, fontWeight:700, color:'#1A0A06', margin:0}}>Visit History</h2>
                 <p style={{color:'#9CA3AF', fontSize:14, marginTop:4}}>Every perk you have redeemed, most recent first</p>
               </div>
               <div style={{background:'white', borderRadius:20, overflow:'hidden', boxShadow:'0 2px 12px rgba(0,0,0,0.06)', border:'1px solid #F3F4F6'}}>
@@ -377,14 +377,14 @@ export default function CustomerDashboard() {
                   const monthLabel = year && month ? new Date(year, parseInt(month)-1).toLocaleDateString('en-US', { month:'long', year:'numeric' }) : ''
                   return (
                     <div key={i} style={{display:'flex', alignItems:'center', gap:16, padding:'16px 24px', borderBottom: i < visitLog.length - 1 ? '1px solid #F9FAFB' : 'none'}}>
-                      <div style={{width:40, height:40, borderRadius:10, background:'rgba(201,168,76,0.08)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0}}>
+                      <div style={{width:40, height:40, borderRadius:10, background:'rgba(192,68,43,0.08)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0}}>
                         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                          <circle cx="9" cy="9" r="7.5" stroke="#C9A84C" strokeWidth="1.2"/>
-                          <path d="M9 5.5V9L11.5 11" stroke="#C9A84C" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                          <circle cx="9" cy="9" r="7.5" stroke="#C0442B" strokeWidth="1.2"/>
+                          <path d="M9 5.5V9L11.5 11" stroke="#C0442B" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
                       </div>
                       <div style={{flex:1, minWidth:0}}>
-                        <p style={{fontSize:14, fontWeight:600, color:'#111827', marginBottom:2, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}>{entry.perk_description}</p>
+                        <p style={{fontSize:14, fontWeight:600, color:'#1A0A06', marginBottom:2, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}>{entry.perk_description}</p>
                         <p style={{fontSize:12, color:'#9CA3AF'}}>{entry.restaurants?.name}{monthLabel ? ` · ${monthLabel}` : ''}</p>
                       </div>
                       <div style={{textAlign:'right', flexShrink:0}}>
@@ -401,7 +401,7 @@ export default function CustomerDashboard() {
         {/* BROWSE RESTAURANTS */}
         <div id="browse">
           <div style={{marginBottom:24}}>
-            <h2 style={{fontFamily:'Georgia, serif', fontSize:24, fontWeight:700, color:'#111827', margin:0}}>
+            <h2 style={{fontFamily:'Georgia, serif', fontSize:24, fontWeight:700, color:'#1A0A06', margin:0}}>
               {hasNoMemberships ? 'Browse Memberships Near You' : 'Explore More Spots'}
             </h2>
             <p style={{color:'#9CA3AF', fontSize:14, marginTop:4}}>
@@ -419,11 +419,11 @@ export default function CustomerDashboard() {
 
               return (
                 <button key={rest.id} onClick={() => selectRestaurant(rest)} className="rest-card"
-                  style={{textAlign:'left', background: isSelected ? (isRecord ? '#0A0906' : accent.bg) : 'white', borderRadius:20, padding:'24px', border:`2px solid ${isSelected ? (isRecord ? '#C9A84C' : accent.accent) : '#F3F4F6'}`, cursor:'pointer', boxShadow:'0 2px 12px rgba(0,0,0,0.06)', position:'relative', overflow:'hidden', width:'100%', fontFamily:'inherit'}}>
-                  <div style={{position:'absolute', top:0, right:0, width:80, height:80, borderRadius:'0 20px 0 80px', background: isRecord ? 'rgba(201,168,76,0.1)' : accent.light, opacity:0.6}} />
+                  style={{textAlign:'left', background: isSelected ? (isRecord ? '#1A0A06' : accent.bg) : 'white', borderRadius:20, padding:'24px', border:`2px solid ${isSelected ? (isRecord ? '#C0442B' : accent.accent) : '#F3F4F6'}`, cursor:'pointer', boxShadow:'0 2px 12px rgba(0,0,0,0.06)', position:'relative', overflow:'hidden', width:'100%', fontFamily:'inherit'}}>
+                  <div style={{position:'absolute', top:0, right:0, width:80, height:80, borderRadius:'0 20px 0 80px', background: isRecord ? 'rgba(192,68,43,0.1)' : accent.light, opacity:0.6}} />
                   <div style={{position:'relative', zIndex:1}}>
                     <div style={{display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:14}}>
-                      <div style={{width:44, height:44, borderRadius:12, background: isRecord ? 'rgba(201,168,76,0.15)' : accent.light, display:'flex', alignItems:'center', justifyContent:'center'}}>
+                      <div style={{width:44, height:44, borderRadius:12, background: isRecord ? 'rgba(192,68,43,0.15)' : accent.light, display:'flex', alignItems:'center', justifyContent:'center'}}>
                         <CategoryIcon type={type} />
                       </div>
                       {activeSub && (
@@ -432,8 +432,8 @@ export default function CustomerDashboard() {
                         </span>
                       )}
                     </div>
-                    <p style={{fontFamily:'Georgia, serif', fontSize:17, fontWeight:700, color: isRecord ? '#F5F0E8' : '#111827', marginBottom:4}}>{rest.name}</p>
-                    <p style={{color: isRecord ? '#C9A84C' : accent.accent, fontSize:12, fontWeight:600, marginBottom:8, textTransform:'uppercase', letterSpacing:'0.08em'}}>{rest.city}</p>
+                    <p style={{fontFamily:'Georgia, serif', fontSize:17, fontWeight:700, color: isRecord ? '#F5F0E8' : '#1A0A06', marginBottom:4}}>{rest.name}</p>
+                    <p style={{color: isRecord ? '#C0442B' : accent.accent, fontSize:12, fontWeight:600, marginBottom:8, textTransform:'uppercase', letterSpacing:'0.08em'}}>{rest.city}</p>
                     <p style={{color: isRecord ? 'rgba(245,240,232,0.75)' : '#6B7280', fontSize:13, lineHeight:1.5, marginBottom:12}}>{rest.description}</p>
                     <p style={{color: isRecord ? 'rgba(245,240,232,0.6)' : '#9CA3AF', fontSize:12}}>{rest.address}</p>
                   </div>
@@ -452,12 +452,12 @@ export default function CustomerDashboard() {
                 <CategoryIcon type={getCategoryType(selected.name)} />
               </div>
               <div>
-                <h3 style={{fontFamily:'Georgia, serif', fontSize:22, fontWeight:700, color:'#111827', margin:0}}>{selected.name}</h3>
+                <h3 style={{fontFamily:'Georgia, serif', fontSize:22, fontWeight:700, color:'#1A0A06', margin:0}}>{selected.name}</h3>
                 <p style={{color:'#9CA3AF', fontSize:13, marginTop:2}}>Choose your membership tier</p>
               </div>
             </div>
 
-            <div style={{height:2, background:'linear-gradient(to right, #C9A84C, transparent)', marginBottom:32, maxWidth:200}} />
+            <div style={{height:2, background:'linear-gradient(to right, #C0442B, transparent)', marginBottom:32, maxWidth:200}} />
 
             <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(260px, 1fr))', gap:20}}>
               {tiers.map((tier, i) => {
@@ -474,10 +474,10 @@ export default function CustomerDashboard() {
 
                 return (
                   <div key={tier.id} className="tier-card-new"
-                    style={{background: 'white', borderRadius:20, padding:'28px', border:`2px solid ${isThisTierActive ? '#059669' : isPopular ? '#C9A84C' : '#F3F4F6'}`, boxShadow:'0 4px 24px rgba(0,0,0,0.08)', position:'relative', display:'flex', flexDirection:'column'}}>
+                    style={{background: 'white', borderRadius:20, padding:'28px', border:`2px solid ${isThisTierActive ? '#059669' : isPopular ? '#C0442B' : '#F3F4F6'}`, boxShadow:'0 4px 24px rgba(0,0,0,0.08)', position:'relative', display:'flex', flexDirection:'column'}}>
 
                     {isPopular && (
-                      <div style={{position:'absolute', top:-13, left:'50%', transform:'translateX(-50%)', background:'linear-gradient(135deg, #C9A84C, #8A6A20)', color:'white', fontSize:10, fontWeight:700, padding:'5px 14px', borderRadius:20, letterSpacing:'0.12em', textTransform:'uppercase', whiteSpace:'nowrap', boxShadow:'0 4px 12px rgba(201,168,76,0.4)'}}>
+                      <div style={{position:'absolute', top:-13, left:'50%', transform:'translateX(-50%)', background:'linear-gradient(135deg, #C0442B, #8A2A14)', color:'white', fontSize:10, fontWeight:700, padding:'5px 14px', borderRadius:20, letterSpacing:'0.12em', textTransform:'uppercase', whiteSpace:'nowrap', boxShadow:'0 4px 12px rgba(192,68,43,0.4)'}}>
                         Most Popular
                       </div>
                     )}
@@ -487,7 +487,7 @@ export default function CustomerDashboard() {
                         {tier.name}
                       </p>
                       <div style={{display:'flex', alignItems:'baseline', gap:4, marginBottom:4}}>
-                        <span style={{fontFamily:'Georgia, serif', fontSize:40, fontWeight:900, color: '#111827', lineHeight:1}}>${tier.price_monthly}</span>
+                        <span style={{fontFamily:'Georgia, serif', fontSize:40, fontWeight:900, color: '#1A0A06', lineHeight:1}}>${tier.price_monthly}</span>
                         <span style={{color: '#9CA3AF', fontSize:14}}>/month</span>
                       </div>
                       <p style={{color: '#9CA3AF', fontSize:12}}>Cancel anytime</p>
@@ -523,8 +523,8 @@ export default function CustomerDashboard() {
                       className="sub-btn"
                       style={{
                         width:'100%', padding:'14px', borderRadius:12, fontSize:14, fontWeight:700, cursor: isThisTierActive ? 'default' : 'pointer', border:'none', letterSpacing:'0.02em', fontFamily:'inherit',
-                        background: isThisTierActive ? '#D1FAE5' : isPopular ? '#C9A84C' : '#111827',
-                        color: isThisTierActive ? '#059669' : isPopular ? '#111827' : '#F9FAFB',
+                        background: isThisTierActive ? '#D1FAE5' : isPopular ? '#C0442B' : '#1A0A06',
+                        color: isThisTierActive ? '#059669' : isPopular ? '#1A0A06' : '#F9FAFB',
                       }}>
                       {isThisTierActive ? '✓ Current Plan' : hasOtherActive ? 'Switch Plan' : subscribing === tier.id ? 'Redirecting...' : 'Get Started'}
                     </button>
