@@ -11,9 +11,9 @@ function newTier() { return { name: '', price: '', perks: [newPerk()] } }
 const inp = (focused) => ({
   width:'100%', padding:'11px 14px',
   background:'white',
-  border:`1.5px solid ${focused ? '#C9A84C' : '#E5E7EB'}`,
-  borderRadius:8, fontSize:13, color:'#111827', outline:'none',
-  boxShadow: focused ? '0 0 0 3px rgba(201,168,76,0.1)' : 'none',
+  border:`1.5px solid ${focused ? '#C0442B' : '#E5E7EB'}`,
+  borderRadius:8, fontSize:13, color:'#1A0A06', outline:'none',
+  boxShadow: focused ? '0 0 0 3px rgba(192,68,43,0.1)' : 'none',
   fontFamily:'inherit', transition:'all 0.15s',
 })
 
@@ -131,16 +131,16 @@ export default function Onboard() {
   if (done) return (
     <div style={{minHeight:'100vh', background:'#F9FAFB', display:'flex', alignItems:'center', justifyContent:'center', padding:'40px 24px', fontFamily:"'Inter', system-ui, sans-serif"}}>
       <div style={{background:'white', borderRadius:20, padding:'48px 40px', maxWidth:440, width:'100%', textAlign:'center', boxShadow:'0 4px 24px rgba(0,0,0,0.08)'}}>
-        <div style={{width:64, height:64, background:'linear-gradient(135deg,#C9A84C,#8A6A20)', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 24px'}}>
+        <div style={{width:64, height:64, background:'linear-gradient(135deg,#C0442B,#8A2A14)', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 24px'}}>
           <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
             <path d="M5 14L11 20L23 8" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
         </div>
-        <p style={{color:'#C9A84C', fontSize:11, letterSpacing:'0.3em', textTransform:'uppercase', fontWeight:600, marginBottom:8}}>Submitted</p>
-        <h2 style={{fontFamily:'Georgia, serif', fontSize:24, fontWeight:700, color:'#111827', marginBottom:12}}>Application Received</h2>
+        <p style={{color:'#C0442B', fontSize:11, letterSpacing:'0.3em', textTransform:'uppercase', fontWeight:600, marginBottom:8}}>Submitted</p>
+        <h2 style={{fontFamily:'Georgia, serif', fontSize:24, fontWeight:700, color:'#1A0A06', marginBottom:12}}>Application Received</h2>
         <p style={{color:'#6B7280', fontSize:14, lineHeight:1.6, marginBottom:24}}>Our team will review your details and reach out within 1 to 2 business days.</p>
         <button onClick={() => router.push('/dashboard/business')}
-          style={{width:'100%', padding:'13px', background:'#111827', color:'white', border:'none', borderRadius:10, fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:'inherit'}}>
+          style={{width:'100%', padding:'13px', background:'#1A0A06', color:'white', border:'none', borderRadius:10, fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:'inherit'}}>
           Back to Dashboard
         </button>
       </div>
@@ -166,8 +166,8 @@ export default function Onboard() {
             </svg>
             Back
           </button>
-          <p style={{fontFamily:'Georgia, serif', fontSize:20, fontWeight:700, color:'#111827', margin:'0 auto'}}>
-            REGL<span style={{color:'#C9A84C'}}>Y</span>
+          <p style={{fontFamily:'Georgia, serif', fontSize:20, fontWeight:700, color:'#1A0A06', margin:'0 auto'}}>
+            <span style={{fontFamily:"'Playfair Display',Georgia,serif",fontWeight:700,fontStyle:"italic",fontSize:"inherit",letterSpacing:"-0.01em"}}>Regly</span>
           </p>
           <div style={{width:60}} />
         </div>
@@ -175,8 +175,8 @@ export default function Onboard() {
 
       <div style={{maxWidth:740, margin:'0 auto', padding:'36px 24px 80px'}}>
         <div style={{marginBottom:32}}>
-          <p style={{color:'#C9A84C', fontSize:11, letterSpacing:'0.3em', textTransform:'uppercase', fontWeight:600, marginBottom:6}}>Business Setup</p>
-          <h1 style={{fontFamily:'Georgia, serif', fontSize:28, fontWeight:700, color:'#111827', marginBottom:6}}>Set Up Your Business</h1>
+          <p style={{color:'#C0442B', fontSize:11, letterSpacing:'0.3em', textTransform:'uppercase', fontWeight:600, marginBottom:6}}>Business Setup</p>
+          <h1 style={{fontFamily:'Georgia, serif', fontSize:28, fontWeight:700, color:'#1A0A06', marginBottom:6}}>Set Up Your Business</h1>
           <p style={{color:'#6B7280', fontSize:14}}>Reviewed and approved within 48 hours. No setup cost.</p>
         </div>
 
@@ -184,7 +184,7 @@ export default function Onboard() {
 
           {/* Business Info */}
           <div style={{background:'white', borderRadius:16, padding:'28px', boxShadow:'0 2px 12px rgba(0,0,0,0.06)'}}>
-            <h2 style={{fontFamily:'Georgia, serif', fontSize:18, fontWeight:700, color:'#111827', marginBottom:20}}>Business Information</h2>
+            <h2 style={{fontFamily:'Georgia, serif', fontSize:18, fontWeight:700, color:'#1A0A06', marginBottom:20}}>Business Information</h2>
             <div style={{display:'flex', flexDirection:'column', gap:14}}>
               {[
                 {k:'business_name', label:'Business Name', ph:'e.g. Vicenzo\'s Pizza'},
@@ -211,7 +211,7 @@ export default function Onboard() {
 
           {/* Tiers */}
           <div style={{background:'white', borderRadius:16, padding:'28px', boxShadow:'0 2px 12px rgba(0,0,0,0.06)'}}>
-            <h2 style={{fontFamily:'Georgia, serif', fontSize:18, fontWeight:700, color:'#111827', marginBottom:4}}>Membership Tiers</h2>
+            <h2 style={{fontFamily:'Georgia, serif', fontSize:18, fontWeight:700, color:'#1A0A06', marginBottom:4}}>Membership Tiers</h2>
             <p style={{color:'#9CA3AF', fontSize:13, marginBottom:24}}>Up to {MAX_TIERS} tiers. Each perk can be unlimited or limited to a set number of uses per month.</p>
 
             <div style={{display:'flex', flexDirection:'column', gap:24}}>
@@ -221,8 +221,8 @@ export default function Onboard() {
                   {/* Tier header */}
                   <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:18}}>
                     <div style={{display:'flex', alignItems:'center', gap:10}}>
-                      <div style={{width:26, height:26, background:'#C9A84C', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center'}}>
-                        <span style={{color:'#0A0906', fontSize:11, fontWeight:700}}>{ti+1}</span>
+                      <div style={{width:26, height:26, background:'#C0442B', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center'}}>
+                        <span style={{color:'#1A0A06', fontSize:11, fontWeight:700}}>{ti+1}</span>
                       </div>
                       <span style={{fontSize:13, fontWeight:600, color:'#374151'}}>Tier {ti+1}</span>
                     </div>
@@ -269,14 +269,14 @@ export default function Onboard() {
 
                           {/* Perk description */}
                           <div style={{display:'flex', gap:8, alignItems:'center', marginBottom:10}}>
-                            <div style={{width:6, height:6, borderRadius:'50%', background:'#C9A84C', flexShrink:0}} />
+                            <div style={{width:6, height:6, borderRadius:'50%', background:'#C0442B', flexShrink:0}} />
                             <input className="perk-desc"
                               style={{...inp(focused===`d-${ti}-${pi}`), marginBottom:0}}
                               value={perk.description}
                               onChange={e => setPerkField(ti, pi, 'description', e.target.value)}
                               onFocus={() => setFocused(`d-${ti}-${pi}`)}
                               onBlur={() => setFocused(null)}
-                              placeholder={`Perk ${pi+1} — e.g. Free appetizer, Size upgrade...`} />
+                              placeholder={`Perk ${pi+1}, e.g. Free appetizer, Size upgrade...`} />
                             {tier.perks.length > 1 && (
                               <button type="button" onClick={() => removePerk(ti, pi)}
                                 style={{color:'#D1D5DB', background:'none', border:'none', cursor:'pointer', fontSize:18, lineHeight:1, flexShrink:0, padding:'0 4px'}}>
@@ -294,9 +294,9 @@ export default function Onboard() {
                               onClick={() => setPerkField(ti, pi, 'type', 'unlimited')}
                               style={{
                                 padding:'4px 12px', borderRadius:20, fontSize:11, fontWeight:600,
-                                border:`1.5px solid ${perk.type==='unlimited' ? '#C9A84C' : '#E5E7EB'}`,
-                                background: perk.type==='unlimited' ? 'rgba(201,168,76,0.1)' : 'white',
-                                color: perk.type==='unlimited' ? '#8A6A20' : '#9CA3AF',
+                                border:`1.5px solid ${perk.type==='unlimited' ? '#C0442B' : '#E5E7EB'}`,
+                                background: perk.type==='unlimited' ? 'rgba(192,68,43,0.1)' : 'white',
+                                color: perk.type==='unlimited' ? '#1A0A06' : '#9CA3AF',
                                 cursor:'pointer', fontFamily:'inherit',
                               }}>
                               Unlimited
@@ -307,9 +307,9 @@ export default function Onboard() {
                               onClick={() => setPerkField(ti, pi, 'type', 'limited')}
                               style={{
                                 padding:'4px 12px', borderRadius:20, fontSize:11, fontWeight:600,
-                                border:`1.5px solid ${perk.type==='limited' ? '#C9A84C' : '#E5E7EB'}`,
-                                background: perk.type==='limited' ? 'rgba(201,168,76,0.1)' : 'white',
-                                color: perk.type==='limited' ? '#8A6A20' : '#9CA3AF',
+                                border:`1.5px solid ${perk.type==='limited' ? '#C0442B' : '#E5E7EB'}`,
+                                background: perk.type==='limited' ? 'rgba(192,68,43,0.1)' : 'white',
+                                color: perk.type==='limited' ? '#1A0A06' : '#9CA3AF',
                                 cursor:'pointer', fontFamily:'inherit',
                               }}>
                               Limited
@@ -323,8 +323,8 @@ export default function Onboard() {
                                   value={perk.limit}
                                   onChange={e => setPerkField(ti, pi, 'limit', e.target.value)}
                                   style={{
-                                    width:52, padding:'4px 8px', border:'1.5px solid #C9A84C',
-                                    borderRadius:8, fontSize:13, color:'#111827', outline:'none',
+                                    width:52, padding:'4px 8px', border:'1.5px solid #C0442B',
+                                    borderRadius:8, fontSize:13, color:'#1A0A06', outline:'none',
                                     textAlign:'center', fontFamily:'inherit', background:'white',
                                   }} />
                                 <span style={{fontSize:12, color:'#6B7280'}}>times</span>
@@ -337,7 +337,7 @@ export default function Onboard() {
 
                     {tier.perks.length < MAX_PERKS && (
                       <button type="button" onClick={() => addPerk(ti)}
-                        style={{marginTop:10, color:'#C9A84C', background:'none', border:'none', cursor:'pointer', fontSize:12, fontWeight:500, fontFamily:'inherit', padding:0}}>
+                        style={{marginTop:10, color:'#C0442B', background:'none', border:'none', cursor:'pointer', fontSize:12, fontWeight:500, fontFamily:'inherit', padding:0}}>
                         + Add another perk
                       </button>
                     )}
@@ -367,10 +367,10 @@ export default function Onboard() {
           {/* Terms checkbox */}
           <div style={{background:'white', borderRadius:14, padding:'18px 20px', boxShadow:'0 2px 12px rgba(0,0,0,0.06)', display:'flex', alignItems:'flex-start', gap:12}}>
             <input type="checkbox" id="terms" checked={agreed} onChange={e => setAgreed(e.target.checked)}
-              style={{marginTop:3, width:16, height:16, accentColor:'#C9A84C', cursor:'pointer', flexShrink:0}} />
+              style={{marginTop:3, width:16, height:16, accentColor:'#C0442B', cursor:'pointer', flexShrink:0}} />
             <label htmlFor="terms" style={{fontSize:13, color:'#374151', lineHeight:1.6, cursor:'pointer'}}>
               I have read and agree to the{' '}
-              <a href="/merchant-terms" target="_blank" style={{color:'#C9A84C', fontWeight:600, textDecoration:'none'}}>
+              <a href="/merchant-terms" target="_blank" style={{color:'#C0442B', fontWeight:600, textDecoration:'none'}}>
                 Regly Merchant Terms of Service
               </a>
               {' '}including the 85/15 revenue split, monthly payouts via Stripe, and my obligation to honor all membership perks I define.
@@ -378,7 +378,7 @@ export default function Onboard() {
           </div>
 
           <button type="submit" disabled={saving}
-            style={{padding:'15px', background: saving ? '#D1D5DB' : '#111827', color:'white', border:'none', borderRadius:12, fontSize:14, fontWeight:600, cursor: saving ? 'not-allowed' : 'pointer', fontFamily:'inherit'}}>
+            style={{padding:'15px', background: saving ? '#D1D5DB' : '#1A0A06', color:'white', border:'none', borderRadius:12, fontSize:14, fontWeight:600, cursor: saving ? 'not-allowed' : 'pointer', fontFamily:'inherit'}}>
             {saving ? 'Submitting...' : 'Submit for Review'}
           </button>
         </form>
