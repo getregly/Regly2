@@ -10,8 +10,8 @@ export default function Privacy() {
       <nav style={{background:'white', borderBottom:'1px solid #F3F4F6', padding:'0 24px'}}>
         <div style={{maxWidth:800, margin:'0 auto', display:'flex', alignItems:'center', justifyContent:'space-between', height:64}}>
           <button onClick={() => router.push('/')}
-            style={{fontFamily:'Georgia, serif', fontSize:20, fontWeight:700, color:'#111827', background:'none', border:'none', cursor:'pointer'}}>
-            REGL<span style={{color:'#C9A84C'}}>Y</span>
+            style={{fontFamily:'Georgia, serif', fontSize:20, fontWeight:700, color:'#1A0A06', background:'none', border:'none', cursor:'pointer'}}>
+            <span style={{fontFamily:"'Playfair Display',Georgia,serif",fontWeight:700,fontStyle:"italic",fontSize:"inherit",letterSpacing:"-0.01em"}}>Regly</span>
           </button>
           <button onClick={() => window.close()}
             style={{display:'flex', alignItems:'center', gap:6, color:'#9CA3AF', background:'none', border:'none', cursor:'pointer', fontSize:14, fontFamily:'inherit'}}>
@@ -25,8 +25,8 @@ export default function Privacy() {
 
       <div style={{maxWidth:800, margin:'0 auto', padding:'48px 24px 80px'}}>
         <div style={{marginBottom:40}}>
-          <p style={{fontSize:11, letterSpacing:'0.2em', textTransform:'uppercase', fontWeight:600, color:'#C9A84C', marginBottom:8}}>Legal</p>
-          <h1 style={{fontFamily:'Georgia, serif', fontSize:32, fontWeight:700, color:'#111827', marginBottom:8}}>Privacy Policy</h1>
+          <p style={{fontSize:11, letterSpacing:'0.2em', textTransform:'uppercase', fontWeight:600, color:'#C0442B', marginBottom:8}}>Legal</p>
+          <h1 style={{fontFamily:'Georgia, serif', fontSize:32, fontWeight:700, color:'#1A0A06', marginBottom:8}}>Privacy Policy</h1>
           <p style={{color:'#9CA3AF', fontSize:14}}>Last updated: April 2026</p>
         </div>
 
@@ -144,7 +144,7 @@ Chicago, Illinois`
           },
         ].map(section => (
           <div key={section.n} style={{marginBottom:36}}>
-            <h2 style={{fontFamily:'Georgia, serif', fontSize:18, fontWeight:700, color:'#111827', marginBottom:12}}>
+            <h2 style={{fontFamily:'Georgia, serif', fontSize:18, fontWeight:700, color:'#1A0A06', marginBottom:12}}>
               {section.n}. {section.title}
             </h2>
             <div style={{background:'white', borderRadius:12, padding:'20px 24px', boxShadow:'0 1px 6px rgba(0,0,0,0.05)'}}>
@@ -165,7 +165,7 @@ Chicago, Illinois`
 
         <div style={{textAlign:'center', paddingTop:32, borderTop:'1px solid #F3F4F6'}}>
           <p style={{color:'#9CA3AF', fontSize:13}}>
-            Questions? <span style={{color:'#C9A84C'}}>getregly@gmail.com</span>
+            Questions? <span style={{color:'#C0442B'}}>getregly@gmail.com</span>
           </p>
         </div>
       </div>
