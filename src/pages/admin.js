@@ -8,7 +8,7 @@ const S = {
   page:    { minHeight:'100vh', background:'#F9FAFB', fontFamily:"'Inter', system-ui, sans-serif" },
   nav:     { background:'white', borderBottom:'1px solid #F3F4F6', padding:'0 24px' },
   navInner:{ maxWidth:900, margin:'0 auto', display:'flex', alignItems:'center', justifyContent:'space-between', height:64 },
-  logo:    { fontFamily:'Georgia, serif', fontSize:22, fontWeight:700, color:'#111827' },
+  logo:    { fontFamily:'Georgia, serif', fontSize:22, fontWeight:700, color:'#1A0A06' },
   card:    { background:'white', borderRadius:20, padding:'28px', boxShadow:'0 2px 12px rgba(0,0,0,0.06)', marginBottom:16 },
   label:   { fontSize:11, letterSpacing:'0.2em', textTransform:'uppercase', fontWeight:600 },
   btn:     { border:'none', borderRadius:10, fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:'inherit', padding:'12px 24px', transition:'all 0.2s ease' },
@@ -193,7 +193,7 @@ export default function Admin() {
       {/* Nav */}
       <nav style={S.nav}>
         <div style={S.navInner}>
-          <p style={S.logo}>REGL<span style={{color:'#C9A84C'}}>Y</span> <span style={{fontSize:13, color:'#9CA3AF', fontFamily:'system-ui', fontWeight:400}}>Admin</span></p>
+          <p style={S.logo}><span style={{fontFamily:"'Playfair Display',Georgia,serif",fontWeight:700,fontStyle:"italic",fontSize:"inherit",letterSpacing:"-0.01em"}}>Regly</span> <span style={{fontSize:13, color:'#9CA3AF', fontFamily:'system-ui', fontWeight:400}}>Admin</span></p>
           <div style={{display:'flex', gap:12, alignItems:'center'}}>
             <button onClick={() => router.push('/dashboard/business')}
               style={{...S.btn, background:'none', color:'#6B7280', border:'1px solid #E5E7EB', padding:'8px 16px', fontSize:13}}>
@@ -211,8 +211,8 @@ export default function Admin() {
 
         {/* Header */}
         <div style={{marginBottom:32}}>
-          <p style={{...S.label, color:'#C9A84C', marginBottom:6}}>Business Onboarding</p>
-          <h1 style={{fontFamily:'Georgia, serif', fontSize:28, fontWeight:700, color:'#111827', marginBottom:4}}>Review Queue</h1>
+          <p style={{...S.label, color:'#C0442B', marginBottom:6}}>Business Onboarding</p>
+          <h1 style={{fontFamily:'Georgia, serif', fontSize:28, fontWeight:700, color:'#1A0A06', marginBottom:4}}>Review Queue</h1>
           <p style={{color:'#9CA3AF', fontSize:14}}>{pending.length} pending review</p>
         </div>
 
@@ -230,7 +230,7 @@ export default function Admin() {
 
         {/* Pending */}
         <div style={{marginBottom:40}}>
-          <h2 style={{fontFamily:'Georgia, serif', fontSize:20, fontWeight:700, color:'#111827', marginBottom:16}}>
+          <h2 style={{fontFamily:'Georgia, serif', fontSize:20, fontWeight:700, color:'#1A0A06', marginBottom:16}}>
             Pending Review <span style={{fontSize:15, fontWeight:400, color:'#9CA3AF'}}>({pending.length})</span>
           </h2>
 
@@ -256,7 +256,7 @@ export default function Admin() {
                       <div style={{flex:1}}>
                         <div style={{display:'flex', alignItems:'center', gap:10, marginBottom:6}}>
                           <div style={{display:'flex', alignItems:'center', gap:8, flexWrap:'wrap'}}>
-                            <h3 style={{fontFamily:'Georgia, serif', fontSize:20, fontWeight:700, color:'#111827', margin:0}}>{sub.business_name}</h3>
+                            <h3 style={{fontFamily:'Georgia, serif', fontSize:20, fontWeight:700, color:'#1A0A06', margin:0}}>{sub.business_name}</h3>
                             {submissions.filter(s => s.business_name.toLowerCase().trim() === sub.business_name.toLowerCase().trim() && s.id !== sub.id).length > 0 && (
                               <span style={{fontSize:10, fontWeight:700, padding:'3px 8px', borderRadius:20, background:'#FEF3C7', color:'#92400E', letterSpacing:'0.05em'}}>
                                 POSSIBLE DUPLICATE
@@ -290,8 +290,8 @@ export default function Admin() {
                             {tiers.map((tier, i) => (
                               <div key={i} style={{background:'#F9FAFB', borderRadius:14, padding:'16px', border:'1px solid #F3F4F6'}}>
                                 <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:10}}>
-                                  <p style={{fontSize:15, fontWeight:600, color:'#111827', margin:0}}>{tier.name}</p>
-                                  <span style={{fontFamily:'Georgia, serif', fontSize:18, fontWeight:700, color:'#C9A84C'}}>${tier.price}<span style={{fontSize:11, color:'#9CA3AF', fontWeight:400}}>/mo</span></span>
+                                  <p style={{fontSize:15, fontWeight:600, color:'#1A0A06', margin:0}}>{tier.name}</p>
+                                  <span style={{fontFamily:'Georgia, serif', fontSize:18, fontWeight:700, color:'#C0442B'}}>${tier.price}<span style={{fontSize:11, color:'#9CA3AF', fontWeight:400}}>/mo</span></span>
                                 </div>
                                 {(Array.isArray(tier.perks) ? tier.perks : [tier.perks]).map((perk, j) => {
                                   const isObj = perk && typeof perk === 'object'
@@ -331,7 +331,7 @@ export default function Admin() {
 
                         <div style={{display:'flex', gap:12}}>
                           <button onClick={() => handleApprove(sub)} disabled={!!approving}
-                            style={{...S.btn, background: approving ? '#D1D5DB' : '#111827', color:'white', flex:1}}>
+                            style={{...S.btn, background: approving ? '#D1D5DB' : '#1A0A06', color:'white', flex:1}}>
                             {approving===sub.id ? 'Approving...' : 'Approve and Go Live'}
                           </button>
                           <button onClick={() => handleReject(sub)}
@@ -351,14 +351,14 @@ export default function Admin() {
         {/* Reviewed */}
         {reviewed.length > 0 && (
           <div>
-            <h2 style={{fontFamily:'Georgia, serif', fontSize:20, fontWeight:700, color:'#111827', marginBottom:16}}>
+            <h2 style={{fontFamily:'Georgia, serif', fontSize:20, fontWeight:700, color:'#1A0A06', marginBottom:16}}>
               Previously Reviewed <span style={{fontSize:15, fontWeight:400, color:'#9CA3AF'}}>({reviewed.length})</span>
             </h2>
             <div style={{background:'white', borderRadius:20, overflow:'hidden', boxShadow:'0 2px 12px rgba(0,0,0,0.06)'}}>
               {reviewed.map((sub, i) => (
                 <div key={sub.id} className="hover-row" style={{display:'flex', alignItems:'center', justifyContent:'space-between', padding:'18px 24px', borderBottom: i<reviewed.length-1 ? '1px solid #F9FAFB' : 'none'}}>
                   <div>
-                    <p style={{fontSize:15, fontWeight:600, color:'#111827', marginBottom:2}}>{sub.business_name}</p>
+                    <p style={{fontSize:15, fontWeight:600, color:'#1A0A06', marginBottom:2}}>{sub.business_name}</p>
                     <p style={{fontSize:13, color:'#9CA3AF'}}>{sub.address}, {sub.city}</p>
                   </div>
                   {statusChip(sub.status)}
