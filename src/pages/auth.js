@@ -53,8 +53,8 @@ export default function Auth() {
   const inputStyle = (field) => ({
     width: '100%', padding: '14px 16px',
     background: '#fff',
-    border: `1.5px solid ${focusedField === field ? '#C9A84C' : '#E5E7EB'}`,
-    borderRadius: 10, fontSize: 15, color: '#111827', outline: 'none',
+    border: `1.5px solid ${focusedField === field ? '#C0442B' : '#E5E7EB'}`,
+    borderRadius: 10, fontSize: 15, color: '#1A0A06', outline: 'none',
     transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
     boxShadow: focusedField === field ? '0 0 0 3px rgba(201,168,76,0.12)' : 'none',
     fontFamily: 'inherit',
@@ -64,15 +64,15 @@ export default function Auth() {
     return (
       <div style={{minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'#F9FAFB', padding:'24px', fontFamily:'system-ui, sans-serif'}}>
         <div style={{background:'white', borderRadius:20, padding:'48px 40px', maxWidth:440, width:'100%', textAlign:'center', boxShadow:'0 4px 32px rgba(0,0,0,0.08)'}}>
-          <div style={{width:64, height:64, background:'rgba(201,168,76,0.1)', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 24px'}}>
+          <div style={{width:64, height:64, background:'rgba(192,68,43,0.1)', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 24px'}}>
             <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-              <path d="M5 14L11 20L23 8" stroke="#C9A84C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M5 14L11 20L23 8" stroke="#C0442B" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
-          <h2 style={{fontSize:24, fontWeight:700, color:'#111827', marginBottom:8, fontFamily:'Georgia, serif'}}>Welcome to Regly</h2>
+          <h2 style={{fontSize:24, fontWeight:700, color:'#1A0A06', marginBottom:8, fontFamily:'Georgia, serif'}}>Welcome to Regly</h2>
           <p style={{color:'#6B7280', fontSize:15, lineHeight:1.6, marginBottom:24}}>Your account has been created. Our team will reach out shortly to get your business set up.</p>
-          <p style={{color:'#9CA3AF', fontSize:13, marginBottom:32}}>Questions? <span style={{color:'#C9A84C'}}>getregly@gmail.com</span></p>
-          <button onClick={() => router.push('/dashboard/business')} style={{width:'100%', padding:'14px', background:'#C9A84C', color:'#0A0906', border:'none', borderRadius:10, fontSize:14, fontWeight:700, cursor:'pointer', letterSpacing:'0.05em', textTransform:'uppercase'}}>
+          <p style={{color:'#9CA3AF', fontSize:13, marginBottom:32}}>Questions? <span style={{color:'#C0442B'}}>getregly@gmail.com</span></p>
+          <button onClick={() => router.push('/dashboard/business')} style={{width:'100%', padding:'14px', background:'#C0442B', color:'#1A0A06', border:'none', borderRadius:10, fontSize:14, fontWeight:700, cursor:'pointer', letterSpacing:'0.05em', textTransform:'uppercase'}}>
             Go to My Dashboard
           </button>
         </div>
@@ -103,7 +103,7 @@ export default function Auth() {
       <div className="auth-grid" style={{display:'grid', gridTemplateColumns:'1fr', minHeight:'100vh'}}>
 
         {/* LEFT, Photo panel */}
-        <div style={{position:'relative', overflow:'hidden', display:'none', background:'#0A0906'}} className="md-photo-panel">
+        <div style={{position:'relative', overflow:'hidden', display:'none', background:'#1A0A06'}} className="md-photo-panel">
           <img
             src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&q=85&fit=crop"
             alt="Restaurant"
@@ -112,7 +112,7 @@ export default function Auth() {
           <div style={{position:'absolute', inset:0, background:'linear-gradient(135deg, rgba(10,9,6,0.7) 0%, rgba(10,9,6,0.4) 100%)'}} />
           <div style={{position:'absolute', inset:0, display:'flex', flexDirection:'column', justifyContent:'space-between', padding:'40px'}}>
             <button onClick={() => router.push('/')} style={{display:'inline-flex', alignItems:'center', gap:8, color:'rgba(245,240,232,0.8)', background:'none', border:'none', cursor:'pointer', fontSize:14, fontFamily:'Georgia, serif', fontWeight:700, letterSpacing:2}}>
-              <span style={{color:'#C9A84C', fontSize:20}}>✦</span> REGLY
+              <svg width="18" height="22" viewBox="0 0 110 132" fill="none" style={{display:'inline-block',verticalAlign:'middle',marginRight:6}}><path d="M55 3C27 3 5 25 5 53C5 81 55 129 55 129C55 129 105 81 105 53C105 25 83 3 55 3Z" fill="#C0442B"/><path d="M38 76L38 22Q58 22 58 22Q78 22 78 38Q78 54 58 54L38 54M56 54L80 76" stroke="#F5F0E8" strokeWidth="9" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg><span style={{fontFamily:"'Playfair Display',Georgia,serif",fontWeight:700,fontStyle:'italic',fontSize:20,letterSpacing:'-0.01em'}}>Regly</span>
             </button>
             <div>
               <p style={{color:'rgba(201,168,76,0.8)', fontSize:11, letterSpacing:'0.3em', textTransform:'uppercase', marginBottom:16, fontFamily:'system-ui', fontWeight:600}}>
@@ -146,7 +146,7 @@ export default function Auth() {
                   style={{
                     flex:1, padding:'10px', borderRadius:9, fontSize:14, fontWeight:600,
                     background: role === r ? 'white' : 'transparent',
-                    color: role === r ? '#111827' : '#9CA3AF',
+                    color: role === r ? '#1A0A06' : '#9CA3AF',
                     boxShadow: role === r ? '0 1px 4px rgba(0,0,0,0.1)' : 'none',
                     fontFamily:'inherit',
                   }}>
@@ -157,7 +157,7 @@ export default function Auth() {
 
             {/* Header */}
             <div style={{marginBottom:28}}>
-              <p style={{fontSize:26, fontFamily:'Georgia, serif', fontWeight:700, color:'#111827', marginBottom:4}}>
+              <p style={{fontSize:26, fontFamily:'Georgia, serif', fontWeight:700, color:'#1A0A06', marginBottom:4}}>
                 {mode === 'login' ? 'Welcome back' : 'Create account'}
               </p>
               <p style={{color:'#6B7280', fontSize:15}}>
@@ -216,7 +216,7 @@ export default function Auth() {
               </div>
 
               <button type="submit" disabled={loading} className="auth-btn"
-                style={{width:'100%', padding:'15px', background: loading ? '#D4B896' : '#C9A84C', color:'#0A0906', border:'none', borderRadius:10, fontSize:15, fontWeight:700, cursor: loading ? 'not-allowed' : 'pointer', marginTop:4, letterSpacing:'0.02em'}}>
+                style={{width:'100%', padding:'15px', background: loading ? '#D4B896' : '#C0442B', color:'#1A0A06', border:'none', borderRadius:10, fontSize:15, fontWeight:700, cursor: loading ? 'not-allowed' : 'pointer', marginTop:4, letterSpacing:'0.02em'}}>
                 {loading ? 'Please wait...' : mode === 'login' ? 'Sign In' : 'Create Account'}
               </button>
             </form>
@@ -232,7 +232,7 @@ export default function Auth() {
             <p style={{textAlign:'center', color:'#6B7280', fontSize:14}}>
               {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
               <button onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError('') }} className="toggle-btn"
-                style={{color:'#C9A84C', background:'none', border:'none', cursor:'pointer', fontSize:14, fontWeight:600, padding:0, transition:'color 0.2s'}}>
+                style={{color:'#C0442B', background:'none', border:'none', cursor:'pointer', fontSize:14, fontWeight:600, padding:0, transition:'color 0.2s'}}>
                 {mode === 'login' ? 'Sign up' : 'Sign in'}
               </button>
             </p>
