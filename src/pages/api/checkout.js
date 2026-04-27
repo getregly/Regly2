@@ -1,7 +1,4 @@
 // src/pages/api/checkout.js
-// Creates a Stripe Checkout session with automatic 85/15 split via Connect
-// Blocks checkout if merchant has not completed Stripe Connect onboarding
-
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
 
@@ -41,78 +38,123 @@ export default async function handler(req, res) {
       .single()
     if (restErr) throw restErr
 
-    // 3. Block checkout if merchant has never started Connect onboarding
-    // This is a new merchant who has not set up payments at all
+    // 3. Verify tier exists and is not paused
+    const { data: tier, error: tierFetchErr } = await supabase
+      .from('membership_tiers')
+      .select('id, is_paused, stripe_price_id')
+      .eq('id', tierId)
+      .single()
+
+    if (tierFetchErr || !tier) {
+      return res.status(404).json({ error: 'Membership tier not found.' })
+    }
+
+    if (tier.is_paused) {
+      return res.status(400).json({
+        error: 'This membership is not currently accepting new members. Please check back soon.',
+        code: 'TIER_PAUSED',
+      })
+    }
+
+    // 4. Block if merchant has no Connect account at all
     if (!restaurant.stripe_account_id) {
       return res.status(400).json({
-        error: 'This business has not completed payment setup yet. Please check back soon.',
+        error: 'This business has not completed payment setup yet.',
         code: 'CONNECT_INCOMPLETE',
       })
     }
 
-    // 4. Block checkout if merchant started but did not finish onboarding
+    // 4. Block if merchant has not finished onboarding
     if (!restaurant.stripe_onboarding_complete) {
       return res.status(400).json({
-        error: 'This business is still completing their payment setup. Please check back soon.',
+        error: 'This business is still completing their payment setup.',
         code: 'CONNECT_INCOMPLETE',
       })
     }
 
-    // 5. Verify with Stripe directly that the account is actually capable
-    // Guards against accounts that were complete but later had issues
+    // 5. Verify Stripe account capabilities
     const account = await stripe.accounts.retrieve(restaurant.stripe_account_id)
-    const connectReady = account.charges_enabled && account.payouts_enabled
 
-    if (!connectReady) {
-      // Update DB to reflect real state — business will disappear from customer browse
+    console.log('Stripe account details:', JSON.stringify({
+      id: account.id,
+      type: account.type,
+      charges_enabled: account.charges_enabled,
+      payouts_enabled: account.payouts_enabled,
+      details_submitted: account.details_submitted,
+      capabilities: account.capabilities,
+    }))
+
+    if (!account.charges_enabled || !account.payouts_enabled) {
       await supabase
         .from('restaurants')
         .update({ stripe_onboarding_complete: false })
         .eq('id', restaurantId)
-
-      // Log for manual follow-up with the merchant
-      console.error(
-        `CONNECT_DEGRADED: Restaurant "${restaurant.name}" (${restaurantId}) ` +
-        `account ${restaurant.stripe_account_id} — ` +
-        `charges_enabled=${account.charges_enabled}, payouts_enabled=${account.payouts_enabled}. ` +
-        `Business hidden from customer browse until resolved.`
-      )
-
       return res.status(400).json({
-        error: 'This business is temporarily unavailable. Please check back soon.',
+        error: 'This business is temporarily unavailable.',
         code: 'CONNECT_DEGRADED',
       })
     }
 
-    // 6. Full Connect checkout — 85/15 split
-    // on_behalf_of: charges appear as merchant on customer statements
-    // application_fee_percent: Regly keeps 15% automatically on every charge
-    // transfer_data.destination: 85% goes directly to merchant bank account
-    const session = await stripe.checkout.sessions.create({
-      mode: 'subscription',
-      payment_method_types: ['card'],
-      line_items: [{ price: stripePriceId, quantity: 1 }],
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/success?tier=${tierId}&restaurant=${restaurantId}&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/customer`,
-      metadata: { tierId, restaurantId, userId: user.id },
-      subscription_data: {
-        application_fee_percent: REGLY_FEE_PERCENT,
-        on_behalf_of: restaurant.stripe_account_id,
-        transfer_data: {
-          destination: restaurant.stripe_account_id,
-        },
-        metadata: {
-          tierId,
-          restaurantId,
-          userId: user.id,
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://getregly.com'
+
+    // 6. For Express accounts use the correct Connect approach
+    // Express accounts require the price to be retrieved or created
+    // on the connected account — not the platform account
+    // We create a one-time price on the connected account for this session
+
+    // First retrieve the platform price to get the amount
+    const platformPrice = await stripe.prices.retrieve(stripePriceId)
+    console.log('Platform price:', JSON.stringify({
+      id: platformPrice.id,
+      unit_amount: platformPrice.unit_amount,
+      currency: platformPrice.currency,
+      recurring: platformPrice.recurring,
+    }))
+
+    // Create a product on the connected account
+    const connectedProduct = await stripe.products.create(
+      { name: restaurant.name },
+      { stripeAccount: restaurant.stripe_account_id }
+    )
+
+    // Create a price on the connected account
+    const connectedPrice = await stripe.prices.create(
+      {
+        product: connectedProduct.id,
+        unit_amount: platformPrice.unit_amount,
+        currency: platformPrice.currency,
+        recurring: platformPrice.recurring,
+      },
+      { stripeAccount: restaurant.stripe_account_id }
+    )
+
+    console.log('Connected price created:', connectedPrice.id)
+
+    // 7. Create checkout session on the connected account
+    // application_fee_amount is in cents — 15% of the subscription amount
+    const feeAmount = Math.round(platformPrice.unit_amount * (REGLY_FEE_PERCENT / 100))
+
+    const session = await stripe.checkout.sessions.create(
+      {
+        mode: 'subscription',
+        payment_method_types: ['card'],
+        line_items: [{ price: connectedPrice.id, quantity: 1 }],
+        success_url: `${appUrl}/success?tier=${tierId}&restaurant=${restaurantId}&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${appUrl}/dashboard/customer`,
+        metadata: { tierId, restaurantId, userId: user.id },
+        subscription_data: {
+          application_fee_percent: REGLY_FEE_PERCENT,
+          metadata: { tierId, restaurantId, userId: user.id },
         },
       },
-    })
+      { stripeAccount: restaurant.stripe_account_id }
+    )
 
+    console.log('Checkout session created on connected account:', session.id)
     return res.status(200).json({ url: session.url })
 
   } catch (err) {
-    console.error('Checkout error:', err)
+    console.error('Checkout error:', err.message, err.type, err.code)
     return res.status(500).json({ error: err.message })
   }
 }
