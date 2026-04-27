@@ -66,6 +66,21 @@ export default function Auth() {
           .from('profiles').select('id, role').eq('id', signInData.user.id).maybeSingle()
         console.log('profile check:', checkProfile)
 
+        // 6. Fire Slack notification — non-blocking, failure does not affect signup
+        if (checkProfile) {
+          fetch('/api/notify', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-webhook-secret': process.env.NEXT_PUBLIC_WEBHOOK_SECRET || '',
+            },
+            body: JSON.stringify({
+              type: 'new_customer',
+              data: { name: form.name, email: form.email, role },
+            }),
+          }).catch(() => {}) // silently ignore any notification errors
+        }
+
         router.push(dash)
 
       } else {
