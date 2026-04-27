@@ -35,6 +35,7 @@ export default function BusinessDashboard() {
   const [addingTier, setAddingTier]     = useState(false)
   const [newTier, setNewTier]           = useState({ name:'', price:'', perks:[{ description:'', type:'unlimited', limit:2 }] })
   const [savingTier, setSavingTier]     = useState(false)
+  const [tierSubmitStatus, setTierSubmitStatus] = useState(null)
   const [connectStatus, setConnectStatus] = useState(null) // 'success'|'pending'|'error'|'refresh'
   const [connectLoading, setConnectLoading] = useState(false)
   const [stats, setStats]             = useState({
@@ -331,52 +332,80 @@ export default function BusinessDashboard() {
   }
 
   async function saveNewTier() {
+    // Validate
     if (!newTier.name.trim() || !newTier.price || isNaN(newTier.price)) return
     const validPerks = newTier.perks.filter(p => p.description.trim())
     if (!validPerks.length) return
+
     setSavingTier(true)
-    const perksConfig = validPerks.map(p => ({
-      description: p.description.trim(),
-      type: p.type,
-      limit: p.type === 'limited' ? Number(p.limit) : null,
-    }))
-    const perksText = validPerks.map(p => p.description.trim()).join(' | ')
-    const { data, error } = await supabase
-      .from('membership_tiers')
-      .insert({
-        restaurant_id: restaurant.id,
-        name: `${restaurant.name} - ${newTier.name.trim()}`,
-        price_monthly: Number(newTier.price),
-        perks_config: perksConfig,
-        perks: perksText,
-        stripe_price_id: '',
-      })
-      .select()
-      .single()
-    if (!error && data) {
-      // Submit tier request to admin for review
-      const { data: { user: currentUser } } = await supabase.auth.getUser()
-      const { error: subErr } = await supabase.from('onboarding_submissions').insert({
-        user_id: currentUser.id,
-        business_name: restaurant.name,
-        address: restaurant.address || '',
-        city: restaurant.city || '',
-        description: `New tier request: ${newTier.name.trim()} at $${newTier.price}/mo`,
-        tiers: JSON.stringify([{
-          name: newTier.name.trim(),
-          price: newTier.price,
+    setTierSubmitStatus(null)
+
+    try {
+      const perksConfig = validPerks.map(p => ({
+        description: p.description.trim(),
+        type: p.type,
+        limit: p.type === 'limited' ? Number(p.limit) : null,
+      }))
+      const perksText = validPerks.map(p => p.description.trim()).join(' | ')
+
+      // Step 1 — Insert tier into membership_tiers
+      const { data: tierData, error: tierErr } = await supabase
+        .from('membership_tiers')
+        .insert({
+          restaurant_id: restaurant.id,
+          name: `${restaurant.name} - ${newTier.name.trim()}`,
+          price_monthly: Number(newTier.price),
+          perks_config: perksConfig,
           perks: perksText,
-        }]),
-        status: 'pending',
-        is_tier_request: true,
-      })
-      if (subErr) console.error('Tier submission error:', subErr.message)
-      setTiers(prev => [...prev, data].sort((a,b) => a.price_monthly - b.price_monthly))
-      setAddingTier(false)
+          stripe_price_id: '',
+        })
+        .select()
+        .single()
+
+      if (tierErr) throw new Error('Could not save tier: ' + tierErr.message)
+
+      // Step 2 — Submit to admin queue for Stripe price creation
+      const { data: { user: currentUser } } = await supabase.auth.getUser()
+      const { error: subErr } = await supabase
+        .from('onboarding_submissions')
+        .insert({
+          user_id: currentUser.id,
+          business_name: restaurant.name,
+          address: restaurant.address || '',
+          city: restaurant.city || '',
+          description: `New tier request: ${newTier.name.trim()} at $${newTier.price}/mo`,
+          tiers: JSON.stringify([{
+            name: newTier.name.trim(),
+            price: newTier.price,
+            perks: perksText,
+          }]),
+          status: 'pending',
+          is_tier_request: true,
+        })
+
+      if (subErr) {
+        // Tier was saved but admin notification failed — not fatal
+        // Log it but still show success to merchant
+        console.error('Admin notification failed:', subErr.message)
+      }
+
+      // Step 3 — Update local state and show success
+      setTiers(prev => [...prev, tierData].sort((a, b) => a.price_monthly - b.price_monthly))
       setNewTier({ name:'', price:'', perks:[{ description:'', type:'unlimited', limit:2 }] })
-      alert('Your new tier has been submitted for review. We will activate it within 48 hours.')
+      setTierSubmitStatus('success')
+
+      // Auto-close form after 3 seconds
+      setTimeout(() => {
+        setAddingTier(false)
+        setTierSubmitStatus(null)
+      }, 3000)
+
+    } catch (err) {
+      console.error('saveNewTier error:', err.message)
+      setTierSubmitStatus('error:' + err.message)
+    } finally {
+      setSavingTier(false)
     }
-    setSavingTier(false)
   }
 
   async function startConnectOnboarding() {
@@ -1024,15 +1053,20 @@ export default function BusinessDashboard() {
                             <div>
                               <div style={{display:'flex', alignItems:'center', gap:8, marginBottom:2}}>
                                 <p style={{fontSize:15, fontWeight:700, color:'#1A0A06', margin:0}}>{tier.name}</p>
-                                {/* Status badge */}
-                                {restaurant?.stripe_onboarding_complete
+                                {/* Status badge — Live only when tier has Stripe price AND restaurant is connected */}
+                                {tier.stripe_price_id && restaurant?.stripe_onboarding_complete
                                   ? <span style={{display:'inline-flex', alignItems:'center', gap:5, background:'#D1FAE5', border:'1px solid #6EE7B7', borderRadius:20, padding:'2px 10px'}}>
                                       <div style={{width:5, height:5, borderRadius:'50%', background:'#059669'}}/>
                                       <span style={{fontSize:10, fontWeight:700, color:'#059669', letterSpacing:'0.05em', textTransform:'uppercase'}}>Live</span>
                                     </span>
-                                  : <span style={{display:'inline-flex', alignItems:'center', gap:5, background:'#FEF3C7', border:'1px solid #FCD34D', borderRadius:20, padding:'2px 10px'}}>
+                                  : tier.stripe_price_id && !restaurant?.stripe_onboarding_complete
+                                  ? <span style={{display:'inline-flex', alignItems:'center', gap:5, background:'#FEF3C7', border:'1px solid #FCD34D', borderRadius:20, padding:'2px 10px'}}>
                                       <div style={{width:5, height:5, borderRadius:'50%', background:'#F59E0B'}}/>
-                                      <span style={{fontSize:10, fontWeight:700, color:'#92400E', letterSpacing:'0.05em', textTransform:'uppercase'}}>Pending Setup</span>
+                                      <span style={{fontSize:10, fontWeight:700, color:'#92400E', letterSpacing:'0.05em', textTransform:'uppercase'}}>Pending Payout Setup</span>
+                                    </span>
+                                  : <span style={{display:'inline-flex', alignItems:'center', gap:5, background:'#F3F4F6', border:'1px solid #E5E7EB', borderRadius:20, padding:'2px 10px'}}>
+                                      <div style={{width:5, height:5, borderRadius:'50%', background:'#9CA3AF'}}/>
+                                      <span style={{fontSize:10, fontWeight:700, color:'#6B7280', letterSpacing:'0.05em', textTransform:'uppercase'}}>Pending Review</span>
                                     </span>
                                 }
                               </div>
@@ -1146,7 +1180,7 @@ export default function BusinessDashboard() {
                           <label style={{display:'block', fontSize:12, fontWeight:500, color:'#1A0A06', marginBottom:5}}>Tier Name</label>
                           <input value={newTier.name} onChange={e => setNewTier(p => ({...p, name:e.target.value}))}
                             placeholder="e.g. Gold, Superfan..."
-                            style={{width:'100%', padding:'10px 12px', border:'1.5px solid #E5E7EB', borderRadius:8, fontSize:13, outline:'none', fontFamily:'inherit'}} />
+                            style={{width:'100%', padding:'10px 12px', border:'1.5px solid #E5E7EB', borderRadius:8, fontSize:13, outline:'none', fontFamily:'inherit', color:'#1A0A06'}} />
                         </div>
                         <div>
                           <label style={{display:'block', fontSize:12, fontWeight:500, color:'#1A0A06', marginBottom:5}}>Price / mo</label>
@@ -1154,7 +1188,7 @@ export default function BusinessDashboard() {
                             <span style={{position:'absolute', left:10, top:'50%', transform:'translateY(-50%)', color:'#9CA3AF', fontSize:13}}>$</span>
                             <input type="number" min="1" value={newTier.price} onChange={e => setNewTier(p => ({...p, price:e.target.value}))}
                               placeholder="0"
-                              style={{width:'100%', padding:'10px 12px 10px 22px', border:'1.5px solid #E5E7EB', borderRadius:8, fontSize:13, outline:'none', fontFamily:'inherit'}} />
+                              style={{width:'100%', padding:'10px 12px 10px 22px', border:'1.5px solid #E5E7EB', borderRadius:8, fontSize:13, outline:'none', fontFamily:'inherit', color:'#1A0A06'}} />
                           </div>
                         </div>
                       </div>
@@ -1189,7 +1223,7 @@ export default function BusinessDashboard() {
                                 <div style={{display:'flex', alignItems:'center', gap:4}}>
                                   <input type="number" min="1" max="31" value={perk.limit}
                                     onChange={e => setNewTierPerkField(pi,'limit',e.target.value)}
-                                    style={{width:44, padding:'3px 6px', border:'1.5px solid #C0442B', borderRadius:6, fontSize:12, textAlign:'center', fontFamily:'inherit', outline:'none'}} />
+                                    style={{width:44, padding:'3px 6px', border:'1.5px solid #C0442B', borderRadius:6, fontSize:12, textAlign:'center', fontFamily:'inherit', outline:'none', color:'#1A0A06'}} />
                                   <span style={{fontSize:11, color:'#6B7280'}}>x</span>
                                 </div>
                               )}
@@ -1209,6 +1243,32 @@ export default function BusinessDashboard() {
                         </button>
                         <p style={{fontSize:11, color:'#9CA3AF'}}>New tiers are reviewed by the Regly team. We will activate it within 48 hours.</p>
                       </div>
+
+                      {/* Submission feedback */}
+                      {tierSubmitStatus === 'success' && (
+                        <div style={{marginTop:16, background:'#F0FDF4', border:'1px solid #6EE7B7', borderRadius:10, padding:'14px 16px', display:'flex', alignItems:'center', gap:10}}>
+                          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                            <circle cx="9" cy="9" r="8" fill="#059669"/>
+                            <path d="M5.5 9L7.5 11L12.5 6.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                          <div>
+                            <p style={{fontSize:13, fontWeight:600, color:'#065F46', margin:0}}>Tier submitted for review</p>
+                            <p style={{fontSize:12, color:'#059669', margin:0, marginTop:2}}>The Regly team will review and activate your new tier within 48 hours.</p>
+                          </div>
+                        </div>
+                      )}
+                      {tierSubmitStatus && tierSubmitStatus.startsWith('error:') && (
+                        <div style={{marginTop:16, background:'#FEF2F2', border:'1px solid #FECACA', borderRadius:10, padding:'14px 16px', display:'flex', alignItems:'center', gap:10}}>
+                          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                            <circle cx="9" cy="9" r="8" fill="#EF4444"/>
+                            <path d="M6 6L12 12M12 6L6 12" stroke="white" strokeWidth="1.5" strokeLinecap="round"/>
+                          </svg>
+                          <div>
+                            <p style={{fontSize:13, fontWeight:600, color:'#991B1B', margin:0}}>Something went wrong</p>
+                            <p style={{fontSize:12, color:'#EF4444', margin:0, marginTop:2}}>{tierSubmitStatus.replace('error:', '')}</p>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
