@@ -140,7 +140,7 @@ export default function CustomerDashboard() {
       .eq('id', rest.id)
       .single()
     setSelected(fullRest || rest)
-    const { data } = await supabase.from('membership_tiers').select('*, perks_config').eq('restaurant_id', rest.id).neq('stripe_price_id', '').order('price_monthly')
+    const { data } = await supabase.from('membership_tiers').select('*, perks_config').eq('restaurant_id', rest.id).neq('stripe_price_id', '').eq('is_paused', false).order('price_monthly')
     setTiers(data || [])
     setTimeout(() => document.getElementById('tiers-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100)
   }
@@ -157,6 +157,10 @@ export default function CustomerDashboard() {
       const { url, error, code } = await res.json()
       if (code === 'CONNECT_INCOMPLETE' || code === 'CONNECT_NOT_READY') {
         alert('This business is still completing their payment setup and is not yet accepting memberships. Please check back soon.')
+        return
+      }
+      if (code === 'TIER_PAUSED') {
+        alert('This membership is not currently accepting new members. Please check back soon.')
         return
       }
       if (error) throw new Error(error)
@@ -469,6 +473,20 @@ export default function CustomerDashboard() {
             </div>
 
             <div style={{height:2, background:'linear-gradient(to right, #C0442B, transparent)', marginBottom:32, maxWidth:200}} />
+
+            {tiers.length === 0 && (
+              <div style={{textAlign:'center', padding:'40px 24px', background:'white', borderRadius:20, border:'1px solid #F3F4F6', boxShadow:'0 2px 12px rgba(0,0,0,0.04)'}}>
+                <div style={{width:48, height:48, background:'#F9FAFB', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 16px'}}>
+                  <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                    <circle cx="11" cy="11" r="9" stroke="#9CA3AF" strokeWidth="1.5"/>
+                    <path d="M7.5 11H14.5" stroke="#9CA3AF" strokeWidth="1.5" strokeLinecap="round"/>
+                    <path d="M11 7.5V14.5" stroke="#9CA3AF" strokeWidth="1.5" strokeLinecap="round"/>
+                  </svg>
+                </div>
+                <p style={{fontSize:15, fontWeight:600, color:'#374151', marginBottom:6}}>Not currently accepting new members</p>
+                <p style={{fontSize:13, color:'#9CA3AF', lineHeight:1.6}}>This business has paused new memberships. Check back soon.</p>
+              </div>
+            )}
 
             <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(260px, 1fr))', gap:20}}>
               {tiers.map((tier, i) => {
