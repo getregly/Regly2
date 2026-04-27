@@ -257,6 +257,11 @@ export default function Admin() {
                         <div style={{display:'flex', alignItems:'center', gap:10, marginBottom:6}}>
                           <div style={{display:'flex', alignItems:'center', gap:8, flexWrap:'wrap'}}>
                             <h3 style={{fontFamily:'Georgia, serif', fontSize:20, fontWeight:700, color:'#1A0A06', margin:0}}>{sub.business_name}</h3>
+                            {sub.is_tier_request && (
+                              <span style={{fontSize:10, fontWeight:700, padding:'3px 8px', borderRadius:20, background:'#EEF2FF', color:'#4338CA', letterSpacing:'0.05em'}}>
+                                TIER REQUEST
+                              </span>
+                            )}
                             {submissions.filter(s => s.business_name.toLowerCase().trim() === sub.business_name.toLowerCase().trim() && s.id !== sub.id).length > 0 && (
                               <span style={{fontSize:10, fontWeight:700, padding:'3px 8px', borderRadius:20, background:'#FEF3C7', color:'#92400E', letterSpacing:'0.05em'}}>
                                 POSSIBLE DUPLICATE
