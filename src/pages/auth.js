@@ -33,7 +33,6 @@ export default function Auth() {
           email: form.email,
           password: form.password,
         })
-        console.log('signUp result:', { userId: data?.user?.id, error: sErr?.message })
         if (sErr) throw sErr
         if (!data?.user?.id) throw new Error('Signup failed. Please try again.')
 
@@ -42,7 +41,6 @@ export default function Auth() {
           email: form.email,
           password: form.password,
         })
-        console.log('signIn after signup:', { userId: signInData?.user?.id, error: signInErr?.message })
         if (signInErr) throw signInErr
 
         // 3. Insert profile now that we have a valid session
@@ -52,7 +50,6 @@ export default function Auth() {
           phone: form.phone.replace(/\D/g, ''),
           role,
         }, { onConflict: 'id' })
-        console.log('profile upsert error:', pErr?.message || 'none')
 
         // 4. Business signup shows confirmation screen
         if (isB) {
@@ -64,26 +61,8 @@ export default function Auth() {
         // 5. Verify profile was created before redirecting
         const { data: checkProfile } = await supabase
           .from('profiles').select('id, role').eq('id', signInData.user.id).maybeSingle()
-        console.log('profile check:', checkProfile)
 
-        // 6. Fire Slack notification — non-blocking, failure does not affect signup
-        if (checkProfile) {
-          fetch('/api/notify', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'x-webhook-secret': process.env.NEXT_PUBLIC_WEBHOOK_SECRET || '',
-            },
-            body: JSON.stringify({
-              type: 'new_customer',
-              data: { name: form.name, email: form.email, role },
-            }),
-          })
-          .then(r => r.json().then(d => console.log('Notify response:', r.status, d)))
-          .catch(err => console.log('Notify fetch error:', err.message))
-        }
-
-        router.push(dash)
+                router.push(dash)
 
       } else {
         // LOGIN
