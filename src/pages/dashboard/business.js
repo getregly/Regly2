@@ -48,6 +48,21 @@ export default function BusinessDashboard() {
   })
 
   useEffect(() => { init() }, [])
+
+  // Poll for tier status updates every 30 seconds
+  // So when admin approves a tier the badge updates without manual reload
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      if (!restaurant) return
+      const { data } = await supabase
+        .from('membership_tiers')
+        .select('id, name, price_monthly, perks_config, perks, stripe_price_id')
+        .eq('restaurant_id', restaurant.id)
+        .order('price_monthly')
+      if (data) setTiers(data)
+    }, 30000)
+    return () => clearInterval(interval)
+  }, [restaurant])
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search)
@@ -72,7 +87,7 @@ export default function BusinessDashboard() {
       // Fetch this restaurant's membership tiers
       const { data: tierRows } = await supabase
         .from('membership_tiers')
-        .select('id, name, price_monthly, perks_config, perks')
+        .select('id, name, price_monthly, perks_config, perks, stripe_price_id')
         .eq('restaurant_id', rest.id)
         .order('price_monthly', { ascending: true })
       setTiers(tierRows || [])
