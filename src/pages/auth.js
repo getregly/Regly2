@@ -33,34 +33,40 @@ export default function Auth() {
           email: form.email,
           password: form.password,
         })
+        console.log('signUp result:', { userId: data?.user?.id, error: sErr?.message })
         if (sErr) throw sErr
         if (!data?.user?.id) throw new Error('Signup failed. Please try again.')
 
-        // 2. Insert profile — use upsert to handle any duplicate gracefully
+        // 2. Sign in immediately so we have a valid session before inserting profile
+        const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({
+          email: form.email,
+          password: form.password,
+        })
+        console.log('signIn after signup:', { userId: signInData?.user?.id, error: signInErr?.message })
+        if (signInErr) throw signInErr
+
+        // 3. Insert profile now that we have a valid session
         const { error: pErr } = await supabase.from('profiles').upsert({
-          id: data.user.id,
+          id: signInData.user.id,
           name: form.name,
-          phone: form.phone.replace(/\D/g, ''),  // normalize to digits only
+          phone: form.phone.replace(/\D/g, ''),
           role,
           email: form.email,
         }, { onConflict: 'id' })
+        console.log('profile upsert error:', pErr?.message || 'none')
 
-        if (pErr) {
-          console.error('Profile insert error:', pErr)
-          // Profile insert failed but auth succeeded — still let them in
-          // Profile may already exist or RLS is blocking — sign them in anyway
-        }
-
-        // 3. Business signup shows confirmation screen
+        // 4. Business signup shows confirmation screen
         if (isB) {
           setBusinessSignedUp(true)
           setLoading(false)
           return
         }
 
-        // 4. Customer — sign them in immediately after signup
-        // signUp already creates a session so just redirect
-        await new Promise(r => setTimeout(r, 1000)) // pause for session and profile to settle
+        // 5. Verify profile was created before redirecting
+        const { data: checkProfile } = await supabase
+          .from('profiles').select('id, role').eq('id', signInData.user.id).maybeSingle()
+        console.log('profile check:', checkProfile)
+
         router.push(dash)
 
       } else {
