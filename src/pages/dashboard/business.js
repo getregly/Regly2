@@ -56,7 +56,7 @@ export default function BusinessDashboard() {
       if (!restaurant) return
       const { data } = await supabase
         .from('membership_tiers')
-        .select('id, name, price_monthly, perks_config, perks, stripe_price_id')
+        .select('id, name, price_monthly, perks_config, perks, stripe_price_id, is_paused')
         .eq('restaurant_id', restaurant.id)
         .order('price_monthly')
       if (data) setTiers(data)
@@ -87,7 +87,7 @@ export default function BusinessDashboard() {
       // Fetch this restaurant's membership tiers
       const { data: tierRows } = await supabase
         .from('membership_tiers')
-        .select('id, name, price_monthly, perks_config, perks, stripe_price_id')
+        .select('id, name, price_monthly, perks_config, perks, stripe_price_id, is_paused')
         .eq('restaurant_id', rest.id)
         .order('price_monthly', { ascending: true })
       setTiers(tierRows || [])
@@ -420,6 +420,21 @@ export default function BusinessDashboard() {
       setTierSubmitStatus('error:' + err.message)
     } finally {
       setSavingTier(false)
+    }
+  }
+
+  async function togglePauseTier(tier) {
+    const newPausedState = !tier.is_paused
+    // Optimistic update
+    setTiers(prev => prev.map(t => t.id === tier.id ? { ...t, is_paused: newPausedState } : t))
+    const { error } = await supabase
+      .from('membership_tiers')
+      .update({ is_paused: newPausedState })
+      .eq('id', tier.id)
+    if (error) {
+      // Revert on error
+      setTiers(prev => prev.map(t => t.id === tier.id ? { ...t, is_paused: !newPausedState } : t))
+      console.error('Pause toggle error:', error.message)
     }
   }
 
@@ -1069,7 +1084,12 @@ export default function BusinessDashboard() {
                               <div style={{display:'flex', alignItems:'center', gap:8, marginBottom:2}}>
                                 <p style={{fontSize:15, fontWeight:700, color:'#1A0A06', margin:0}}>{tier.name}</p>
                                 {/* Status badge — Live only when tier has Stripe price AND restaurant is connected */}
-                                {tier.stripe_price_id && restaurant?.stripe_onboarding_complete
+                                {tier.stripe_price_id && restaurant?.stripe_onboarding_complete && tier.is_paused
+                                  ? <span style={{display:'inline-flex', alignItems:'center', gap:5, background:'#FEF3C7', border:'1px solid #FCD34D', borderRadius:20, padding:'2px 10px'}}>
+                                      <div style={{width:5, height:5, borderRadius:'50%', background:'#F59E0B'}}/>
+                                      <span style={{fontSize:10, fontWeight:700, color:'#92400E', letterSpacing:'0.05em', textTransform:'uppercase'}}>Paused</span>
+                                    </span>
+                                  : tier.stripe_price_id && restaurant?.stripe_onboarding_complete
                                   ? <span style={{display:'inline-flex', alignItems:'center', gap:5, background:'#D1FAE5', border:'1px solid #6EE7B7', borderRadius:20, padding:'2px 10px'}}>
                                       <div style={{width:5, height:5, borderRadius:'50%', background:'#059669'}}/>
                                       <span style={{fontSize:10, fontWeight:700, color:'#059669', letterSpacing:'0.05em', textTransform:'uppercase'}}>Live</span>
@@ -1091,6 +1111,31 @@ export default function BusinessDashboard() {
                             </div>
                           </div>
                           <div style={{display:'flex', alignItems:'center', gap:10}}>
+                            {/* Pause/Resume toggle — only for live tiers */}
+                            {tier.stripe_price_id && restaurant?.stripe_onboarding_complete && (
+                              <button
+                                onClick={() => togglePauseTier(tier)}
+                                title={tier.is_paused ? 'Resume tier — new members can join' : 'Pause tier — prevent new members from joining'}
+                                style={{
+                                  display:'flex', alignItems:'center', gap:6,
+                                  padding:'6px 12px',
+                                  background: tier.is_paused ? '#FEF3C7' : '#F3F4F6',
+                                  border: `1px solid ${tier.is_paused ? '#FCD34D' : '#E5E7EB'}`,
+                                  borderRadius:8, fontSize:12, fontWeight:600,
+                                  color: tier.is_paused ? '#92400E' : '#6B7280',
+                                  cursor:'pointer', fontFamily:'inherit',
+                                }}>
+                                {tier.is_paused
+                                  ? <><svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                      <path d="M2 2L10 6L2 10V2Z" fill="#92400E"/>
+                                    </svg> Resume</>
+                                  : <><svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                                      <rect x="2" y="2" width="3" height="8" rx="1" fill="#6B7280"/>
+                                      <rect x="7" y="2" width="3" height="8" rx="1" fill="#6B7280"/>
+                                    </svg> Pause</>
+                                }
+                              </button>
+                            )}
                             <span style={{fontFamily:'Georgia, serif', fontSize:20, fontWeight:700, color:'#1A0A06'}}>
                               ${tier.price_monthly}<span style={{fontSize:12, fontWeight:400, color:'#9CA3AF'}}>/mo</span>
                             </span>
