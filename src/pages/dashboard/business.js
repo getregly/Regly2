@@ -354,9 +354,24 @@ export default function BusinessDashboard() {
       .select()
       .single()
     if (!error && data) {
+      // Also submit to admin for review via onboarding_submissions
+      await supabase.from('onboarding_submissions').insert({
+        user_id: restaurant.owner_id,
+        business_name: restaurant.name,
+        address: restaurant.address || '',
+        description: `New tier request: ${newTier.name.trim()} at $${newTier.price}/mo`,
+        tiers: JSON.stringify([{
+          name: newTier.name.trim(),
+          price: newTier.price,
+          perks: perksText,
+        }]),
+        status: 'pending',
+        is_tier_request: true,
+      })
       setTiers(prev => [...prev, data].sort((a,b) => a.price_monthly - b.price_monthly))
       setAddingTier(false)
       setNewTier({ name:'', price:'', perks:[{ description:'', type:'unlimited', limit:2 }] })
+      alert('Your new tier has been submitted for review. We will activate it within 48 hours.')
     }
     setSavingTier(false)
   }
@@ -481,18 +496,14 @@ export default function BusinessDashboard() {
                       Your business is now visible to customers on Regly. Memberships are live and payouts are active. Share the word with your regulars.
                     </p>
 
-                    {/* Three quick stats */}
-                    <div style={{display:'flex', gap:32}}>
-                      {[
-                        {val:'$0', label:'To get started'},
-                        {val:'Monthly', label:'Payout schedule'},
-                        {val:'Instant', label:'Member access'},
-                      ].map((s, i) => (
-                        <div key={i}>
-                          <p style={{fontSize:22, fontWeight:700, color:'#F5F0E8', fontFamily:"'Playfair Display',Georgia,serif", marginBottom:2}}>{s.val}</p>
-                          <p style={{fontSize:11, color:'rgba(245,240,232,0.4)', letterSpacing:'0.05em'}}>{s.label}</p>
-                        </div>
-                      ))}
+                    {/* Promote CTA */}
+                    <div style={{display:'flex', alignItems:'center', gap:12, background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.1)', borderRadius:12, padding:'14px 18px', maxWidth:440}}>
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{flexShrink:0}}>
+                        <path d="M10 2L12.4 7.3L18 8.1L14 12L15.1 17.5L10 14.8L4.9 17.5L6 12L2 8.1L7.6 7.3L10 2Z" stroke="#F5F0E8" strokeWidth="1.4" strokeLinejoin="round" fill="none" opacity="0.6"/>
+                      </svg>
+                      <p style={{fontSize:13, color:'rgba(245,240,232,0.7)', lineHeight:1.5, margin:0}}>
+                        Start spreading the word. Let your regulars know they can now subscribe to exclusive perks at {displayName}.
+                      </p>
                     </div>
                   </div>
 
@@ -1129,13 +1140,13 @@ export default function BusinessDashboard() {
 
                       <div style={{display:'grid', gridTemplateColumns:'1fr 130px', gap:10, marginBottom:14}}>
                         <div>
-                          <label style={{display:'block', fontSize:12, fontWeight:500, color:'#374151', marginBottom:5}}>Tier Name</label>
+                          <label style={{display:'block', fontSize:12, fontWeight:500, color:'#1A0A06', marginBottom:5}}>Tier Name</label>
                           <input value={newTier.name} onChange={e => setNewTier(p => ({...p, name:e.target.value}))}
                             placeholder="e.g. Gold, Superfan..."
                             style={{width:'100%', padding:'10px 12px', border:'1.5px solid #E5E7EB', borderRadius:8, fontSize:13, outline:'none', fontFamily:'inherit'}} />
                         </div>
                         <div>
-                          <label style={{display:'block', fontSize:12, fontWeight:500, color:'#374151', marginBottom:5}}>Price / mo</label>
+                          <label style={{display:'block', fontSize:12, fontWeight:500, color:'#1A0A06', marginBottom:5}}>Price / mo</label>
                           <div style={{position:'relative'}}>
                             <span style={{position:'absolute', left:10, top:'50%', transform:'translateY(-50%)', color:'#9CA3AF', fontSize:13}}>$</span>
                             <input type="number" min="1" value={newTier.price} onChange={e => setNewTier(p => ({...p, price:e.target.value}))}
@@ -1145,7 +1156,7 @@ export default function BusinessDashboard() {
                         </div>
                       </div>
 
-                      <label style={{display:'block', fontSize:12, fontWeight:500, color:'#374151', marginBottom:8}}>Perks</label>
+                      <label style={{display:'block', fontSize:12, fontWeight:500, color:'#1A0A06', marginBottom:8}}>Perks</label>
                       <div style={{display:'flex', flexDirection:'column', gap:8, marginBottom:10}}>
                         {newTier.perks.map((perk, pi) => (
                           <div key={pi} style={{background:'white', border:'1px solid #E5E7EB', borderRadius:8, padding:'10px 12px'}}>
@@ -1191,9 +1202,9 @@ export default function BusinessDashboard() {
                       <div style={{display:'flex', gap:10, alignItems:'center'}}>
                         <button onClick={saveNewTier} disabled={savingTier || !newTier.name.trim() || !newTier.price}
                           style={{padding:'10px 20px', background: savingTier || !newTier.name.trim() || !newTier.price ? '#D1D5DB' : '#1A0A06', color:'white', border:'none', borderRadius:8, fontSize:13, fontWeight:600, cursor: savingTier ? 'not-allowed' : 'pointer', fontFamily:'inherit'}}>
-                          {savingTier ? 'Saving...' : 'Create Tier'}
+                          {savingTier ? 'Submitting...' : 'Submit for Review'}
                         </button>
-                        <p style={{fontSize:11, color:'#9CA3AF'}}>New tiers are reviewed by the Regly team before going live. We'll activate it within 48 hours.</p>
+                        <p style={{fontSize:11, color:'#9CA3AF'}}>New tiers are reviewed by the Regly team. We will activate it within 48 hours.</p>
                       </div>
                     </div>
                   )}
