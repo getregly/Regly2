@@ -408,8 +408,9 @@ export default function BusinessDashboard() {
   }
 
   const displayName = restaurant?.name || submission?.business_name || 'Your Business'
-  const isPending   = !restaurant && submission?.status === 'pending'
-  const isNew       = !restaurant && !submission
+  const isPending        = !restaurant && submission?.status === 'pending'
+  const isNew            = !restaurant && !submission
+  const isApprovedNotLive = restaurant && !restaurant.stripe_onboarding_complete
   const reglyFee    = (stats.revenue * 0.15).toFixed(2)
   const ownerRevenue= (stats.revenue * 0.85).toFixed(2)
 
@@ -497,26 +498,102 @@ export default function BusinessDashboard() {
               </div>
             )}
 
-            {/* Not yet connected, prompt to set up */}
-            {!restaurant.stripe_onboarding_complete && connectStatus !== 'success' && (
-              <div style={{background:'white', border:'1px solid #E5E7EB', borderRadius:16, padding:'20px 24px', marginBottom:20, display:'flex', alignItems:'center', justifyContent:'space-between', gap:16, boxShadow:'0 2px 12px rgba(0,0,0,0.04)'}}>
-                <div style={{display:'flex', alignItems:'center', gap:14}}>
-                  <div style={{width:44, height:44, background:'#FEF9EC', border:'1px solid #FCD34D', borderRadius:12, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0}}>
-                    <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-                      <rect x="2" y="6" width="18" height="13" rx="2" stroke="#F59E0B" strokeWidth="1.5"/>
-                      <path d="M2 10H20" stroke="#F59E0B" strokeWidth="1.5"/>
-                      <path d="M6 14H8M10 14H12" stroke="#F59E0B" strokeWidth="1.5" strokeLinecap="round"/>
-                    </svg>
+            {/* ── APPROVED BUT NOT LIVE — Full onboarding moment ─────── */}
+            {isApprovedNotLive && connectStatus !== 'success' && (
+              <div style={{marginBottom:24}}>
+
+                {/* Hero celebration card */}
+                <div style={{background:'#1A0A06', borderRadius:24, padding:'48px 40px', marginBottom:16, position:'relative', overflow:'hidden'}}>
+                  {/* Ghosted R watermark */}
+                  <div style={{position:'absolute', right:-40, top:-60, fontFamily:"'Playfair Display',Georgia,serif", fontSize:280, fontWeight:700, fontStyle:'italic', color:'rgba(192,68,43,0.08)', lineHeight:1, pointerEvents:'none', userSelect:'none'}}>R</div>
+
+                  {/* Approved badge */}
+                  <div style={{display:'inline-flex', alignItems:'center', gap:8, background:'rgba(5,150,105,0.15)', border:'1px solid rgba(5,150,105,0.3)', borderRadius:20, padding:'6px 14px', marginBottom:24}}>
+                    <div style={{width:8, height:8, borderRadius:'50%', background:'#059669'}}/>
+                    <span style={{fontSize:11, fontWeight:700, color:'#059669', letterSpacing:'0.1em', textTransform:'uppercase'}}>Application Approved</span>
                   </div>
-                  <div>
-                    <p style={{fontSize:14, fontWeight:600, color:'#1A0A06', marginBottom:3}}>Stripe Connect setup required to receive payouts</p>
-                    <p style={{fontSize:13, color:'#6B7280'}}>You must complete Stripe Connect to begin accepting membership payouts. Payouts are deposited monthly directly to your bank account. Takes about 2 minutes.</p>
+
+                  <h2 style={{fontFamily:"'Playfair Display',Georgia,serif", fontWeight:700, fontStyle:'italic', fontSize:36, color:'#F5F0E8', marginBottom:12, lineHeight:1.2}}>
+                    Welcome to Regly,<br/>{displayName}.
+                  </h2>
+                  <p style={{fontSize:15, color:'rgba(245,240,232,0.6)', maxWidth:480, lineHeight:1.65, marginBottom:0, fontWeight:300}}>
+                    Your application has been approved. Complete one final step to go live and start accepting memberships from your regulars.
+                  </p>
+                </div>
+
+                {/* Progress steps */}
+                <div style={{background:'white', borderRadius:24, padding:'32px 36px', marginBottom:16, boxShadow:'0 2px 12px rgba(0,0,0,0.06)'}}>
+                  <p style={{fontSize:11, fontWeight:700, color:'#C0442B', letterSpacing:'0.15em', textTransform:'uppercase', marginBottom:24}}>Getting Started</p>
+
+                  {/* Step 1 — Done */}
+                  <div style={{display:'flex', gap:16, marginBottom:20}}>
+                    <div style={{width:36, height:36, borderRadius:'50%', background:'#059669', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0}}>
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M3 8L6.5 11.5L13 4.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                    <div style={{paddingTop:4}}>
+                      <p style={{fontSize:14, fontWeight:600, color:'#059669', marginBottom:2}}>Application submitted</p>
+                      <p style={{fontSize:13, color:'#9CA3AF'}}>Your business details and membership tiers have been reviewed and approved.</p>
+                    </div>
+                  </div>
+
+                  {/* Step 2 — Done */}
+                  <div style={{display:'flex', gap:16, marginBottom:20}}>
+                    <div style={{width:36, height:36, borderRadius:'50%', background:'#059669', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0}}>
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                        <path d="M3 8L6.5 11.5L13 4.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                    <div style={{paddingTop:4}}>
+                      <p style={{fontSize:14, fontWeight:600, color:'#059669', marginBottom:2}}>Membership tiers created</p>
+                      <p style={{fontSize:13, color:'#9CA3AF'}}>Your tiers are set up and ready to go live the moment you complete setup.</p>
+                    </div>
+                  </div>
+
+                  {/* Step 3 — Active / CTA */}
+                  <div style={{display:'flex', gap:16, background:'#FFF8F7', border:'1.5px solid #C0442B', borderRadius:16, padding:'20px 20px 20px 20px'}}>
+                    <div style={{width:36, height:36, borderRadius:'50%', background:'#C0442B', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0}}>
+                      <span style={{color:'white', fontWeight:700, fontSize:14}}>3</span>
+                    </div>
+                    <div style={{flex:1}}>
+                      <p style={{fontSize:14, fontWeight:700, color:'#1A0A06', marginBottom:4}}>Set up payouts to go live</p>
+                      <p style={{fontSize:13, color:'#6B7280', marginBottom:16, lineHeight:1.6}}>Connect your bank account through Stripe to start receiving monthly payouts. Takes about 2 minutes. Your business will be immediately visible to customers once complete.</p>
+                      <div style={{display:'flex', alignItems:'center', gap:12, flexWrap:'wrap'}}>
+                        <button onClick={startConnectOnboarding} disabled={connectLoading}
+                          style={{padding:'12px 28px', background: connectLoading ? '#D1D5DB' : '#C0442B', color:'white', border:'none', borderRadius:10, fontSize:14, fontWeight:600, cursor: connectLoading ? 'not-allowed' : 'pointer', fontFamily:'inherit'}}>
+                          {connectLoading ? 'Loading...' : 'Set Up Payouts'}
+                        </button>
+                        <div style={{display:'flex', alignItems:'center', gap:6}}>
+                          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                            <path d="M7 1C3.7 1 1 3.7 1 7C1 10.3 3.7 13 7 13C10.3 13 13 10.3 13 7C13 3.7 10.3 1 7 1Z" stroke="#9CA3AF" strokeWidth="1.2"/>
+                            <path d="M7 6V10M7 4.5V5" stroke="#9CA3AF" strokeWidth="1.2" strokeLinecap="round"/>
+                          </svg>
+                          <span style={{fontSize:12, color:'#9CA3AF'}}>Secured by Stripe</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <button onClick={startConnectOnboarding} disabled={connectLoading}
-                  style={{padding:'10px 20px', background: connectLoading ? '#D1D5DB' : '#1A0A06', color:'white', border:'none', borderRadius:10, fontSize:13, fontWeight:600, cursor: connectLoading ? 'not-allowed' : 'pointer', fontFamily:'inherit', flexShrink:0, whiteSpace:'nowrap'}}>
-                  {connectLoading ? 'Loading...' : 'Set Up Payouts'}
-                </button>
+
+                {/* What happens next */}
+                <div style={{background:'white', borderRadius:24, padding:'28px 36px', boxShadow:'0 2px 12px rgba(0,0,0,0.06)'}}>
+                  <p style={{fontSize:11, fontWeight:700, color:'#9CA3AF', letterSpacing:'0.15em', textTransform:'uppercase', marginBottom:20}}>What happens after you connect</p>
+                  <div style={{display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:20}}>
+                    {[
+                      {icon:'🏪', title:'Go live instantly', desc:'Your business appears on Regly and customers can subscribe to your memberships immediately.'},
+                      {icon:'💳', title:'Customers subscribe', desc:'Members pay monthly and get their perks every visit. You look them up by phone number right here.'},
+                      {icon:'💰', title:'Get paid monthly', desc:'85% of every subscription goes directly to your bank account on a monthly payout schedule.'},
+                    ].map((item, i) => (
+                      <div key={i} style={{textAlign:'center', padding:'4px 0'}}>
+                        <div style={{fontSize:28, marginBottom:10}}>{item.icon}</div>
+                        <p style={{fontSize:13, fontWeight:600, color:'#1A0A06', marginBottom:6}}>{item.title}</p>
+                        <p style={{fontSize:12, color:'#9CA3AF', lineHeight:1.6}}>{item.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
               </div>
             )}
           </>
