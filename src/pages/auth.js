@@ -51,7 +51,6 @@ export default function Auth() {
           name: form.name,
           phone: form.phone.replace(/\D/g, ''),
           role,
-          email: form.email,
         }, { onConflict: 'id' })
         console.log('profile upsert error:', pErr?.message || 'none')
 
@@ -150,7 +149,7 @@ export default function Auth() {
       <meta property="og:description" content="Sign in or create your Regly account." />
     </Head>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Inter:wght@300;400;500;600;700&display=swap');
         * { box-sizing: border-box; }
         .auth-input::placeholder { color: #9CA3AF; }
         .auth-btn:hover { opacity: 0.92; transform: translateY(-1px); }
