@@ -140,7 +140,7 @@ export default function CustomerDashboard() {
       .eq('id', rest.id)
       .single()
     setSelected(fullRest || rest)
-    const { data } = await supabase.from('membership_tiers').select('*, perks_config').eq('restaurant_id', rest.id).order('price_monthly')
+    const { data } = await supabase.from('membership_tiers').select('*, perks_config').eq('restaurant_id', rest.id).neq('stripe_price_id', '').order('price_monthly')
     setTiers(data || [])
     setTimeout(() => document.getElementById('tiers-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100)
   }
