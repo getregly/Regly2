@@ -118,25 +118,6 @@ export default function Onboard() {
       })
       if (err) throw err
 
-      // Fire Slack notification — non-blocking
-      fetch('/api/notify', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-webhook-secret': process.env.NEXT_PUBLIC_WEBHOOK_SECRET || '',
-        },
-        body: JSON.stringify({
-          type: 'new_merchant',
-          data: {
-            business_name: form.business_name,
-            owner_name: user?.user_metadata?.name || '',
-            email: user?.email || '',
-            phone: form.phone || '',
-            address: `${form.address}, ${form.city}`,
-          },
-        }),
-      }).catch(() => {})
-
       setDone(true)
     } catch(err) { setError(err.message) }
     finally { setSaving(false) }
