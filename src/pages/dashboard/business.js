@@ -354,11 +354,13 @@ export default function BusinessDashboard() {
       .select()
       .single()
     if (!error && data) {
-      // Also submit to admin for review via onboarding_submissions
-      await supabase.from('onboarding_submissions').insert({
-        user_id: restaurant.owner_id,
+      // Submit tier request to admin for review
+      const { data: { user: currentUser } } = await supabase.auth.getUser()
+      const { error: subErr } = await supabase.from('onboarding_submissions').insert({
+        user_id: currentUser.id,
         business_name: restaurant.name,
         address: restaurant.address || '',
+        city: restaurant.city || '',
         description: `New tier request: ${newTier.name.trim()} at $${newTier.price}/mo`,
         tiers: JSON.stringify([{
           name: newTier.name.trim(),
@@ -368,6 +370,7 @@ export default function BusinessDashboard() {
         status: 'pending',
         is_tier_request: true,
       })
+      if (subErr) console.error('Tier submission error:', subErr.message)
       setTiers(prev => [...prev, data].sort((a,b) => a.price_monthly - b.price_monthly))
       setAddingTier(false)
       setNewTier({ name:'', price:'', perks:[{ description:'', type:'unlimited', limit:2 }] })
@@ -1135,8 +1138,8 @@ export default function BusinessDashboard() {
 
                   {/* New tier form */}
                   {addingTier && (
-                    <div style={{marginTop:16, background:'#F9FAFB', borderRadius:12, padding:'20px', border:'1px solid #E5E7EB'}}>
-                      <p style={{fontSize:13, fontWeight:600, color:'#1A0A06', marginBottom:14}}>Create New Tier</p>
+                    <div style={{marginTop:16, background:'white', borderRadius:12, padding:'24px', border:'1.5px solid #E5E7EB', boxShadow:'0 2px 8px rgba(0,0,0,0.04)'}}>
+                      <p style={{fontSize:14, fontWeight:700, color:'#1A0A06', marginBottom:16}}>New Membership Tier</p>
 
                       <div style={{display:'grid', gridTemplateColumns:'1fr 130px', gap:10, marginBottom:14}}>
                         <div>
@@ -1164,7 +1167,7 @@ export default function BusinessDashboard() {
                               <div style={{width:6, height:6, borderRadius:'50%', background:'#C0442B', flexShrink:0}} />
                               <input value={perk.description} onChange={e => setNewTierPerkField(pi,'description',e.target.value)}
                                 placeholder={`Perk ${pi+1}`}
-                                style={{flex:1, padding:'6px 10px', border:'1px solid #E5E7EB', borderRadius:6, fontSize:12, outline:'none', fontFamily:'inherit'}} />
+                                style={{flex:1, padding:'6px 10px', border:'1px solid #E5E7EB', borderRadius:6, fontSize:12, outline:'none', fontFamily:'inherit', color:'#1A0A06'}} />
                               {newTier.perks.length > 1 && (
                                 <button type="button" onClick={() => removeNewTierPerk(pi)}
                                   style={{color:'#D1D5DB', background:'none', border:'none', cursor:'pointer', fontSize:16, padding:'0 4px'}}>×</button>
