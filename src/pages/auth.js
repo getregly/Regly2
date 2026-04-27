@@ -60,7 +60,7 @@ export default function Auth() {
 
         // 4. Customer — sign them in immediately after signup
         // signUp already creates a session so just redirect
-        await new Promise(r => setTimeout(r, 500)) // brief pause for session to settle
+        await new Promise(r => setTimeout(r, 1000)) // pause for session and profile to settle
         router.push(dash)
 
       } else {
