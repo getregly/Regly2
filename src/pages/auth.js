@@ -48,6 +48,7 @@ export default function Auth() {
           id: signInData.user.id,
           name: form.name,
           phone: form.phone.replace(/\D/g, ''),
+          email: form.email,
           role,
         }, { onConflict: 'id' })
 
