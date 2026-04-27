@@ -78,7 +78,9 @@ export default function Auth() {
               type: 'new_customer',
               data: { name: form.name, email: form.email, role },
             }),
-          }).catch(() => {}) // silently ignore any notification errors
+          })
+          .then(r => r.json().then(d => console.log('Notify response:', r.status, d)))
+          .catch(err => console.log('Notify fetch error:', err.message))
         }
 
         router.push(dash)
