@@ -580,17 +580,43 @@ export default function BusinessDashboard() {
                 <div style={{background:'white', borderRadius:24, padding:'28px 36px', boxShadow:'0 2px 12px rgba(0,0,0,0.06)'}}>
                   <p style={{fontSize:11, fontWeight:700, color:'#9CA3AF', letterSpacing:'0.15em', textTransform:'uppercase', marginBottom:20}}>What happens after you connect</p>
                   <div style={{display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:20}}>
-                    {[
-                      {icon:'🏪', title:'Go live instantly', desc:'Your business appears on Regly and customers can subscribe to your memberships immediately.'},
-                      {icon:'💳', title:'Customers subscribe', desc:'Members pay monthly and get their perks every visit. You look them up by phone number right here.'},
-                      {icon:'💰', title:'Get paid monthly', desc:'85% of every subscription goes directly to your bank account on a monthly payout schedule.'},
-                    ].map((item, i) => (
-                      <div key={i} style={{textAlign:'center', padding:'4px 0'}}>
-                        <div style={{fontSize:28, marginBottom:10}}>{item.icon}</div>
-                        <p style={{fontSize:13, fontWeight:600, color:'#1A0A06', marginBottom:6}}>{item.title}</p>
-                        <p style={{fontSize:12, color:'#9CA3AF', lineHeight:1.6}}>{item.desc}</p>
+                    {/* Go live */}
+                    <div style={{textAlign:'center', padding:'4px 0'}}>
+                      <div style={{width:48, height:48, background:'#FFF0ED', borderRadius:14, display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 12px'}}>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                          <path d="M3 9L12 3L21 9V20C21 20.6 20.6 21 20 21H15V15H9V21H4C3.4 21 3 20.6 3 20V9Z" stroke="#C0442B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
                       </div>
-                    ))}
+                      <p style={{fontSize:13, fontWeight:600, color:'#1A0A06', marginBottom:6}}>Go live instantly</p>
+                      <p style={{fontSize:12, color:'#9CA3AF', lineHeight:1.6}}>Your business appears on Regly and customers can subscribe to your memberships immediately.</p>
+                    </div>
+
+                    {/* Customers subscribe */}
+                    <div style={{textAlign:'center', padding:'4px 0'}}>
+                      <div style={{width:48, height:48, background:'#FFF0ED', borderRadius:14, display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 12px'}}>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                          <circle cx="12" cy="8" r="4" stroke="#C0442B" strokeWidth="1.5"/>
+                          <path d="M4 20C4 17.8 7.6 16 12 16C16.4 16 20 17.8 20 20" stroke="#C0442B" strokeWidth="1.5" strokeLinecap="round"/>
+                          <path d="M16 12L18 14L22 10" stroke="#C0442B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </div>
+                      <p style={{fontSize:13, fontWeight:600, color:'#1A0A06', marginBottom:6}}>Customers subscribe</p>
+                      <p style={{fontSize:12, color:'#9CA3AF', lineHeight:1.6}}>Members pay monthly and get their perks every visit. You look them up by phone number right here.</p>
+                    </div>
+
+                    {/* Get paid monthly */}
+                    <div style={{textAlign:'center', padding:'4px 0'}}>
+                      <div style={{width:48, height:48, background:'#FFF0ED', borderRadius:14, display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 12px'}}>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                          <rect x="2" y="6" width="20" height="14" rx="2" stroke="#C0442B" strokeWidth="1.5"/>
+                          <path d="M2 10H22" stroke="#C0442B" strokeWidth="1.5"/>
+                          <circle cx="12" cy="15" r="2" stroke="#C0442B" strokeWidth="1.5"/>
+                          <path d="M6 15H7M17 15H18" stroke="#C0442B" strokeWidth="1.5" strokeLinecap="round"/>
+                        </svg>
+                      </div>
+                      <p style={{fontSize:13, fontWeight:600, color:'#1A0A06', marginBottom:6}}>Get paid monthly</p>
+                      <p style={{fontSize:12, color:'#9CA3AF', lineHeight:1.6}}>85% of every subscription goes directly to your bank account on a monthly payout schedule.</p>
+                    </div>
                   </div>
                 </div>
 
