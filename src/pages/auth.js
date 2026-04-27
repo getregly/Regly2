@@ -28,19 +28,74 @@ export default function Auth() {
     setLoading(true)
     try {
       if (mode === 'signup') {
-        const { data, error: sErr } = await supabase.auth.signUp({ email: form.email, password: form.password })
+        // 1. Create auth user
+        const { data, error: sErr } = await supabase.auth.signUp({
+          email: form.email,
+          password: form.password,
+        })
         if (sErr) throw sErr
-        await supabase.from('profiles').insert({ id: data.user.id, name: form.name, phone: form.phone, role })
-        if (isB) { setBusinessSignedUp(true); setLoading(false); return }
-        router.push(dash)
-      } else {
-        const { data, error: lErr } = await supabase.auth.signInWithPassword({ email: form.email, password: form.password })
-        if (lErr) throw lErr
-        const { data: profile } = await supabase.from('profiles').select('role').eq('id', data.user.id).single()
-        if (profile?.role !== role) {
-          await supabase.auth.signOut()
-          throw new Error(`This account is not registered as a ${isB ? 'merchant' : 'customer'}.`)
+        if (!data?.user?.id) throw new Error('Signup failed. Please try again.')
+
+        // 2. Insert profile — use upsert to handle any duplicate gracefully
+        const { error: pErr } = await supabase.from('profiles').upsert({
+          id: data.user.id,
+          name: form.name,
+          phone: form.phone.replace(/\D/g, ''),  // normalize to digits only
+          role,
+          email: form.email,
+        }, { onConflict: 'id' })
+
+        if (pErr) {
+          console.error('Profile insert error:', pErr)
+          // Profile insert failed but auth succeeded — still let them in
+          // Profile may already exist or RLS is blocking — sign them in anyway
         }
+
+        // 3. Business signup shows confirmation screen
+        if (isB) {
+          setBusinessSignedUp(true)
+          setLoading(false)
+          return
+        }
+
+        // 4. Customer — sign them in immediately after signup
+        // signUp already creates a session so just redirect
+        await new Promise(r => setTimeout(r, 500)) // brief pause for session to settle
+        router.push(dash)
+
+      } else {
+        // LOGIN
+        const { data, error: lErr } = await supabase.auth.signInWithPassword({
+          email: form.email,
+          password: form.password,
+        })
+        if (lErr) throw lErr
+
+        // Fetch profile to verify role
+        const { data: profile, error: profileErr } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', data.user.id)
+          .maybeSingle()
+
+        // If no profile exists yet (race condition on signup) create it
+        if (!profile && !profileErr) {
+          await supabase.from('profiles').upsert({
+            id: data.user.id,
+            email: form.email,
+            role,
+          }, { onConflict: 'id' })
+          router.push(dash)
+          return
+        }
+
+        // If profile exists but role doesn't match
+        if (profile && profile.role !== role) {
+          await supabase.auth.signOut()
+          const correctRole = profile.role === 'business' ? 'merchant' : 'customer'
+          throw new Error(`This account is registered as a ${correctRole}. Please switch the tab above.`)
+        }
+
         router.push(dash)
       }
     } catch (err) {
