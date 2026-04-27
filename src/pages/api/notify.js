@@ -10,8 +10,6 @@
 // 5. Rate limit friendly — fails fast on bad requests
 // 6. No sensitive data logged
 
-const ADMIN_EMAIL = 'sarrafian.josh@gmail.com'
-
 // Slack block kit message builder
 function buildSlackMessage(type, data) {
   const ts = new Date().toLocaleString('en-US', {
