@@ -65,6 +65,40 @@ export default function Admin() {
     setApproving(sub.id)
     setMessage(null)
     try {
+
+      // Tier request — just create Stripe price for the tier and mark approved
+      if (sub.is_tier_request) {
+        const { data: session } = await supabase.auth.getSession()
+        const tiers = JSON.parse(sub.tiers || '[]')
+        // Find the matching tier in membership_tiers
+        const { data: existingTier } = await supabase
+          .from('membership_tiers')
+          .select('id, stripe_price_id')
+          .eq('name', `${sub.business_name} - ${tiers[0]?.name}`)
+          .maybeSingle()
+
+        if (existingTier && !existingTier.stripe_price_id) {
+          await fetch('/api/create-stripe-price', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session?.session?.access_token}`,
+            },
+            body: JSON.stringify({
+              tier_id: existingTier.id,
+              tier_name: tiers[0]?.name,
+              price_monthly: Number(tiers[0]?.price),
+              business_name: sub.business_name,
+            }),
+          })
+        }
+        await supabase.from('onboarding_submissions').update({ status: 'approved' }).eq('id', sub.id)
+        setSubmissions(prev => prev.filter(s => s.id !== sub.id))
+        setMessage({ type:'success', text:`New tier approved for ${sub.business_name}.` })
+        setApproving(null)
+        return
+      }
+
       // 1. Create restaurant
       const { data: restaurant, error: restErr } = await supabase.from('restaurants').insert({
         name: sub.business_name, description: sub.description,
