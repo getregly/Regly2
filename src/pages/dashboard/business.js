@@ -459,14 +459,50 @@ export default function BusinessDashboard() {
         {/* STRIPE CONNECT BANNER */}
         {restaurant && (
           <>
-            {/* Success banner */}
+                        {/* ── STRIPE CONNECTED CELEBRATION ─────────────────── */}
             {connectStatus === 'success' && (
-              <div style={{background:'#D1FAE5', border:'1px solid #6EE7B7', borderRadius:12, padding:'14px 18px', marginBottom:20, display:'flex', alignItems:'center', gap:10}}>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <circle cx="8" cy="8" r="7" fill="#059669"/>
-                  <path d="M5 8L7 10L11 6" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-                <p style={{fontSize:14, color:'#065F46', margin:0, fontWeight:500}}>Stripe account connected! Payouts are now active for your memberships.</p>
+              <div style={{background:'#1A0A06', borderRadius:24, padding:'40px', marginBottom:24, position:'relative', overflow:'hidden'}}>
+                {/* Animated background glow */}
+                <div style={{position:'absolute', top:-60, right:-60, width:200, height:200, borderRadius:'50%', background:'radial-gradient(circle, rgba(192,68,43,0.3) 0%, transparent 70%)', pointerEvents:'none'}}/>
+                <div style={{position:'absolute', bottom:-40, left:-40, width:160, height:160, borderRadius:'50%', background:'radial-gradient(circle, rgba(5,150,105,0.2) 0%, transparent 70%)', pointerEvents:'none'}}/>
+
+                <div style={{position:'relative', display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:24, flexWrap:'wrap'}}>
+                  <div style={{flex:1, minWidth:280}}>
+                    {/* Live badge */}
+                    <div style={{display:'inline-flex', alignItems:'center', gap:8, background:'rgba(5,150,105,0.15)', border:'1px solid rgba(5,150,105,0.4)', borderRadius:20, padding:'6px 14px', marginBottom:20}}>
+                      <div style={{width:8, height:8, borderRadius:'50%', background:'#059669', boxShadow:'0 0 6px #059669'}}/>
+                      <span style={{fontSize:11, fontWeight:700, color:'#34D399', letterSpacing:'0.1em', textTransform:'uppercase'}}>You are live on Regly</span>
+                    </div>
+
+                    <h2 style={{fontFamily:"'Playfair Display',Georgia,serif", fontWeight:700, fontStyle:'italic', fontSize:32, color:'#F5F0E8', marginBottom:10, lineHeight:1.2}}>
+                      {displayName} is open<br/>for memberships.
+                    </h2>
+                    <p style={{fontSize:14, color:'rgba(245,240,232,0.55)', lineHeight:1.65, maxWidth:440, marginBottom:24, fontWeight:300}}>
+                      Your business is now visible to customers on Regly. Memberships are live and payouts are active. Share the word with your regulars.
+                    </p>
+
+                    {/* Three quick stats */}
+                    <div style={{display:'flex', gap:32}}>
+                      {[
+                        {val:'$0', label:'To get started'},
+                        {val:'Monthly', label:'Payout schedule'},
+                        {val:'Instant', label:'Member access'},
+                      ].map((s, i) => (
+                        <div key={i}>
+                          <p style={{fontSize:22, fontWeight:700, color:'#F5F0E8', fontFamily:"'Playfair Display',Georgia,serif", marginBottom:2}}>{s.val}</p>
+                          <p style={{fontSize:11, color:'rgba(245,240,232,0.4)', letterSpacing:'0.05em'}}>{s.label}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Right side — big checkmark */}
+                  <div style={{width:80, height:80, background:'rgba(5,150,105,0.15)', border:'1px solid rgba(5,150,105,0.3)', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0}}>
+                    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+                      <path d="M7 18L14 25L29 10" stroke="#34D399" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                </div>
               </div>
             )}
 
@@ -972,7 +1008,20 @@ export default function BusinessDashboard() {
                         <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 20px', background:'#FAFAFA', borderBottom:'1px solid #F3F4F6'}}>
                           <div style={{display:'flex', alignItems:'center', gap:12}}>
                             <div>
-                              <p style={{fontSize:15, fontWeight:700, color:'#1A0A06', margin:0}}>{tier.name}</p>
+                              <div style={{display:'flex', alignItems:'center', gap:8, marginBottom:2}}>
+                                <p style={{fontSize:15, fontWeight:700, color:'#1A0A06', margin:0}}>{tier.name}</p>
+                                {/* Status badge */}
+                                {restaurant?.stripe_onboarding_complete
+                                  ? <span style={{display:'inline-flex', alignItems:'center', gap:5, background:'#D1FAE5', border:'1px solid #6EE7B7', borderRadius:20, padding:'2px 10px'}}>
+                                      <div style={{width:5, height:5, borderRadius:'50%', background:'#059669'}}/>
+                                      <span style={{fontSize:10, fontWeight:700, color:'#059669', letterSpacing:'0.05em', textTransform:'uppercase'}}>Live</span>
+                                    </span>
+                                  : <span style={{display:'inline-flex', alignItems:'center', gap:5, background:'#FEF3C7', border:'1px solid #FCD34D', borderRadius:20, padding:'2px 10px'}}>
+                                      <div style={{width:5, height:5, borderRadius:'50%', background:'#F59E0B'}}/>
+                                      <span style={{fontSize:10, fontWeight:700, color:'#92400E', letterSpacing:'0.05em', textTransform:'uppercase'}}>Pending Setup</span>
+                                    </span>
+                                }
+                              </div>
                               <p style={{fontSize:12, color:'#9CA3AF', marginTop:2}}>
                                 {memberCount} active member{memberCount !== 1 ? 's' : ''}
                               </p>
