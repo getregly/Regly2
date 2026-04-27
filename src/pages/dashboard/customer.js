@@ -74,8 +74,19 @@ export default function CustomerDashboard() {
   async function init() {
     const { data: { user: u } } = await supabase.auth.getUser()
     if (!u) { router.push('/'); return }
-    const { data: profile } = await supabase.from('profiles').select('*').eq('id', u.id).single()
-    if (profile?.role !== 'customer') { router.push('/'); return }
+
+    // Retry profile fetch up to 5 times
+    // Handles race condition where profile insert hasn't committed yet after signup
+    let profile = null
+    for (let i = 0; i < 5; i++) {
+      const { data } = await supabase
+        .from('profiles').select('*').eq('id', u.id).maybeSingle()
+      if (data) { profile = data; break }
+      await new Promise(r => setTimeout(r, 600))
+    }
+
+    if (!profile) { router.push('/'); return }
+    if (profile.role !== 'customer') { router.push('/'); return }
     setUser(profile)
     const { data: rests } = await supabase
       .from('restaurants')
