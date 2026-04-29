@@ -17,10 +17,14 @@ export default function Auth() {
   const dash = isB ? '/dashboard/business' : '/dashboard/customer'
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
 
-  // Sync role from query param if it changes
+  // Sync role from query param and auto-switch to signup for direct links
   useState(() => {
-    if (router.query.role) setRole(router.query.role)
-  }, [router.query.role])
+    if (router.query.role) {
+      setRole(router.query.role)
+      // If coming from a direct signup link, start in signup mode
+      if (router.query.mode === 'signup') setMode('signup')
+    }
+  }, [router.query.role, router.query.mode])
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -195,104 +199,108 @@ export default function Auth() {
               Back
             </button>
 
-            {/* Role toggle */}
-            <div style={{display:'flex', background:'#F3F4F6', borderRadius:12, padding:4, marginBottom:28, gap:4}}>
-              {['customer', 'business'].map(r => (
-                <button key={r} className="role-tab"
-                  onClick={() => { setRole(r); setError('') }}
-                  style={{
-                    flex:1, padding:'10px', borderRadius:9, fontSize:14, fontWeight:600,
-                    background: role === r ? 'white' : 'transparent',
-                    color: role === r ? '#1A0A06' : '#9CA3AF',
-                    boxShadow: role === r ? '0 1px 4px rgba(0,0,0,0.1)' : 'none',
-                    fontFamily:'inherit',
-                  }}>
-                  {r === 'customer' ? 'Customer' : 'Merchant'}
-                </button>
-              ))}
-            </div>
-
-            {/* Header */}
+            {/* Header — changes based on mode */}
             <div style={{marginBottom:28}}>
-              <p style={{fontSize:26, fontFamily:'Georgia, serif', fontWeight:700, color:'#1A0A06', marginBottom:4}}>
-                {mode === 'login' ? 'Welcome back' : 'Create account'}
+              <p style={{fontSize:26, fontFamily:"'Playfair Display',Georgia,serif", fontWeight:700, fontStyle:'italic', color:'#1A0A06', marginBottom:6, letterSpacing:'-0.01em'}}>
+                {mode === 'login' ? 'Welcome back.' : 'Create your account.'}
               </p>
-              <p style={{color:'#6B7280', fontSize:15}}>
+              <p style={{color:'#6B7280', fontSize:14, lineHeight:1.6}}>
                 {mode === 'login'
-                  ? `Sign in to your ${isB ? 'Merchant' : ''} Regly account`
-                  : `Join Regly as a ${isB ? 'merchant' : 'customer'}`}
+                  ? 'Sign in to access your Regly dashboard.'
+                  : 'Join Regly and start building loyalty with your regulars.'}
               </p>
             </div>
 
-            {/* Error */}
-            {error && (
-              <div style={{background:'#FEF2F2', border:'1px solid #FECACA', borderRadius:10, padding:'12px 16px', marginBottom:20, display:'flex', alignItems:'center', gap:10}}>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <circle cx="8" cy="8" r="7" stroke="#EF4444" strokeWidth="1.5"/>
-                  <path d="M8 5V8M8 11H8.01" stroke="#EF4444" strokeWidth="1.5" strokeLinecap="round"/>
-                </svg>
-                <p style={{color:'#DC2626', fontSize:14, margin:0}}>{error}</p>
+            {/* Role selection — signup only */}
+            {mode === 'signup' && (
+              <div style={{marginBottom:20}}>
+                <p style={{fontSize:12, fontWeight:600, color:'#6B7280', letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:10}}>I am a</p>
+                <div style={{display:'flex', background:'#F3F4F6', borderRadius:12, padding:4, gap:4}}>
+                  {['customer', 'business'].map(r => (
+                    <button key={r} className="role-tab"
+                      onClick={() => { setRole(r); setError('') }}
+                      style={{
+                        flex:1, padding:'10px', borderRadius:9, fontSize:14, fontWeight:600,
+                        background: role === r ? 'white' : 'transparent',
+                        color: role === r ? '#1A0A06' : '#9CA3AF',
+                        boxShadow: role === r ? '0 1px 4px rgba(0,0,0,0.1)' : 'none',
+                        fontFamily:'inherit',
+                      }}>
+                      {r === 'customer' ? 'Customer' : 'Business Owner'}
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
 
-            {/* Form */}
-            <form onSubmit={handleSubmit} style={{display:'flex', flexDirection:'column', gap:16}}>
+            {/* Form fields */}
+            <form onSubmit={handleSubmit} style={{display:'flex', flexDirection:'column', gap:14}}>
+
               {mode === 'signup' && (
-                <>
-                  <div>
-                    <label style={{display:'block', fontSize:13, fontWeight:500, color:'#374151', marginBottom:6}}>
-                      {isB ? 'Business / Contact Name' : 'Full Name'}
-                    </label>
-                    <input className="auth-input" style={inputStyle('name')}
-                      value={form.name} onChange={e => set('name', e.target.value)}
-                      onFocus={() => setFocusedField('name')} onBlur={() => setFocusedField(null)}
-                      required placeholder="Your name" />
-                  </div>
-                  <div>
-                    <label style={{display:'block', fontSize:13, fontWeight:500, color:'#374151', marginBottom:6}}>Phone Number</label>
-                    <input className="auth-input" style={inputStyle('phone')}
-                      value={form.phone} onChange={e => set('phone', e.target.value)}
-                      onFocus={() => setFocusedField('phone')} onBlur={() => setFocusedField(null)}
-                      required placeholder="(312) 555-0000" />
-                  </div>
-                </>
+                <div>
+                  <label style={{display:'block', fontSize:12, fontWeight:600, color:'#374151', marginBottom:6, letterSpacing:'0.03em'}}>Full name</label>
+                  <input className="auth-input" type="text" value={form.name} onChange={e => set('name', e.target.value)} required
+                    placeholder="Your name"
+                    onFocus={() => setFocusedField('name')} onBlur={() => setFocusedField(null)}
+                    style={{width:'100%', padding:'12px 14px', border:`1.5px solid ${focusedField==='name' ? '#1A0A06' : '#E5E7EB'}`, borderRadius:10, fontSize:14, outline:'none', fontFamily:'inherit', color:'#1A0A06', transition:'border-color 0.2s'}}/>
+                </div>
               )}
+
               <div>
-                <label style={{display:'block', fontSize:13, fontWeight:500, color:'#374151', marginBottom:6}}>Email address</label>
-                <input className="auth-input" style={inputStyle('email')} type="email"
-                  value={form.email} onChange={e => set('email', e.target.value)}
+                <label style={{display:'block', fontSize:12, fontWeight:600, color:'#374151', marginBottom:6, letterSpacing:'0.03em'}}>Email address</label>
+                <input className="auth-input" type="email" value={form.email} onChange={e => set('email', e.target.value)} required
+                  placeholder="you@example.com"
                   onFocus={() => setFocusedField('email')} onBlur={() => setFocusedField(null)}
-                  required placeholder="you@email.com" />
-              </div>
-              <div>
-                <label style={{display:'block', fontSize:13, fontWeight:500, color:'#374151', marginBottom:6}}>Password</label>
-                <input className="auth-input" style={inputStyle('password')} type="password"
-                  value={form.password} onChange={e => set('password', e.target.value)}
-                  onFocus={() => setFocusedField('password')} onBlur={() => setFocusedField(null)}
-                  required placeholder="••••••••" />
+                  style={{width:'100%', padding:'12px 14px', border:`1.5px solid ${focusedField==='email' ? '#1A0A06' : '#E5E7EB'}`, borderRadius:10, fontSize:14, outline:'none', fontFamily:'inherit', color:'#1A0A06', transition:'border-color 0.2s'}}/>
               </div>
 
+              <div>
+                <label style={{display:'block', fontSize:12, fontWeight:600, color:'#374151', marginBottom:6, letterSpacing:'0.03em'}}>Password</label>
+                <input className="auth-input" type="password" value={form.password} onChange={e => set('password', e.target.value)} required
+                  placeholder={mode === 'login' ? 'Your password' : 'Create a password'}
+                  onFocus={() => setFocusedField('password')} onBlur={() => setFocusedField(null)}
+                  style={{width:'100%', padding:'12px 14px', border:`1.5px solid ${focusedField==='password' ? '#1A0A06' : '#E5E7EB'}`, borderRadius:10, fontSize:14, outline:'none', fontFamily:'inherit', color:'#1A0A06', transition:'border-color 0.2s'}}/>
+              </div>
+
+              {mode === 'signup' && (
+                <div>
+                  <label style={{display:'block', fontSize:12, fontWeight:600, color:'#374151', marginBottom:6, letterSpacing:'0.03em'}}>Phone number</label>
+                  <input className="auth-input" type="tel" value={form.phone} onChange={e => set('phone', e.target.value)}
+                    placeholder="Your phone number"
+                    onFocus={() => setFocusedField('phone')} onBlur={() => setFocusedField(null)}
+                    style={{width:'100%', padding:'12px 14px', border:`1.5px solid ${focusedField==='phone' ? '#1A0A06' : '#E5E7EB'}`, borderRadius:10, fontSize:14, outline:'none', fontFamily:'inherit', color:'#1A0A06', transition:'border-color 0.2s'}}/>
+                </div>
+              )}
+
+              {error && (
+                <div style={{background:'#FEF2F2', border:'1px solid #FECACA', borderRadius:8, padding:'10px 14px'}}>
+                  <p style={{color:'#991B1B', fontSize:13, margin:0}}>{error}</p>
+                </div>
+              )}
+
               <button type="submit" disabled={loading} className="auth-btn"
-                style={{width:'100%', padding:'15px', background: loading ? '#D4B896' : '#C0442B', color:'#1A0A06', border:'none', borderRadius:10, fontSize:15, fontWeight:700, cursor: loading ? 'not-allowed' : 'pointer', marginTop:4, letterSpacing:'0.02em'}}>
-                {loading ? 'Please wait...' : mode === 'login' ? 'Sign In' : 'Create Account'}
+                style={{width:'100%', padding:'14px', background: loading ? '#D1D5DB' : '#1A0A06', color:'#F5F0E8', border:'none', borderRadius:10, fontSize:15, fontWeight:700, cursor: loading ? 'not-allowed' : 'pointer', fontFamily:'inherit', marginTop:4}}>
+                {loading ? 'Please wait...' : mode === 'login' ? 'Sign in' : role === 'business' ? 'Apply to join' : 'Create account'}
               </button>
+
             </form>
 
             {/* Divider */}
-            <div style={{display:'flex', alignItems:'center', gap:12, margin:'24px 0'}}>
-              <div style={{flex:1, height:1, background:'#F3F4F6'}} />
-              <span style={{color:'#9CA3AF', fontSize:13}}>or</span>
-              <div style={{flex:1, height:1, background:'#F3F4F6'}} />
+            <div style={{display:'flex', alignItems:'center', gap:12, margin:'20px 0'}}>
+              <div style={{flex:1, height:'1px', background:'#F3F4F6'}}/>
+              <span style={{fontSize:12, color:'#D1D5DB', fontWeight:500}}>
+                {mode === 'login' ? 'New to Regly?' : 'Already have an account?'}
+              </span>
+              <div style={{flex:1, height:'1px', background:'#F3F4F6'}}/>
             </div>
 
             {/* Toggle mode */}
-            <p style={{textAlign:'center', color:'#6B7280', fontSize:14}}>
-              {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
-              <button onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError('') }} className="toggle-btn"
-                style={{color:'#C0442B', background:'none', border:'none', cursor:'pointer', fontSize:14, fontWeight:600, padding:0, transition:'color 0.2s'}}>
-                {mode === 'login' ? 'Sign up' : 'Sign in'}
-              </button>
-            </p>
+            <button onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError(''); setRole('customer') }}
+              style={{width:'100%', padding:'13px', background:'white', color:'#1A0A06', border:'1.5px solid #E5E7EB', borderRadius:10, fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:'inherit', transition:'border-color 0.2s'}}
+              onMouseEnter={e => e.currentTarget.style.borderColor='#1A0A06'}
+              onMouseLeave={e => e.currentTarget.style.borderColor='#E5E7EB'}>
+              {mode === 'login' ? 'Create a free account' : 'Sign in instead'}
+            </button>
 
             {/* Footer */}
             <p style={{textAlign:'center', color:'#D1D5DB', fontSize:12, marginTop:32}}>
