@@ -187,9 +187,18 @@ export default function Admin() {
   }
 
   async function handleReject(sub) {
-    if (!confirm(`Reject ${sub.business_name}?`)) return
-    await supabase.from('onboarding_submissions').update({ status: 'rejected' }).eq('id', sub.id)
-    await loadSubmissions()
+    if (!confirm(`Reject ${sub.business_name}? This cannot be undone.`)) return
+    const { error } = await supabase
+      .from('onboarding_submissions')
+      .update({ status: 'rejected' })
+      .eq('id', sub.id)
+    if (error) {
+      setMessage({ type:'error', text:`Failed to reject: ${error.message}` })
+      return
+    }
+    // Remove from UI immediately
+    setSubmissions(prev => prev.filter(s => s.id !== sub.id))
+    setMessage({ type:'error', text:`${sub.business_name} has been rejected.` })
   }
 
   async function logout() { await supabase.auth.signOut(); router.push('/') }
