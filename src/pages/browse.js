@@ -12,7 +12,6 @@ export default function Browse() {
   const router = useRouter()
   const [restaurants, setRestaurants] = useState([])
   const [loading, setLoading] = useState(true)
-  const [search, setSearch] = useState('')
 
   useEffect(() => {
     async function load() {
@@ -20,26 +19,36 @@ export default function Browse() {
       // RLS allows public SELECT on both tables — no auth needed
       const { data: rests } = await supabase
         .from('restaurants')
-        .select('id, name, address, city, description, image_url')
-        .eq('stripe_onboarding_complete', true)
+        .select('id, name, address, city, description, image_url, stripe_onboarding_complete')
         .order('name')
 
-      if (!rests) { setLoading(false); return }
+      if (!rests || rests.length === 0) { setLoading(false); return }
+
+      // Filter to only fully live restaurants — handle boolean or string true
+      const liveRests = rests.filter(r =>
+        r.stripe_onboarding_complete === true || r.stripe_onboarding_complete === 'true'
+      )
+
+      if (liveRests.length === 0) { setLoading(false); return }
 
       // Fetch tiers for all restaurants in one query
       const { data: tiers } = await supabase
         .from('membership_tiers')
-        .select('id, name, price_monthly, perks, perks_config, restaurant_id')
-        .in('restaurant_id', rests.map(r => r.id))
-        .neq('stripe_price_id', '')
-        .eq('is_paused', false)
+        .select('id, name, price_monthly, perks, perks_config, restaurant_id, stripe_price_id, is_paused')
+        .in('restaurant_id', liveRests.map(r => r.id))
         .order('price_monthly')
 
-      // Attach tiers to restaurants, filter out restaurants with no live tiers
-      const enriched = rests
+      // Attach tiers to restaurants
+      // Filter tiers in JS: approved (has stripe_price_id) and not paused
+      const enriched = liveRests
         .map(r => ({
           ...r,
-          tiers: (tiers || []).filter(t => t.restaurant_id === r.id)
+          tiers: (tiers || []).filter(t =>
+            t.restaurant_id === r.id &&
+            t.stripe_price_id &&
+            t.stripe_price_id !== '' &&
+            !t.is_paused
+          )
         }))
         .filter(r => r.tiers.length > 0)
 
@@ -63,10 +72,7 @@ export default function Browse() {
     router.push(`/auth?mode=signup&role=customer&tierId=${tier.id}&restaurantId=${restaurant.id}`)
   }
 
-  const filtered = restaurants.filter(r =>
-    r.name.toLowerCase().includes(search.toLowerCase()) ||
-    (r.city || '').toLowerCase().includes(search.toLowerCase())
-  )
+  const filtered = restaurants
 
   return (
     <>
@@ -103,20 +109,7 @@ export default function Browse() {
               Subscribe to local business memberships and get real perks on every visit.
             </p>
 
-            {/* Search */}
-            <div style={{position:'relative', maxWidth:400}}>
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{position:'absolute', left:14, top:'50%', transform:'translateY(-50%)', opacity:0.4}}>
-                <circle cx="6.5" cy="6.5" r="5" stroke="#F5F0E8" strokeWidth="1.5"/>
-                <path d="M10.5 10.5L14 14" stroke="#F5F0E8" strokeWidth="1.5" strokeLinecap="round"/>
-              </svg>
-              <input
-                type="text"
-                placeholder="Search businesses..."
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                style={{width:'100%', padding:'12px 14px 12px 40px', background:'rgba(255,255,255,0.08)', border:'1px solid rgba(255,255,255,0.12)', borderRadius:10, fontSize:14, color:'#F5F0E8', outline:'none', fontFamily:'inherit'}}
-              />
-            </div>
+
           </div>
         </div>
 
@@ -132,10 +125,10 @@ export default function Browse() {
           {!loading && filtered.length === 0 && (
             <div style={{textAlign:'center', padding:'80px 0'}}>
               <p style={{fontSize:16, fontWeight:600, color:'#374151', marginBottom:8}}>
-                {search ? 'No results found' : 'No memberships available yet'}
+                'No memberships available yet'
               </p>
               <p style={{fontSize:14, color:'#9CA3AF'}}>
-                {search ? 'Try a different search term.' : 'Check back soon — businesses are joining Regly.'}
+                'Check back soon. Businesses are joining Regly.'
               </p>
             </div>
           )}
