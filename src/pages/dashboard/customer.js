@@ -140,7 +140,7 @@ export default function CustomerDashboard() {
       .eq('id', rest.id)
       .single()
     setSelected(fullRest || rest)
-    const { data } = await supabase.from('membership_tiers').select('*, perks_config').eq('restaurant_id', rest.id).neq('stripe_price_id', '').eq('is_paused', false).order('price_monthly')
+    const { data } = await supabase.from('membership_tiers').select('*, perks_config').eq('restaurant_id', rest.id).neq('stripe_price_id', '').order('price_monthly')
     setTiers(data || [])
     setTimeout(() => document.getElementById('tiers-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100)
   }
@@ -474,25 +474,12 @@ export default function CustomerDashboard() {
 
             <div style={{height:2, background:'linear-gradient(to right, #C0442B, transparent)', marginBottom:32, maxWidth:200}} />
 
-            {tiers.length === 0 && (
-              <div style={{textAlign:'center', padding:'40px 24px', background:'white', borderRadius:20, border:'1px solid #F3F4F6', boxShadow:'0 2px 12px rgba(0,0,0,0.04)'}}>
-                <div style={{width:48, height:48, background:'#F9FAFB', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 16px'}}>
-                  <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-                    <circle cx="11" cy="11" r="9" stroke="#9CA3AF" strokeWidth="1.5"/>
-                    <path d="M7.5 11H14.5" stroke="#9CA3AF" strokeWidth="1.5" strokeLinecap="round"/>
-                    <path d="M11 7.5V14.5" stroke="#9CA3AF" strokeWidth="1.5" strokeLinecap="round"/>
-                  </svg>
-                </div>
-                <p style={{fontSize:15, fontWeight:600, color:'#374151', marginBottom:6}}>Not currently accepting new members</p>
-                <p style={{fontSize:13, color:'#9CA3AF', lineHeight:1.6}}>This business has paused new memberships. Check back soon.</p>
-              </div>
-            )}
-
             <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(260px, 1fr))', gap:20}}>
               {tiers.map((tier, i) => {
                 const isThisTierActive  = !!activeSubForTier(tier.id)
                 const hasOtherActive    = !isThisTierActive && !!activeSubForRestaurant(selected.id)
                 const isPopular         = i === 1 && tiers.length >= 2
+                const isPaused          = tier.is_paused && !isThisTierActive
 
                 // Use perks_config (structured) if available, fall back to plain text
                 const perksConfig = tier.perks_config && tier.perks_config.length > 0
@@ -503,9 +490,15 @@ export default function CustomerDashboard() {
 
                 return (
                   <div key={tier.id} className="tier-card-new"
-                    style={{background: 'white', borderRadius:20, padding:'28px', border:`2px solid ${isThisTierActive ? '#059669' : isPopular ? '#C0442B' : '#F3F4F6'}`, boxShadow:'0 4px 24px rgba(0,0,0,0.08)', position:'relative', display:'flex', flexDirection:'column'}}>
+                    style={{background: isPaused ? '#FAFAFA' : 'white', borderRadius:20, padding:'28px', border:`2px solid ${isThisTierActive ? '#059669' : isPopular && !isPaused ? '#C0442B' : isPaused ? '#E5E7EB' : '#F3F4F6'}`, boxShadow:'0 4px 24px rgba(0,0,0,0.08)', opacity: isPaused ? 0.75 : 1, position:'relative', display:'flex', flexDirection:'column'}}>
 
-                    {isPopular && (
+                    {tier.is_paused && !isThisTierActive && (
+                      <div style={{position:'absolute', top:-13, left:'50%', transform:'translateX(-50%)', background:'#1A0A06', color:'#F5F0E8', fontSize:10, fontWeight:700, padding:'5px 14px', borderRadius:20, letterSpacing:'0.1em', textTransform:'uppercase', whiteSpace:'nowrap', zIndex:1}}>
+                        Limited Availability
+                      </div>
+                    )}
+
+                    {isPopular && !tier.is_paused && (
                       <div style={{position:'absolute', top:-13, left:'50%', transform:'translateX(-50%)', background:'linear-gradient(135deg, #C0442B, #8A2A14)', color:'white', fontSize:10, fontWeight:700, padding:'5px 14px', borderRadius:20, letterSpacing:'0.12em', textTransform:'uppercase', whiteSpace:'nowrap', boxShadow:'0 4px 12px rgba(192,68,43,0.4)'}}>
                         Most Popular
                       </div>
@@ -547,16 +540,24 @@ export default function CustomerDashboard() {
                     </div>
 
                     <button
-                      onClick={() => !isThisTierActive && handleSubscribe(tier)}
-                      disabled={subscribing === tier.id || isThisTierActive}
+                      onClick={() => !isThisTierActive && !tier.is_paused && handleSubscribe(tier)}
+                      disabled={subscribing === tier.id || isThisTierActive || tier.is_paused}
                       className="sub-btn"
                       style={{
-                        width:'100%', padding:'14px', borderRadius:12, fontSize:14, fontWeight:700, cursor: isThisTierActive ? 'default' : 'pointer', border:'none', letterSpacing:'0.02em', fontFamily:'inherit',
-                        background: isThisTierActive ? '#D1FAE5' : isPopular ? '#C0442B' : '#1A0A06',
-                        color: isThisTierActive ? '#059669' : isPopular ? '#1A0A06' : '#F9FAFB',
+                        width:'100%', padding:'14px', borderRadius:12, fontSize:14, fontWeight:700,
+                        cursor: isThisTierActive || tier.is_paused ? 'default' : 'pointer',
+                        border: tier.is_paused ? '1.5px solid #E5E7EB' : 'none',
+                        letterSpacing:'0.02em', fontFamily:'inherit',
+                        background: isThisTierActive ? '#D1FAE5' : tier.is_paused ? '#F9FAFB' : isPopular ? '#C0442B' : '#1A0A06',
+                        color: isThisTierActive ? '#059669' : tier.is_paused ? '#9CA3AF' : isPopular ? '#1A0A06' : '#F9FAFB',
                       }}>
-                      {isThisTierActive ? '✓ Current Plan' : hasOtherActive ? 'Switch Plan' : subscribing === tier.id ? 'Redirecting...' : 'Get Started'}
+                      {isThisTierActive ? '✓ Current Plan' : tier.is_paused ? 'Currently Not Accepting New Members' : hasOtherActive ? 'Switch Plan' : subscribing === tier.id ? 'Redirecting...' : 'Get Started'}
                     </button>
+                    {tier.is_paused && !isThisTierActive && (
+                      <p style={{fontSize:11, color:'#9CA3AF', textAlign:'center', marginTop:8, letterSpacing:'0.03em'}}>
+                        Check back soon — spots may open up.
+                      </p>
+                    )}
                   </div>
                 )
               })}
