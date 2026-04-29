@@ -67,6 +67,7 @@ export default function CustomerDashboard() {
   const [visitLog, setVisitLog] = useState([])
   const [loading, setLoading]             = useState(true)
   const [subscribing, setSubscribing]     = useState(null)
+  const [highlightTierId, setHighlightTierId] = useState(null)
   const [hoveredCard, setHoveredCard]     = useState(null)
 
   useEffect(() => { init() }, [])
@@ -94,6 +95,17 @@ export default function CustomerDashboard() {
       .eq('stripe_onboarding_complete', true)
       .order('name')
     setRestaurants(rests || [])
+
+    // Auto-select restaurant if coming from browse page with tier intent
+    const { tierId: intentTierId, restaurantId: intentRestaurantId } = router.query
+    if (intentRestaurantId && rests) {
+      const target = rests.find(r => r.id === intentRestaurantId)
+      if (target) {
+        // selectRestaurant is defined below — call after state settles
+        setTimeout(() => selectRestaurant(target, intentTierId), 100)
+      }
+    }
+
     const { data: subs } = await supabase
       .from('subscriptions')
       .select('*, restaurants(name), membership_tiers(name, price_monthly, perks, perks_config)')
@@ -132,7 +144,7 @@ export default function CustomerDashboard() {
     setLoading(false)
   }
 
-  async function selectRestaurant(rest) {
+  async function selectRestaurant(rest, autoTierId = null) {
     // Fetch full restaurant details including Connect status
     const { data: fullRest } = await supabase
       .from('restaurants')
@@ -142,6 +154,17 @@ export default function CustomerDashboard() {
     setSelected(fullRest || rest)
     const { data } = await supabase.from('membership_tiers').select('*, perks_config').eq('restaurant_id', rest.id).neq('stripe_price_id', '').order('price_monthly')
     setTiers(data || [])
+
+    // If coming from browse with a specific tier — scroll to tiers and highlight
+    if (autoTierId) {
+      setTimeout(() => {
+        document.getElementById('tiers-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        // Store the highlighted tier ID so the tier card can show a brief highlight ring
+        setHighlightTierId(autoTierId)
+        setTimeout(() => setHighlightTierId(null), 3000)
+      }, 300)
+    }
+
     setTimeout(() => document.getElementById('tiers-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100)
   }
 
