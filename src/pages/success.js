@@ -14,8 +14,12 @@ export default function Success() {
   }, [tier, restaurant, session_id])
 
   async function recordSubscription() {
+    try {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
+    // Verify customer role — merchants should not land here
+    const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle()
+    if (profile?.role !== 'customer') { router.push('/'); return }
 
     // Fetch tier info immediately for display
     const { data: tierData } = await supabase
@@ -40,6 +44,10 @@ export default function Success() {
       }
     }
     poll()
+    } catch (err) {
+      console.error('Success page error:', err.message)
+      setDone(true)
+    }
   }
 
   // Use perks_config if available, fall back to plain text
