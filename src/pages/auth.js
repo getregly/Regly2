@@ -6,7 +6,11 @@ import { supabase } from '../lib/supabase'
 export default function Auth() {
   const router = useRouter()
   const [role, setRole] = useState(router.query.role || 'customer')
-  const [mode, setMode] = useState('login')
+  const [mode, setMode] = useState(router.query.mode === 'signup' ? 'signup' : 'login')
+  const tierIntent = {
+    tierId: router.query.tierId || null,
+    restaurantId: router.query.restaurantId || null,
+  }
   const [form, setForm] = useState({ name: '', email: '', password: '', phone: '' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -17,13 +21,11 @@ export default function Auth() {
   const dash = isB ? '/dashboard/business' : '/dashboard/customer'
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
 
-  // Sync role from query param and auto-switch to signup for direct links
+  // Sync role and mode from query params
+  // When coming from browse page: mode=signup, role=customer are pre-set
   useState(() => {
-    if (router.query.role) {
-      setRole(router.query.role)
-      // If coming from a direct signup link, start in signup mode
-      if (router.query.mode === 'signup') setMode('signup')
-    }
+    if (router.query.role) setRole(router.query.role)
+    if (router.query.mode === 'signup') setMode('signup')
   }, [router.query.role, router.query.mode])
 
   async function handleSubmit(e) {
@@ -67,7 +69,12 @@ export default function Auth() {
         const { data: checkProfile } = await supabase
           .from('profiles').select('id, role').eq('id', signInData.user.id).maybeSingle()
 
-                router.push(dash)
+        // If customer came from browse page with tier intent — go straight to checkout
+        if (checkProfile?.role === 'customer' && tierIntent.tierId && tierIntent.restaurantId) {
+          router.push(`/dashboard/customer?tierId=${tierIntent.tierId}&restaurantId=${tierIntent.restaurantId}`)
+          return
+        }
+        router.push(dash)
 
       } else {
         // LOGIN
@@ -96,9 +103,11 @@ export default function Auth() {
         }
 
         // Route to correct dashboard based on actual profile role
-        // No role mismatch error — a single login works for both customers and merchants
         if (profile?.role === 'business') {
           router.push('/dashboard/business')
+        } else if (tierIntent.tierId && tierIntent.restaurantId) {
+          // Customer came from browse with tier intent — go straight to that tier
+          router.push(`/dashboard/customer?tierId=${tierIntent.tierId}&restaurantId=${tierIntent.restaurantId}`)
         } else {
           router.push('/dashboard/customer')
         }
