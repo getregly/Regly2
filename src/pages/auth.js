@@ -95,14 +95,13 @@ export default function Auth() {
           return
         }
 
-        // If profile exists but role doesn't match
-        if (profile && profile.role !== role) {
-          await supabase.auth.signOut()
-          const correctRole = profile.role === 'business' ? 'merchant' : 'customer'
-          throw new Error(`This account is registered as a ${correctRole}. Please switch the tab above.`)
+        // Route to correct dashboard based on actual profile role
+        // No role mismatch error — a single login works for both customers and merchants
+        if (profile?.role === 'business') {
+          router.push('/dashboard/business')
+        } else {
+          router.push('/dashboard/customer')
         }
-
-        router.push(dash)
       }
     } catch (err) {
       setError(err.message)
