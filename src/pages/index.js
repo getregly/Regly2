@@ -68,6 +68,12 @@ export default function Home() {
           <img src="/favicon.svg" width="20" height="24" alt="Regly" style={{display:"inline-block",verticalAlign:"middle"}}/><span style={{fontFamily:"'Playfair Display',Georgia,serif",fontWeight:700,fontStyle:'italic',fontSize:20,color:'#1A0A06',letterSpacing:'-0.01em'}}>Regly</span>
         </button>
         <div style={{display:'flex', alignItems:'center', gap:8}}>
+          <button onClick={() => router.push('/browse')}
+            style={{padding:'10px 20px', background:'none', color:'#1A0A06', border:'1.5px solid #E5E7EB', borderRadius:8, fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:'inherit', transition:'all 0.2s', marginRight:8}}
+            onMouseEnter={e => { e.currentTarget.style.borderColor='#1A0A06' }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor='#E5E7EB' }}>
+            Browse
+          </button>
           <button onClick={() => router.push('/auth')}
             style={{padding:'10px 20px', background:'#1A0A06', color:'#F5F0E8', border:'none', borderRadius:8, fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:'inherit', transition:'background 0.2s'}}
             onMouseEnter={e => e.currentTarget.style.background='#C0442B'}
@@ -97,7 +103,7 @@ export default function Home() {
             Regly is the membership platform for local businesses. Subscribe to the spots you already love and get real perks every time you walk in. Not points. Not punch cards. Actual value, instantly.
           </p>
           <div className="fade-up-3" style={{display:'flex', gap:12, flexWrap:'wrap'}}>
-            <button onClick={() => router.push('/auth?role=customer')}
+            <button onClick={() => router.push('/browse')}
               style={{display:'flex', alignItems:'center', gap:10, padding:'14px 28px', background:'#C0442B', color:'#1A0A06', border:'none', borderRadius:8, fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:'inherit', transition:'opacity 0.2s'}}
               onMouseEnter={e => e.currentTarget.style.opacity='0.88'}
               onMouseLeave={e => e.currentTarget.style.opacity='1'}>
@@ -354,7 +360,7 @@ export default function Home() {
           <p style={{fontSize:16, color:'#6B7280', fontWeight:300, lineHeight:1.7, marginBottom:40}}>
             Browse local businesses on Regly, choose a membership that fits how you already spend, and start getting real perks from day one.
           </p>
-          <button onClick={() => router.push('/auth?role=customer')}
+          <button onClick={() => router.push('/browse')}
             style={{display:'inline-flex', alignItems:'center', gap:10, padding:'16px 36px', background:'#1A0A06', color:'white', border:'none', borderRadius:8, fontSize:15, fontWeight:600, cursor:'pointer', fontFamily:'inherit', transition:'background 0.2s'}}
             onMouseEnter={e => e.currentTarget.style.background='#C0442B'}
             onMouseLeave={e => e.currentTarget.style.background='#1A0A06'}>
@@ -378,7 +384,7 @@ export default function Home() {
             </div>
             {[
               { heading:'Members', links:[
-                { label:'Browse memberships', href:'/auth?role=customer' },
+                { label:'Browse memberships', href:'/browse' },
                 { label:'Sign in', href:'/auth' },
                 { label:'Create account', href:'/auth' },
                 { label:'Customer terms', href:'/terms' },
