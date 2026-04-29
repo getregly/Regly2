@@ -1,0 +1,295 @@
+// src/pages/browse.js
+// Public browse page — no auth required
+// Shows all live restaurants and their membership tiers
+// Clicking a tier prompts login/signup then goes straight to checkout
+
+import Head from 'next/head'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/router'
+import { supabase } from '../lib/supabase'
+
+export default function Browse() {
+  const router = useRouter()
+  const [restaurants, setRestaurants] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
+
+  useEffect(() => {
+    async function load() {
+      // Fetch all live restaurants with their approved, unpaused tiers
+      // RLS allows public SELECT on both tables — no auth needed
+      const { data: rests } = await supabase
+        .from('restaurants')
+        .select('id, name, address, city, description, image_url')
+        .eq('stripe_onboarding_complete', true)
+        .order('name')
+
+      if (!rests) { setLoading(false); return }
+
+      // Fetch tiers for all restaurants in one query
+      const { data: tiers } = await supabase
+        .from('membership_tiers')
+        .select('id, name, price_monthly, perks, perks_config, restaurant_id')
+        .in('restaurant_id', rests.map(r => r.id))
+        .neq('stripe_price_id', '')
+        .eq('is_paused', false)
+        .order('price_monthly')
+
+      // Attach tiers to restaurants, filter out restaurants with no live tiers
+      const enriched = rests
+        .map(r => ({
+          ...r,
+          tiers: (tiers || []).filter(t => t.restaurant_id === r.id)
+        }))
+        .filter(r => r.tiers.length > 0)
+
+      setRestaurants(enriched)
+      setLoading(false)
+    }
+    load()
+  }, [])
+
+  function handleTierClick(restaurant, tier) {
+    // Store intent in sessionStorage so auth page can pick it up after login/signup
+    sessionStorage.setItem('regly_tier_intent', JSON.stringify({
+      tierId: tier.id,
+      restaurantId: restaurant.id,
+      tierName: tier.name,
+      restaurantName: restaurant.name,
+      price: tier.price_monthly,
+    }))
+    // Go to auth in signup mode with customer role pre-selected
+    // Pass tier/restaurant as params for direct access
+    router.push(`/auth?mode=signup&role=customer&tierId=${tier.id}&restaurantId=${restaurant.id}`)
+  }
+
+  const filtered = restaurants.filter(r =>
+    r.name.toLowerCase().includes(search.toLowerCase()) ||
+    (r.city || '').toLowerCase().includes(search.toLowerCase())
+  )
+
+  return (
+    <>
+      <Head>
+        <title>Browse Memberships — Regly</title>
+        <meta name="description" content="Discover local business memberships in your area. Get exclusive perks and support the places you love." />
+      </Head>
+
+      <div style={{minHeight:'100vh', background:'#F5F0E8', fontFamily:"'Inter',system-ui,sans-serif"}}>
+
+        {/* ── NAV ────────────────────────────────────────────── */}
+        <nav style={{background:'white', borderBottom:'1px solid #F0EFEC', padding:'0 24px', height:64, display:'flex', alignItems:'center', justifyContent:'space-between', position:'sticky', top:0, zIndex:100}}>
+          <button onClick={() => router.push('/')}
+            style={{display:'flex', alignItems:'center', gap:10, background:'none', border:'none', cursor:'pointer', padding:0}}>
+            <img src="/favicon.svg" width="22" height="26" alt="Regly" style={{display:'inline-block', verticalAlign:'middle'}}/>
+            <span style={{fontFamily:"'Playfair Display',Georgia,serif", fontWeight:700, fontStyle:'italic', fontSize:20, color:'#1A0A06', letterSpacing:'-0.01em'}}>Regly</span>
+          </button>
+          <button onClick={() => router.push('/auth')}
+            style={{padding:'9px 20px', background:'#1A0A06', color:'#F5F0E8', border:'none', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer', fontFamily:'inherit'}}
+            onMouseEnter={e => e.currentTarget.style.background='#C0442B'}
+            onMouseLeave={e => e.currentTarget.style.background='#1A0A06'}>
+            Log in
+          </button>
+        </nav>
+
+        {/* ── HEADER ─────────────────────────────────────────── */}
+        <div style={{background:'#1A0A06', padding:'56px 24px 48px'}}>
+          <div style={{maxWidth:860, margin:'0 auto'}}>
+            <p style={{fontSize:11, fontWeight:700, color:'#C0442B', letterSpacing:'0.2em', textTransform:'uppercase', marginBottom:12}}>Memberships</p>
+            <h1 style={{fontFamily:"'Playfair Display',Georgia,serif", fontWeight:700, fontStyle:'italic', fontSize:'clamp(32px,5vw,52px)', color:'#F5F0E8', marginBottom:16, letterSpacing:'-0.02em', lineHeight:1.15}}>
+              Support the places<br/>you already love.
+            </h1>
+            <p style={{fontSize:16, color:'rgba(245,240,232,0.6)', maxWidth:480, lineHeight:1.65, marginBottom:32, fontWeight:300}}>
+              Subscribe to local business memberships and get real perks on every visit.
+            </p>
+
+            {/* Search */}
+            <div style={{position:'relative', maxWidth:400}}>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{position:'absolute', left:14, top:'50%', transform:'translateY(-50%)', opacity:0.4}}>
+                <circle cx="6.5" cy="6.5" r="5" stroke="#F5F0E8" strokeWidth="1.5"/>
+                <path d="M10.5 10.5L14 14" stroke="#F5F0E8" strokeWidth="1.5" strokeLinecap="round"/>
+              </svg>
+              <input
+                type="text"
+                placeholder="Search businesses..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                style={{width:'100%', padding:'12px 14px 12px 40px', background:'rgba(255,255,255,0.08)', border:'1px solid rgba(255,255,255,0.12)', borderRadius:10, fontSize:14, color:'#F5F0E8', outline:'none', fontFamily:'inherit'}}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* ── CONTENT ────────────────────────────────────────── */}
+        <div style={{maxWidth:860, margin:'0 auto', padding:'40px 24px 80px'}}>
+
+          {loading && (
+            <div style={{textAlign:'center', padding:'80px 0', color:'#9CA3AF', fontSize:14}}>
+              Loading memberships...
+            </div>
+          )}
+
+          {!loading && filtered.length === 0 && (
+            <div style={{textAlign:'center', padding:'80px 0'}}>
+              <p style={{fontSize:16, fontWeight:600, color:'#374151', marginBottom:8}}>
+                {search ? 'No results found' : 'No memberships available yet'}
+              </p>
+              <p style={{fontSize:14, color:'#9CA3AF'}}>
+                {search ? 'Try a different search term.' : 'Check back soon — businesses are joining Regly.'}
+              </p>
+            </div>
+          )}
+
+          {!loading && filtered.length > 0 && (
+            <div style={{display:'flex', flexDirection:'column', gap:24}}>
+              {filtered.map(restaurant => (
+                <RestaurantCard
+                  key={restaurant.id}
+                  restaurant={restaurant}
+                  onTierClick={handleTierClick}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+      </div>
+    </>
+  )
+}
+
+function RestaurantCard({ restaurant, onTierClick }) {
+  const [expanded, setExpanded] = useState(true)
+
+  return (
+    <div style={{background:'white', borderRadius:20, overflow:'hidden', boxShadow:'0 2px 16px rgba(0,0,0,0.07)'}}>
+
+      {/* Restaurant header */}
+      <div style={{padding:'24px 28px', display:'flex', alignItems:'center', justifyContent:'space-between', borderBottom:'1px solid #F3F4F6', cursor:'pointer'}}
+        onClick={() => setExpanded(e => !e)}>
+        <div style={{display:'flex', alignItems:'center', gap:16}}>
+          {/* Initial avatar */}
+          <div style={{width:48, height:48, background:'#C0442B', borderRadius:14, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0}}>
+            <span style={{fontFamily:"'Playfair Display',Georgia,serif", fontWeight:700, fontSize:22, color:'#F5F0E8'}}>
+              {restaurant.name.charAt(0)}
+            </span>
+          </div>
+          <div>
+            <h2 style={{fontSize:18, fontWeight:700, color:'#1A0A06', margin:0, letterSpacing:'-0.01em'}}>
+              {restaurant.name}
+            </h2>
+            {(restaurant.address || restaurant.city) && (
+              <p style={{fontSize:13, color:'#9CA3AF', margin:'3px 0 0', display:'flex', alignItems:'center', gap:4}}>
+                <svg width="11" height="13" viewBox="0 0 110 132" fill="none" style={{opacity:0.5}}>
+                  <path d="M55 3C27 3 5 25 5 53C5 81 55 129 55 129C55 129 105 81 105 53C105 25 83 3 55 3Z" fill="#9CA3AF"/>
+                </svg>
+                {[restaurant.address, restaurant.city].filter(Boolean).join(', ')}
+              </p>
+            )}
+          </div>
+        </div>
+        <div style={{display:'flex', alignItems:'center', gap:10}}>
+          <span style={{fontSize:12, color:'#9CA3AF'}}>
+            {restaurant.tiers.length} tier{restaurant.tiers.length !== 1 ? 's' : ''}
+          </span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+            style={{transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)', transition:'transform 0.2s'}}>
+            <path d="M4 6L8 10L12 6" stroke="#9CA3AF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      {/* Description */}
+      {expanded && restaurant.description && (
+        <div style={{padding:'16px 28px 0', borderBottom:'none'}}>
+          <p style={{fontSize:13, color:'#6B7280', lineHeight:1.65, margin:0}}>{restaurant.description}</p>
+        </div>
+      )}
+
+      {/* Tier cards */}
+      {expanded && (
+        <div style={{padding:'16px 28px 24px', display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(220px,1fr))', gap:14}}>
+          {restaurant.tiers.map((tier, i) => (
+            <TierCard
+              key={tier.id}
+              tier={tier}
+              isPopular={i === 1 && restaurant.tiers.length >= 2}
+              onSelect={() => onTierClick(restaurant, tier)}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function TierCard({ tier, isPopular, onSelect }) {
+  // Parse perks
+  const perks = tier.perks_config && tier.perks_config.length > 0
+    ? tier.perks_config
+    : (tier.perks || '').split('|').map(p => ({ description: p.trim() })).filter(p => p.description)
+
+  return (
+    <div style={{
+      border: isPopular ? '2px solid #C0442B' : '1.5px solid #F3F4F6',
+      borderRadius:14,
+      overflow:'hidden',
+      display:'flex',
+      flexDirection:'column',
+      position:'relative',
+    }}>
+
+      {/* Popular badge */}
+      {isPopular && (
+        <div style={{position:'absolute', top:-1, left:'50%', transform:'translateX(-50%)', background:'#C0442B', color:'#F5F0E8', fontSize:9, fontWeight:700, padding:'4px 12px', borderRadius:'0 0 8px 8px', letterSpacing:'0.1em', textTransform:'uppercase', whiteSpace:'nowrap'}}>
+          Most Popular
+        </div>
+      )}
+
+      {/* Tier info */}
+      <div style={{padding:'20px 18px 14px'}}>
+        <p style={{fontSize:14, fontWeight:700, color:'#1A0A06', marginBottom:4}}>{tier.name.replace(/^.* - /, '')}</p>
+        <p style={{fontSize:24, fontWeight:700, color:'#1A0A06', fontFamily:"'Playfair Display',Georgia,serif", marginBottom:14}}>
+          ${tier.price_monthly}<span style={{fontSize:12, fontWeight:400, color:'#9CA3AF'}}>/mo</span>
+        </p>
+
+        {/* Perks list */}
+        <div style={{display:'flex', flexDirection:'column', gap:7}}>
+          {perks.slice(0, 4).map((perk, i) => (
+            <div key={i} style={{display:'flex', alignItems:'flex-start', gap:8}}>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" style={{flexShrink:0, marginTop:1}}>
+                <circle cx="7" cy="7" r="6" fill="#C0442B" opacity="0.12"/>
+                <path d="M4 7L6 9L10 5" stroke="#C0442B" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span style={{fontSize:12, color:'#4B5563', lineHeight:1.5}}>
+                {perk.description}
+                {perk.type === 'limited' && perk.limit && (
+                  <span style={{color:'#9CA3AF'}}> ({perk.limit}x/month)</span>
+                )}
+              </span>
+            </div>
+          ))}
+          {perks.length > 4 && (
+            <p style={{fontSize:11, color:'#9CA3AF', margin:0}}>+{perks.length - 4} more perks</p>
+          )}
+        </div>
+      </div>
+
+      {/* CTA */}
+      <div style={{padding:'0 18px 18px', marginTop:'auto'}}>
+        <button onClick={onSelect}
+          style={{
+            width:'100%', padding:'11px', borderRadius:9,
+            background: isPopular ? '#C0442B' : '#1A0A06',
+            color: isPopular ? '#F5F0E8' : '#F5F0E8',
+            border:'none', fontSize:13, fontWeight:700,
+            cursor:'pointer', fontFamily:'inherit', letterSpacing:'0.02em',
+          }}
+          onMouseEnter={e => e.currentTarget.style.opacity='0.88'}
+          onMouseLeave={e => e.currentTarget.style.opacity='1'}>
+          Get Started
+        </button>
+      </div>
+    </div>
+  )
+}
