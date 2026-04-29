@@ -18,7 +18,7 @@ export default function Browse() {
       // Fetch all restaurants with full detail for debugging
       const { data: rests, error: restErr } = await supabase
         .from('restaurants')
-        .select('id, name, address, city, description, image_url, stripe_onboarding_complete')
+        .select('id, name, address, city, description, stripe_onboarding_complete')
         .order('name')
 
       console.log('Browse: restaurants raw:', rests, 'error:', restErr)
