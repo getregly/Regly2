@@ -15,28 +15,45 @@ export default function Browse() {
 
   useEffect(() => {
     async function load() {
-      // Fetch all live restaurants with their approved, unpaused tiers
-      // RLS allows public SELECT on both tables — no auth needed
-      const { data: rests } = await supabase
+      // Fetch all restaurants with full detail for debugging
+      const { data: rests, error: restErr } = await supabase
         .from('restaurants')
         .select('id, name, address, city, description, image_url, stripe_onboarding_complete')
         .order('name')
 
+      console.log('Browse: restaurants raw:', rests, 'error:', restErr)
+
       if (!rests || rests.length === 0) { setLoading(false); return }
 
-      // Filter to only fully live restaurants — handle boolean or string true
+      // Filter to only fully live restaurants
       const liveRests = rests.filter(r =>
         r.stripe_onboarding_complete === true || r.stripe_onboarding_complete === 'true'
       )
 
-      if (liveRests.length === 0) { setLoading(false); return }
+      console.log('Browse: liveRests:', liveRests)
+
+      if (liveRests.length === 0) {
+        // Show all restaurants anyway in dev so we can see data
+        // Remove this block before going live
+        console.log('Browse: no live restaurants — showing all for debug')
+        const { data: allTiers } = await supabase
+          .from('membership_tiers')
+          .select('id, name, price_monthly, perks, perks_config, restaurant_id, stripe_price_id, is_paused')
+          .in('restaurant_id', rests.map(r => r.id))
+          .order('price_monthly')
+        console.log('Browse: all tiers:', allTiers)
+        setLoading(false)
+        return
+      }
 
       // Fetch tiers for all restaurants in one query
-      const { data: tiers } = await supabase
+      const { data: tiers, error: tierErr } = await supabase
         .from('membership_tiers')
         .select('id, name, price_monthly, perks, perks_config, restaurant_id, stripe_price_id, is_paused')
         .in('restaurant_id', liveRests.map(r => r.id))
         .order('price_monthly')
+
+      console.log('Browse: tiers raw:', tiers, 'error:', tierErr)
 
       // Attach tiers to restaurants
       // Filter tiers in JS: approved (has stripe_price_id) and not paused
@@ -52,6 +69,7 @@ export default function Browse() {
         }))
         .filter(r => r.tiers.length > 0)
 
+      console.log('Browse: enriched:', enriched)
       setRestaurants(enriched)
       setLoading(false)
     }
