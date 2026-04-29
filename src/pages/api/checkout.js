@@ -64,7 +64,7 @@ export default async function handler(req, res) {
       })
     }
 
-    // 4. Block if merchant has not finished onboarding
+    // 5. Block if merchant has not finished onboarding
     if (!restaurant.stripe_onboarding_complete) {
       return res.status(400).json({
         error: 'This business is still completing their payment setup.',
@@ -72,17 +72,8 @@ export default async function handler(req, res) {
       })
     }
 
-    // 5. Verify Stripe account capabilities
+    // 6. Verify Stripe account capabilities
     const account = await stripe.accounts.retrieve(restaurant.stripe_account_id)
-
-    console.log('Stripe account details:', JSON.stringify({
-      id: account.id,
-      type: account.type,
-      charges_enabled: account.charges_enabled,
-      payouts_enabled: account.payouts_enabled,
-      details_submitted: account.details_submitted,
-      capabilities: account.capabilities,
-    }))
 
     if (!account.charges_enabled || !account.payouts_enabled) {
       await supabase
@@ -128,7 +119,6 @@ export default async function handler(req, res) {
       { stripeAccount: restaurant.stripe_account_id }
     )
 
-    console.log('Connected price created:', connectedPrice.id)
 
     // 7. Create checkout session on the connected account
     // application_fee_amount is in cents — 15% of the subscription amount
@@ -150,7 +140,6 @@ export default async function handler(req, res) {
       { stripeAccount: restaurant.stripe_account_id }
     )
 
-    console.log('Checkout session created on connected account:', session.id)
     return res.status(200).json({ url: session.url })
 
   } catch (err) {
