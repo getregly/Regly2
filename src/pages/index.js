@@ -87,7 +87,7 @@ export default function Home() {
         <div style={{position:'absolute', inset:0, background:'linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.45) 50%, rgba(0,0,0,0.88) 100%)'}} />
 
         <div className="fade-up" style={{position:'relative', zIndex:10, maxWidth:1100, margin:'0 auto', padding: isMobile ? '0 24px 60px' : '0 40px 80px', width:'100%'}}>
-          <p style={{fontSize:11, letterSpacing:'0.25em', textTransform:'uppercase', color:'rgba(192,68,43,0.9)', fontWeight:600, marginBottom:20}}>Now in Chicago</p>
+          <p style={{fontSize:11, letterSpacing:'0.25em', textTransform:'uppercase', color:'rgba(192,68,43,0.9)', fontWeight:600, marginBottom:20}}>Built for local businesses</p>
           <h1 style={{fontFamily:'Georgia, serif', fontSize:'clamp(3rem, 7vw, 6.5rem)', fontWeight:700, color:'#FFFFFF', lineHeight:1.0, letterSpacing:'-0.02em', marginBottom:28, maxWidth:800}}>
             Your favorite spots,<br />
             <span style={{color:'#C0442B', fontStyle:'italic'}}>rewarding you</span><br />
@@ -117,7 +117,7 @@ export default function Home() {
           {[
             { n:'$0',        l:'Setup cost for businesses' },
             { n:'48 hrs',    l:'Average time to go live' },
-            { n:'85%',       l:'Revenue kept by the business' },
+            { n:'Low fee',   l:'Keep the majority of every membership' },
             { n:'No app',    l:'Required for customers' },
           ].map(s => (
             <div key={s.n} style={{textAlign:'center'}}>
@@ -162,7 +162,7 @@ export default function Home() {
               },
               {
                 n:'04', title:'Business gets paid monthly',
-                body:'Subscription revenue is collected automatically each month and deposited directly into the business bank account via Stripe. The business keeps 85% of every dollar.',
+                body:'Subscription revenue is collected automatically each month and deposited directly into the business bank account via Stripe. One simple fee — the business keeps the majority of every membership.',
                 img:'https://images.unsplash.com/photo-1559526324-593bc073d938?w=800&q=80&fit=crop',
                 dark: true,
               },
@@ -195,7 +195,7 @@ export default function Home() {
             <p style={{fontFamily:'Georgia, serif', fontSize:'clamp(1.6rem, 3.5vw, 2.8rem)', fontStyle:'italic', fontWeight:400, color:'#F5F0E8', lineHeight:1.3, marginBottom:20}}>
               "Your regulars are already there. Regly gives them a reason to never go anywhere else."
             </p>
-            <p style={{fontSize:12, letterSpacing:'0.2em', textTransform:'uppercase', color:'rgba(192,68,43,0.7)', fontWeight:600}}>Regly, Chicago</p>
+            <p style={{fontSize:12, letterSpacing:'0.2em', textTransform:'uppercase', color:'rgba(192,68,43,0.7)', fontWeight:600}}>Regly</p>
           </div>
         </div>
       </section>
@@ -329,7 +329,7 @@ export default function Home() {
             <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:12}}>
               {[
                 { n:'$0',     l:'Setup cost' },
-                { n:'85%',    l:'Revenue you keep' },
+                { n:'Simple', l:'One transparent fee' },
                 { n:'48 hrs', l:'Time to go live' },
                 { n:'Monthly',l:'Payouts via Stripe' },
               ].map(s => (
@@ -408,7 +408,7 @@ export default function Home() {
             ))}
           </div>
           <div style={{borderTop:'1px solid rgba(255,255,255,0.06)', paddingTop:24, display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:12}}>
-            <p style={{fontSize:12, color:'rgba(255,255,255,0.2)'}}>2026 Regly. Chicago, IL. All rights reserved.</p>
+            <p style={{fontSize:12, color:'rgba(255,255,255,0.2)'}}>2026 Regly. All rights reserved.</p>
             <div style={{display:'flex', gap:24}}>
               {[['Privacy', '/privacy'],['Terms', '/terms'],['Merchant Agreement', '/merchant-terms']].map(([l,h]) => (
                 <a key={l} href={h} style={{fontSize:12, color:'rgba(255,255,255,0.2)', textDecoration:'none', transition:'color 0.2s'}}
