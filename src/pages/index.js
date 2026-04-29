@@ -62,19 +62,17 @@ export default function Home() {
 
       {/* ── NAV ─────────────────────────────────────────────────── */}
       <nav className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${scrolled ? 'nav-blur' : ''}`}
-        style={{background: scrolled ? 'rgba(255,255,255,0.95)' : 'transparent', borderBottom: scrolled ? '1px solid #F3F4F6' : 'none', padding: isMobile ? '0 20px' : '0 40px', height:64, display:'flex', alignItems:'center', justifyContent:'space-between'}}>
+        style={{background: 'rgba(255,255,255,0.97)', borderBottom: '1px solid #F3F4F6', padding: isMobile ? '0 20px' : '0 40px', height:64, display:'flex', alignItems:'center', justifyContent:'space-between'}}>
         <button onClick={() => router.push('/')}
           style={{fontFamily:'Georgia, serif', fontSize:22, fontWeight:700, color:'#1A0A06', background:'none', border:'none', cursor:'pointer'}}>
           <svg width="20" height="24" viewBox="0 0 110 132" fill="none" style={{display:'inline-block',verticalAlign:'middle',marginRight:8}}><path d="M55 3C27 3 5 25 5 53C5 81 55 129 55 129C55 129 105 81 105 53C105 25 83 3 55 3Z" fill="#C0442B"/><path d="M38 76L38 22Q58 22 58 22Q78 22 78 38Q78 54 58 54L38 54M56 54L80 76" stroke="#F5F0E8" strokeWidth="9" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg><span style={{fontFamily:"'Playfair Display',Georgia,serif",fontWeight:700,fontStyle:'italic',fontSize:20,color:'#1A0A06',letterSpacing:'-0.01em'}}>Regly</span>
         </button>
         <div style={{display:'flex', alignItems:'center', gap:8}}>
-          <button onClick={() => router.push('/auth')} className="nav-link" style={{padding:'8px 16px'}}>Log in</button>
-          {!isMobile && <button onClick={() => router.push('/auth?role=business')} className="nav-link" style={{padding:'8px 16px'}}>For businesses</button>}
-          <button onClick={() => router.push('/auth?role=customer')}
-            style={{padding:'10px 18px', background:'#1A0A06', color:'white', border:'none', borderRadius:8, fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:'inherit', transition:'background 0.2s'}}
+          <button onClick={() => router.push('/auth')}
+            style={{padding:'10px 20px', background:'#1A0A06', color:'#F5F0E8', border:'none', borderRadius:8, fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:'inherit', transition:'background 0.2s'}}
             onMouseEnter={e => e.currentTarget.style.background='#C0442B'}
             onMouseLeave={e => e.currentTarget.style.background='#1A0A06'}>
-            Join free
+            Log in
           </button>
         </div>
       </nav>
