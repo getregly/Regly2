@@ -238,9 +238,11 @@ export default function Auth() {
 
               {mode === 'signup' && (
                 <div>
-                  <label style={{display:'block', fontSize:12, fontWeight:600, color:'#374151', marginBottom:6, letterSpacing:'0.03em'}}>Full name</label>
+                  <label style={{display:'block', fontSize:12, fontWeight:600, color:'#374151', marginBottom:6, letterSpacing:'0.03em'}}>
+                    {role === 'business' ? 'Your name' : 'Full name'}
+                  </label>
                   <input className="auth-input" type="text" value={form.name} onChange={e => set('name', e.target.value)} required
-                    placeholder="Your name"
+                    placeholder={role === 'business' ? 'Owner name' : 'Your name'}
                     onFocus={() => setFocusedField('name')} onBlur={() => setFocusedField(null)}
                     style={{width:'100%', padding:'12px 14px', border:`1.5px solid ${focusedField==='name' ? '#1A0A06' : '#E5E7EB'}`, borderRadius:10, fontSize:14, outline:'none', fontFamily:'inherit', color:'#1A0A06', transition:'border-color 0.2s'}}/>
                 </div>
@@ -262,13 +264,26 @@ export default function Auth() {
                   style={{width:'100%', padding:'12px 14px', border:`1.5px solid ${focusedField==='password' ? '#1A0A06' : '#E5E7EB'}`, borderRadius:10, fontSize:14, outline:'none', fontFamily:'inherit', color:'#1A0A06', transition:'border-color 0.2s'}}/>
               </div>
 
-              {mode === 'signup' && (
+              {mode === 'signup' && role === 'customer' && (
                 <div>
                   <label style={{display:'block', fontSize:12, fontWeight:600, color:'#374151', marginBottom:6, letterSpacing:'0.03em'}}>Phone number</label>
                   <input className="auth-input" type="tel" value={form.phone} onChange={e => set('phone', e.target.value)}
                     placeholder="Your phone number"
                     onFocus={() => setFocusedField('phone')} onBlur={() => setFocusedField(null)}
                     style={{width:'100%', padding:'12px 14px', border:`1.5px solid ${focusedField==='phone' ? '#1A0A06' : '#E5E7EB'}`, borderRadius:10, fontSize:14, outline:'none', fontFamily:'inherit', color:'#1A0A06', transition:'border-color 0.2s'}}/>
+                </div>
+              )}
+
+              {/* Business context note — explain what happens after signup */}
+              {mode === 'signup' && role === 'business' && (
+                <div style={{background:'#FFF8F7', border:'1px solid #FDDDD9', borderRadius:10, padding:'12px 14px', display:'flex', gap:10, alignItems:'flex-start'}}>
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{flexShrink:0, marginTop:1}}>
+                    <circle cx="8" cy="8" r="7" fill="#C0442B" opacity="0.15"/>
+                    <path d="M8 5V8.5M8 10.5V11" stroke="#C0442B" strokeWidth="1.5" strokeLinecap="round"/>
+                  </svg>
+                  <p style={{fontSize:12, color:'#92400E', lineHeight:1.6, margin:0}}>
+                    After creating your account you will complete your business details — including your name, address, and membership tiers — before going live.
+                  </p>
                 </div>
               )}
 
@@ -280,7 +295,7 @@ export default function Auth() {
 
               <button type="submit" disabled={loading} className="auth-btn"
                 style={{width:'100%', padding:'14px', background: loading ? '#D1D5DB' : '#1A0A06', color:'#F5F0E8', border:'none', borderRadius:10, fontSize:15, fontWeight:700, cursor: loading ? 'not-allowed' : 'pointer', fontFamily:'inherit', marginTop:4}}>
-                {loading ? 'Please wait...' : mode === 'login' ? 'Sign in' : role === 'business' ? 'Apply to join' : 'Create account'}
+                {loading ? 'Please wait...' : mode === 'login' ? 'Sign in' : role === 'business' ? 'Create business account' : 'Create account'}
               </button>
 
             </form>
