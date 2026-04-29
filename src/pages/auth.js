@@ -173,7 +173,7 @@ export default function Auth() {
           <div style={{position:'absolute', inset:0, background:'linear-gradient(135deg, rgba(10,9,6,0.7) 0%, rgba(10,9,6,0.4) 100%)'}} />
           <div style={{position:'absolute', inset:0, display:'flex', flexDirection:'column', justifyContent:'space-between', padding:'40px'}}>
             <button onClick={() => router.push('/')} style={{display:'inline-flex', alignItems:'center', gap:8, color:'rgba(245,240,232,0.8)', background:'none', border:'none', cursor:'pointer', fontSize:14, fontFamily:'Georgia, serif', fontWeight:700, letterSpacing:2}}>
-              <svg width="18" height="22" viewBox="0 0 110 132" fill="none" style={{display:'inline-block',verticalAlign:'middle',marginRight:6}}><path d="M55 3C27 3 5 25 5 53C5 81 55 129 55 129C55 129 105 81 105 53C105 25 83 3 55 3Z" fill="#C0442B"/><path d="M38 76L38 22Q58 22 58 22Q78 22 78 38Q78 54 58 54L38 54M56 54L80 76" stroke="#F5F0E8" strokeWidth="9" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg><span style={{fontFamily:"'Playfair Display',Georgia,serif",fontWeight:700,fontStyle:'italic',fontSize:20,letterSpacing:'-0.01em'}}>Regly</span>
+              <img src="/favicon.svg" width="18" height="21" alt="Regly" style={{display:"inline-block",verticalAlign:"middle"}}/><span style={{fontFamily:"'Playfair Display',Georgia,serif",fontWeight:700,fontStyle:'italic',fontSize:20,letterSpacing:'-0.01em'}}>Regly</span>
             </button>
             <div>
               <p style={{color:'rgba(201,168,76,0.8)', fontSize:11, letterSpacing:'0.3em', textTransform:'uppercase', marginBottom:16, fontFamily:'system-ui', fontWeight:600}}>
