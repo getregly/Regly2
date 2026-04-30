@@ -37,10 +37,10 @@ export default function Home() {
   return (
     <div style={{minHeight:'100vh', background:'#FFFFFF', fontFamily:"'Inter', system-ui, sans-serif", overflowX:'hidden'}}>
     <Head>
-      <title>Regly — Monthly Memberships for Local Businesses</title>
-      <meta name="description" content="Regly is the membership platform for local businesses. Offer monthly memberships to your regulars. They get real perks. You get paid every month." />
-      <meta property="og:title" content="Regly — Monthly Memberships for Local Businesses" />
-      <meta property="og:description" content="Regly is the membership platform for local businesses. Offer monthly memberships to your regulars. They get real perks. You get paid every month." />
+      <title>Regly — Memberships for the Places You Love</title>
+      <meta name="description" content="Regly lets you subscribe to the local businesses you love and get real perks every visit. No points. No punch cards. Actual value, instantly." />
+      <meta property="og:title" content="Regly — Memberships for the Places You Love" />
+      <meta property="og:description" content="Regly lets you subscribe to the local businesses you love and get real perks every visit. No points. No punch cards. Actual value, instantly." />
     </Head>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Inter:wght@300;400;500;600;700&display=swap');
@@ -121,10 +121,10 @@ export default function Home() {
       <section style={{background:'#1A0A06', padding:'32px 40px'}}>
         <div style={{maxWidth:1100, margin:'0 auto', display:'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: isMobile ? 24 : 32}}>
           {[
-            { n:'$0',        l:'Setup cost for businesses' },
-            { n:'48 hrs',    l:'Average time to go live' },
-            { n:'Low fee',   l:'Keep the majority of every membership' },
-            { n:'No app',    l:'Required for customers' },
+            { n:'Day one',   l:'Perks start from your first visit' },
+            { n:'No app',    l:'Required. Just your phone number' },
+            { n:'Unlimited', l:'Perks every single visit' },
+            { n:'Cancel',    l:'Anytime. No questions asked' },
           ].map(s => (
             <div key={s.n} style={{textAlign:'center'}}>
               <p style={{fontFamily:'Georgia, serif', fontSize:28, fontWeight:700, color:'#C0442B', marginBottom:4}}>{s.n}</p>
@@ -149,8 +149,8 @@ export default function Home() {
           <div style={{display:'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap:2}}>
             {[
               {
-                n:'01', title:'Business designs their membership',
-                body:'The business creates tiers with specific perks and a monthly price. Free items, discounts, secret menu access, reserved seating, anything they want. Regly handles everything else.',
+                n:'01', title:'Find a business you love,',
+                body:'Browse local businesses on Regly and see exactly what each membership includes before you commit. Perks, pricing, and everything in between.',
                 img:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80&fit=crop',
                 dark: true,
               },
@@ -167,8 +167,8 @@ export default function Home() {
                 dark: false,
               },
               {
-                n:'04', title:'Business gets paid monthly',
-                body:'Subscription revenue is collected automatically each month and deposited directly into the business bank account via Stripe. One simple fee — the business keeps the majority of every membership.',
+                n:'04', title:'Perks that reset automatically,',
+                body:'Your membership is automatically renewed and your perks reset each cycle. No action needed. Just show up and enjoy the benefits you signed up for.',
                 img:'https://images.unsplash.com/photo-1559526324-593bc073d938?w=800&q=80&fit=crop',
                 dark: true,
               },
@@ -213,8 +213,8 @@ export default function Home() {
             <div>
               <p style={{fontSize:11, letterSpacing:'0.25em', textTransform:'uppercase', color:'#C0442B', fontWeight:600, marginBottom:16}}>The possibilities</p>
               <h2 style={{fontFamily:'Georgia, serif', fontSize:'clamp(2rem, 4vw, 3.2rem)', fontWeight:700, color:'#1A0A06', lineHeight:1.1}}>
-                A membership can be<br />
-                <span style={{fontStyle:'italic', color:'#1A0A06'}}>anything you imagine.</span>
+                What could be<br />
+                <span style={{fontStyle:'italic', color:'#1A0A06'}}>waiting for you.</span>
               </h2>
             </div>
             <div style={{paddingTop:8}}>
@@ -253,18 +253,18 @@ export default function Home() {
           <div style={{marginTop:48, padding: isMobile ? '32px 24px' : '48px', background:'#1A0A06', borderRadius:16, display:'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'flex-start' : 'center', justifyContent:'space-between', gap:32}}>
             <div>
               <h3 style={{fontFamily:'Georgia, serif', fontSize:28, fontWeight:700, color:'#F5F0E8', marginBottom:10}}>
-                Your membership. Your rules.<br />
-                <span style={{color:'#C0442B', fontStyle:'italic'}}>Make it irresistible.</span>
+                The places you love,<br />
+                <span style={{color:'#C0442B', fontStyle:'italic'}}>rewarding you back.</span>
               </h3>
               <p style={{fontSize:14, color:'rgba(255,255,255,0.5)', fontWeight:300, maxWidth:480, lineHeight:1.65}}>
                 Regly gives you the platform. You bring the creativity. Build a membership your regulars will talk about.
               </p>
             </div>
-            <button onClick={() => router.push('/auth?role=business')}
+            <button onClick={() => router.push('/browse')}
               style={{display:'flex', alignItems:'center', gap:10, padding:'14px 28px', background:'#C0442B', color:'#1A0A06', border:'none', borderRadius:8, fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:'inherit', whiteSpace:'nowrap', transition:'opacity 0.2s'}}
               onMouseEnter={e => e.currentTarget.style.opacity='0.88'}
               onMouseLeave={e => e.currentTarget.style.opacity='1'}>
-              Build my membership program <ArrowRight />
+              Browse memberships <ArrowRight />
             </button>
           </div>
         </div>
@@ -323,7 +323,7 @@ export default function Home() {
                 to <span style={{color:'#C0442B', fontStyle:'italic'}}>always choose you.</span>
               </h2>
               <p style={{fontSize:16, color:'rgba(245,240,232,0.55)', fontWeight:300, lineHeight:1.7, marginBottom:40, maxWidth:440}}>
-                Regly powers your membership program. You design the experience. Regly handles payments, member tracking, and monthly payouts directly to your bank. No hardware. No upfront cost. Live in 48 hours.
+                Regly powers your membership program. You design the experience. Regly handles payments, member tracking, and regular payouts directly to your bank. No hardware. No upfront cost. Live within 24 hours.
               </p>
               <button onClick={() => router.push('/auth?role=business')}
                 style={{display:'flex', alignItems:'center', gap:10, padding:'14px 28px', background:'#C0442B', color:'#1A0A06', border:'none', borderRadius:8, fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:'inherit', transition:'opacity 0.2s'}}
@@ -336,8 +336,8 @@ export default function Home() {
               {[
                 { n:'$0',     l:'Setup cost' },
                 { n:'Simple', l:'One transparent fee' },
-                { n:'48 hrs', l:'Time to go live' },
-                { n:'Monthly',l:'Payouts via Stripe' },
+                { n:'24 hrs', l:'Time to go live' },
+                { n:'Direct', l:'Payouts via Stripe' },
               ].map(s => (
                 <div key={s.n} style={{background:'rgba(255,255,255,0.04)', border:'1px solid rgba(192,68,43,0.15)', borderRadius:12, padding:'28px', textAlign:'center'}}>
                   <p style={{fontFamily:'Georgia, serif', fontSize:30, fontWeight:700, color:'#C0442B', marginBottom:6}}>{s.n}</p>
@@ -378,7 +378,7 @@ export default function Home() {
                 <img src="/favicon.svg" width="16" height="19" alt="Regly" style={{display:"inline-block",verticalAlign:"middle"}}/><span style={{fontFamily:"'Playfair Display',Georgia,serif",fontWeight:700,fontStyle:'italic',letterSpacing:'-0.01em'}}>Regly</span>
               </p>
               <p style={{fontSize:13, color:'rgba(255,255,255,0.35)', lineHeight:1.7, maxWidth:260, fontWeight:300, marginBottom:20}}>
-                Monthly memberships for the local businesses you already love.
+                Memberships for the local businesses you already love.
               </p>
               <a href="mailto:getregly@gmail.com" style={{fontSize:13, color:'#C0442B', textDecoration:'none'}}>getregly@gmail.com</a>
             </div>
