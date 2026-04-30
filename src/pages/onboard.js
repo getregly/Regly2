@@ -178,7 +178,7 @@ export default function Onboard() {
         <div style={{marginBottom:32}}>
           <p style={{color:'#C0442B', fontSize:11, letterSpacing:'0.3em', textTransform:'uppercase', fontWeight:600, marginBottom:6}}>Business Setup</p>
           <h1 style={{fontFamily:'Georgia, serif', fontSize:28, fontWeight:700, color:'#1A0A06', marginBottom:6}}>Set Up Your Business</h1>
-          <p style={{color:'#6B7280', fontSize:14}}>Reviewed and approved within 48 hours. No setup cost.</p>
+          <p style={{color:'#6B7280', fontSize:14}}>Reviewed and approved within 24 hours. No setup cost.</p>
         </div>
 
         <form onSubmit={handleSubmit} style={{display:'flex', flexDirection:'column', gap:20}}>
@@ -374,7 +374,7 @@ export default function Onboard() {
               <a href="/merchant-terms" target="_blank" style={{color:'#C0442B', fontWeight:600, textDecoration:'none'}}>
                 Regly Merchant Terms of Service
               </a>
-              {' '}including the 85/15 revenue split, monthly payouts via Stripe, and my obligation to honor all membership perks I define.
+              {' '}including the 85/15 revenue split, regular payouts via Stripe, and my obligation to honor all membership perks I define.
             </label>
           </div>
 
