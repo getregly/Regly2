@@ -667,7 +667,7 @@ export default function BusinessDashboard() {
                     </div>
                     <div style={{flex:1}}>
                       <p style={{fontSize:14, fontWeight:700, color:'#1A0A06', marginBottom:4}}>Set up payouts to go live</p>
-                      <p style={{fontSize:13, color:'#6B7280', marginBottom:16, lineHeight:1.6}}>Connect your bank account through Stripe to start receiving monthly payouts. Takes about 2 minutes. Your business will be immediately visible to customers once complete.</p>
+                      <p style={{fontSize:13, color:'#6B7280', marginBottom:16, lineHeight:1.6}}>Connect your bank account through Stripe to start receiving payouts. Takes about 2 minutes. Your business will be immediately visible to customers once complete.</p>
                       <div style={{display:'flex', alignItems:'center', gap:12, flexWrap:'wrap'}}>
                         <button onClick={startConnectOnboarding} disabled={connectLoading}
                           style={{padding:'12px 28px', background: connectLoading ? '#D1D5DB' : '#C0442B', color:'white', border:'none', borderRadius:10, fontSize:14, fontWeight:600, cursor: connectLoading ? 'not-allowed' : 'pointer', fontFamily:'inherit'}}>
@@ -713,7 +713,7 @@ export default function BusinessDashboard() {
                       <p style={{fontSize:12, color:'#9CA3AF', lineHeight:1.6}}>Members pay monthly and get their perks every visit. You look them up by phone number right here.</p>
                     </div>
 
-                    {/* Get paid monthly */}
+                    {/* Get paid regularly */}
                     <div style={{textAlign:'center', padding:'4px 0'}}>
                       <div style={{width:48, height:48, background:'#FFF0ED', borderRadius:14, display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 12px'}}>
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -723,8 +723,8 @@ export default function BusinessDashboard() {
                           <path d="M6 15H7M17 15H18" stroke="#C0442B" strokeWidth="1.5" strokeLinecap="round"/>
                         </svg>
                       </div>
-                      <p style={{fontSize:13, fontWeight:600, color:'#1A0A06', marginBottom:6}}>Get paid monthly</p>
-                      <p style={{fontSize:12, color:'#9CA3AF', lineHeight:1.6}}>85% of every subscription goes directly to your bank account on a monthly payout schedule.</p>
+                      <p style={{fontSize:13, fontWeight:600, color:'#1A0A06', marginBottom:6}}>Get paid regularly</p>
+                      <p style={{fontSize:12, color:'#9CA3AF', lineHeight:1.6}}>85% of every subscription goes directly to your bank account on a regular payout schedule.</p>
                     </div>
                   </div>
                 </div>
@@ -1301,7 +1301,7 @@ export default function BusinessDashboard() {
                           style={{padding:'10px 20px', background: savingTier || !newTier.name.trim() || !newTier.price ? '#D1D5DB' : '#1A0A06', color:'white', border:'none', borderRadius:8, fontSize:13, fontWeight:600, cursor: savingTier ? 'not-allowed' : 'pointer', fontFamily:'inherit'}}>
                           {savingTier ? 'Submitting...' : 'Submit for Review'}
                         </button>
-                        <p style={{fontSize:11, color:'#9CA3AF'}}>New tiers are reviewed by the Regly team. We will activate it within 48 hours.</p>
+                        <p style={{fontSize:11, color:'#9CA3AF'}}>New tiers are reviewed by the Regly team. We will activate it within 24 hours.</p>
                       </div>
 
                       {/* Submission feedback */}
@@ -1313,7 +1313,7 @@ export default function BusinessDashboard() {
                           </svg>
                           <div>
                             <p style={{fontSize:13, fontWeight:600, color:'#065F46', margin:0}}>Tier submitted for review</p>
-                            <p style={{fontSize:12, color:'#059669', margin:0, marginTop:2}}>The Regly team will review and activate your new tier within 48 hours.</p>
+                            <p style={{fontSize:12, color:'#059669', margin:0, marginTop:2}}>The Regly team will review and activate your new tier within 24 hours.</p>
                           </div>
                         </div>
                       )}
