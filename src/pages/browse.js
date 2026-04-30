@@ -21,8 +21,6 @@ export default function Browse() {
         .select('id, name, address, city, description, stripe_onboarding_complete')
         .order('name')
 
-      console.log('Browse: restaurants raw:', rests, 'error:', restErr)
-
       if (!rests || rests.length === 0) { setLoading(false); return }
 
       // Filter to only fully live restaurants
@@ -30,18 +28,14 @@ export default function Browse() {
         r.stripe_onboarding_complete === true || r.stripe_onboarding_complete === 'true'
       )
 
-      console.log('Browse: liveRests:', liveRests)
-
       if (liveRests.length === 0) {
         // Show all restaurants anyway in dev so we can see data
         // Remove this block before going live
-        console.log('Browse: no live restaurants — showing all for debug')
         const { data: allTiers } = await supabase
           .from('membership_tiers')
           .select('id, name, price_monthly, perks, perks_config, restaurant_id, stripe_price_id, is_paused')
           .in('restaurant_id', rests.map(r => r.id))
           .order('price_monthly')
-        console.log('Browse: all tiers:', allTiers)
         setLoading(false)
         return
       }
@@ -52,8 +46,6 @@ export default function Browse() {
         .select('id, name, price_monthly, perks, perks_config, restaurant_id, stripe_price_id, is_paused')
         .in('restaurant_id', liveRests.map(r => r.id))
         .order('price_monthly')
-
-      console.log('Browse: tiers raw:', tiers, 'error:', tierErr)
 
       // Attach tiers to restaurants
       // Filter tiers in JS: approved (has stripe_price_id) and not paused
@@ -68,8 +60,6 @@ export default function Browse() {
           )
         }))
         .filter(r => r.tiers.length > 0)
-
-      console.log('Browse: enriched:', enriched)
       setRestaurants(enriched)
       setLoading(false)
     }
@@ -274,9 +264,10 @@ function TierCard({ tier, isPopular, onSelect }) {
               </svg>
               <span style={{fontSize:12, color:'#4B5563', lineHeight:1.5}}>
                 {perk.description}
-                {perk.type === 'limited' && perk.limit && (
-                  <span style={{color:'#9CA3AF'}}> ({perk.limit}x/month)</span>
-                )}
+                {perk.type === 'limited' && perk.limit
+                  ? <span style={{color:'#9CA3AF'}}> ({perk.limit}x/month)</span>
+                  : <span style={{color:'#9CA3AF'}}> (unlimited)</span>
+                }
               </span>
             </div>
           ))}
