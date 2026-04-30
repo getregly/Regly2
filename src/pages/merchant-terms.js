@@ -94,7 +94,7 @@ Upon cancellation:
 • No new customer subscriptions will be accepted for your business
 • Existing active subscriber memberships will continue until their current billing period ends
 • You will continue to receive payouts for any revenue collected during active subscription periods
-• Your business listing will be removed from the Regly platform within 48 hours of cancellation confirmation`
+• Your business listing will be removed from the Regly platform within 24 hours of cancellation confirmation`
           },
           {
             n:'7', title:'Regly\'s Right to Remove a Merchant',
