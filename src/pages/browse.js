@@ -48,15 +48,15 @@ export default function Browse() {
         .order('price_monthly')
 
       // Attach tiers to restaurants
-      // Filter tiers in JS: approved (has stripe_price_id) and not paused
+      // Show approved tiers (has stripe_price_id) including paused ones
+      // Paused tiers show with Limited Availability badge like the member dashboard
       const enriched = liveRests
         .map(r => ({
           ...r,
           tiers: (tiers || []).filter(t =>
             t.restaurant_id === r.id &&
             t.stripe_price_id &&
-            t.stripe_price_id !== '' &&
-            !t.is_paused
+            t.stripe_price_id !== ''
           )
         }))
         .filter(r => r.tiers.length > 0)
@@ -225,6 +225,8 @@ function RestaurantCard({ restaurant, onTierClick }) {
 }
 
 function TierCard({ tier, isPopular, onSelect }) {
+  const isPaused = tier.is_paused
+
   // Parse perks
   const perks = tier.perks_config && tier.perks_config.length > 0
     ? tier.perks_config
@@ -232,16 +234,24 @@ function TierCard({ tier, isPopular, onSelect }) {
 
   return (
     <div style={{
-      border: isPopular ? '2px solid #C0442B' : '1.5px solid #F3F4F6',
+      border: isPaused ? '1.5px solid #E5E7EB' : isPopular ? '2px solid #C0442B' : '1.5px solid #F3F4F6',
       borderRadius:14,
       overflow:'hidden',
       display:'flex',
       flexDirection:'column',
       position:'relative',
+      opacity: isPaused ? 0.85 : 1,
     }}>
 
-      {/* Popular badge */}
-      {isPopular && (
+      {/* Limited Availability badge — paused tiers */}
+      {isPaused && (
+        <div style={{position:'absolute', top:-1, left:'50%', transform:'translateX(-50%)', background:'#1A0A06', color:'#F5F0E8', fontSize:9, fontWeight:700, padding:'4px 12px', borderRadius:'0 0 8px 8px', letterSpacing:'0.1em', textTransform:'uppercase', whiteSpace:'nowrap'}}>
+          Limited Availability
+        </div>
+      )}
+
+      {/* Popular badge — only when not paused */}
+      {isPopular && !isPaused && (
         <div style={{position:'absolute', top:-1, left:'50%', transform:'translateX(-50%)', background:'#C0442B', color:'#F5F0E8', fontSize:9, fontWeight:700, padding:'4px 12px', borderRadius:'0 0 8px 8px', letterSpacing:'0.1em', textTransform:'uppercase', whiteSpace:'nowrap'}}>
           Most Popular
         </div>
@@ -279,17 +289,21 @@ function TierCard({ tier, isPopular, onSelect }) {
 
       {/* CTA */}
       <div style={{padding:'0 18px 18px', marginTop:'auto'}}>
-        <button onClick={onSelect}
+        <button
+          onClick={isPaused ? undefined : onSelect}
+          disabled={isPaused}
           style={{
             width:'100%', padding:'11px', borderRadius:9,
-            background: isPopular ? '#C0442B' : '#1A0A06',
-            color: isPopular ? '#F5F0E8' : '#F5F0E8',
-            border:'none', fontSize:13, fontWeight:700,
-            cursor:'pointer', fontFamily:'inherit', letterSpacing:'0.02em',
+            background: isPaused ? '#F9FAFB' : isPopular ? '#C0442B' : '#1A0A06',
+            color: isPaused ? '#9CA3AF' : '#F5F0E8',
+            border: isPaused ? '1px solid #E5E7EB' : 'none',
+            fontSize:13, fontWeight:700,
+            cursor: isPaused ? 'default' : 'pointer',
+            fontFamily:'inherit', letterSpacing:'0.02em',
           }}
-          onMouseEnter={e => e.currentTarget.style.opacity='0.88'}
-          onMouseLeave={e => e.currentTarget.style.opacity='1'}>
-          Get Started
+          onMouseEnter={e => { if (!isPaused) e.currentTarget.style.opacity='0.88' }}
+          onMouseLeave={e => { if (!isPaused) e.currentTarget.style.opacity='1' }}>
+          {isPaused ? 'Currently Not Accepting New Members' : 'Get Started'}
         </button>
       </div>
     </div>
