@@ -1,0 +1,19 @@
+# Regly — robots.txt
+
+# Allow public pages to be indexed
+User-agent: *
+Allow: /
+Allow: /browse
+
+# Block all private, auth, dashboard, and admin routes
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /dashboard/customer
+Disallow: /dashboard/business
+Disallow: /auth
+Disallow: /onboard
+Disallow: /success
+Disallow: /api/
+
+# Sitemap
+Sitemap: https://getregly.com/sitemap.xml
