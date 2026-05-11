@@ -70,7 +70,56 @@ export default function CustomerDashboard() {
   const [highlightTierId, setHighlightTierId] = useState(null)
   const [hoveredCard, setHoveredCard]     = useState(null)
 
-  useEffect(() => { init() }, [])
+  useEffect(() => {
+    init()
+
+    // Real-time subscription — update perk usage immediately when merchant redeems a perk
+    // This means the customer sees remaining uses update live without refreshing
+    let channel
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return
+      channel = supabase
+        .channel('perk-usage-changes')
+        .on('postgres_changes', {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'perk_usage',
+        }, async () => {
+          // Re-fetch active subscriptions then refresh usage
+          const { data: subs } = await supabase
+            .from('subscriptions')
+            .select('id')
+            .eq('customer_id', user.id)
+            .in('status', ['active', 'past_due'])
+          if (subs && subs.length > 0) {
+            await refreshPerkUsage(subs.map(s => s.id))
+          }
+        })
+        .subscribe()
+    })
+
+    return () => {
+      if (channel) supabase.removeChannel(channel)
+    }
+  }, [])
+
+  // Standalone perk usage refresh — called on init and via real-time subscription
+  async function refreshPerkUsage(subIds) {
+    if (!subIds || subIds.length === 0) return
+    const billingMonth = new Date().toISOString().slice(0, 7)
+    const { data: usage } = await supabase
+      .from('perk_usage')
+      .select('subscription_id, perk_index')
+      .in('subscription_id', subIds)
+      .eq('billing_month', billingMonth)
+    const usageMap = {}
+    ;(usage || []).forEach(u => {
+      const key = u.subscription_id
+      if (!usageMap[key]) usageMap[key] = {}
+      usageMap[key][u.perk_index] = (usageMap[key][u.perk_index] || 0) + 1
+    })
+    setPerkUsageMap(usageMap)
+  }
 
   async function init() {
     const { data: { user: u } } = await supabase.auth.getUser()
@@ -119,18 +168,7 @@ export default function CustomerDashboard() {
     if (activeSubs.length > 0) {
       const billingMonth = new Date().toISOString().slice(0, 7)
       const subIds = activeSubs.map(s => s.id)
-      const { data: usage } = await supabase
-        .from('perk_usage')
-        .select('subscription_id, perk_index')
-        .in('subscription_id', subIds)
-        .eq('billing_month', billingMonth)
-      const usageMap = {}
-      ;(usage || []).forEach(u => {
-        const key = u.subscription_id
-        if (!usageMap[key]) usageMap[key] = {}
-        usageMap[key][u.perk_index] = (usageMap[key][u.perk_index] || 0) + 1
-      })
-      setPerkUsageMap(usageMap)
+      await refreshPerkUsage(subIds)
 
       // Fetch full visit log — all perk redemptions across all subscriptions
       const { data: log } = await supabase
