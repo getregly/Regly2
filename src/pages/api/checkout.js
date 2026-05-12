@@ -93,14 +93,15 @@ export default async function handler(req, res) {
     // on the connected account — not the platform account
     // We create a one-time price on the connected account for this session
 
-    // First retrieve the platform price to get the amount
+    // Retrieve the platform price to get amount and interval
     const platformPrice = await stripe.prices.retrieve(stripePriceId)
-    console.log('Platform price:', JSON.stringify({
-      id: platformPrice.id,
-      unit_amount: platformPrice.unit_amount,
-      currency: platformPrice.currency,
-      recurring: platformPrice.recurring,
-    }))
+
+    // unit_amount must be a valid positive integer (cents)
+    // In test mode it can sometimes come back null or as a float
+    const unitAmount = Math.round(Number(platformPrice.unit_amount))
+    if (!unitAmount || unitAmount <= 0) {
+      return res.status(400).json({ error: 'Invalid price amount on this tier. Please contact support.' })
+    }
 
     // Create a product on the connected account
     const connectedProduct = await stripe.products.create(
@@ -109,20 +110,23 @@ export default async function handler(req, res) {
     )
 
     // Create a price on the connected account
+    // Only pass interval and interval_count — not the full recurring object
+    // which contains read-only fields like usage_type that Stripe rejects
     const connectedPrice = await stripe.prices.create(
       {
         product: connectedProduct.id,
-        unit_amount: platformPrice.unit_amount,
-        currency: platformPrice.currency,
-        recurring: platformPrice.recurring,
+        unit_amount: unitAmount,
+        currency: platformPrice.currency || 'usd',
+        recurring: {
+          interval: platformPrice.recurring.interval,
+          interval_count: platformPrice.recurring.interval_count || 1,
+        },
       },
       { stripeAccount: restaurant.stripe_account_id }
     )
 
-
     // 7. Create checkout session on the connected account
-    // application_fee_amount is in cents — 15% of the subscription amount
-    const feeAmount = Math.round(platformPrice.unit_amount * (REGLY_FEE_PERCENT / 100))
+    const feeAmount = Math.round(unitAmount * (REGLY_FEE_PERCENT / 100))
 
     const session = await stripe.checkout.sessions.create(
       {
