@@ -30,7 +30,7 @@ export default async function handler(req, res) {
     const { data: { user }, error: authErr } = await supabase.auth.getUser(token)
     if (!user || authErr) return res.status(401).json({ error: 'Unauthorized' })
 
-    // 2. Fetch restaurant Stripe Connect details
+    // 2. Fetch restaurant Connect details
     const { data: restaurant, error: restErr } = await supabase
       .from('restaurants')
       .select('stripe_account_id, stripe_onboarding_complete, name')
@@ -39,24 +39,24 @@ export default async function handler(req, res) {
     if (restErr) throw restErr
 
     // 3. Verify tier exists and is not paused
-    const { data: tier, error: tierFetchErr } = await supabase
+    const { data: tier, error: tierErr } = await supabase
       .from('membership_tiers')
       .select('id, is_paused, stripe_price_id')
       .eq('id', tierId)
       .single()
 
-    if (tierFetchErr || !tier) {
+    if (tierErr || !tier) {
       return res.status(404).json({ error: 'Membership tier not found.' })
     }
 
     if (tier.is_paused) {
       return res.status(400).json({
-        error: 'This membership is not currently accepting new members. Please check back soon.',
+        error: 'This membership is not currently accepting new members.',
         code: 'TIER_PAUSED',
       })
     }
 
-    // 4. Block if merchant has no Connect account at all
+    // 4. Block if merchant has no Connect account
     if (!restaurant.stripe_account_id) {
       return res.status(400).json({
         error: 'This business has not completed payment setup yet.',
@@ -74,7 +74,6 @@ export default async function handler(req, res) {
 
     // 6. Verify Stripe account capabilities
     const account = await stripe.accounts.retrieve(restaurant.stripe_account_id)
-
     if (!account.charges_enabled || !account.payouts_enabled) {
       await supabase
         .from('restaurants')
@@ -88,61 +87,24 @@ export default async function handler(req, res) {
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://getregly.com'
 
-    // 6. For Express accounts use the correct Connect approach
-    // Express accounts require the price to be retrieved or created
-    // on the connected account — not the platform account
-    // We create a one-time price on the connected account for this session
-
-    // Retrieve the platform price to get amount and interval
-    const platformPrice = await stripe.prices.retrieve(stripePriceId)
-
-    // unit_amount must be a valid positive integer (cents)
-    // In test mode it can sometimes come back null or as a float
-    const unitAmount = Math.round(Number(platformPrice.unit_amount))
-    if (!unitAmount || unitAmount <= 0) {
-      return res.status(400).json({ error: 'Invalid price amount on this tier. Please contact support.' })
-    }
-
-    // Create a product on the connected account
-    const connectedProduct = await stripe.products.create(
-      { name: restaurant.name },
-      { stripeAccount: restaurant.stripe_account_id }
-    )
-
-    // Create a price on the connected account
-    // Only pass interval and interval_count — not the full recurring object
-    // which contains read-only fields like usage_type that Stripe rejects
-    const connectedPrice = await stripe.prices.create(
-      {
-        product: connectedProduct.id,
-        unit_amount: unitAmount,
-        currency: platformPrice.currency || 'usd',
-        recurring: {
-          interval: platformPrice.recurring.interval,
-          interval_count: platformPrice.recurring.interval_count || 1,
+    // 7. Create checkout session on the PLATFORM account
+    // Using transfer_data so the webhook fires on the platform and
+    // Stripe automatically splits the payment — 15% to Regly, 85% to merchant
+    const session = await stripe.checkout.sessions.create({
+      mode: 'subscription',
+      payment_method_types: ['card'],
+      line_items: [{ price: stripePriceId, quantity: 1 }],
+      success_url: `${appUrl}/success?tier=${tierId}&restaurant=${restaurantId}&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${appUrl}/dashboard/customer`,
+      metadata: { tierId, restaurantId, userId: user.id },
+      subscription_data: {
+        application_fee_percent: REGLY_FEE_PERCENT,
+        transfer_data: {
+          destination: restaurant.stripe_account_id,
         },
-      },
-      { stripeAccount: restaurant.stripe_account_id }
-    )
-
-    // 7. Create checkout session on the connected account
-    const feeAmount = Math.round(unitAmount * (REGLY_FEE_PERCENT / 100))
-
-    const session = await stripe.checkout.sessions.create(
-      {
-        mode: 'subscription',
-        payment_method_types: ['card'],
-        line_items: [{ price: connectedPrice.id, quantity: 1 }],
-        success_url: `${appUrl}/success?tier=${tierId}&restaurant=${restaurantId}&session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${appUrl}/dashboard/customer`,
         metadata: { tierId, restaurantId, userId: user.id },
-        subscription_data: {
-          application_fee_percent: REGLY_FEE_PERCENT,
-          metadata: { tierId, restaurantId, userId: user.id },
-        },
       },
-      { stripeAccount: restaurant.stripe_account_id }
-    )
+    })
 
     return res.status(200).json({ url: session.url })
 
