@@ -117,14 +117,19 @@ export default function CustomerDashboard() {
   async function refreshPerkUsage(subIds, subsWithPeriods) {
     if (!subIds || subIds.length === 0) return
 
-    // Fetch without billing_month filter — then filter in JS per subscription
-    // This handles multiple subscriptions that may have different billing dates
+    // Fetch ALL perk_usage rows for these subs — no month filter
     const { data: usage } = await supabase
       .from('perk_usage')
       .select('subscription_id, perk_index, billing_month')
       .in('subscription_id', subIds)
 
-    // Build a billing month map per subscription from current_period_end
+    console.log('[Regly] perk_usage rows fetched:', usage)
+    console.log('[Regly] subsWithPeriods:', subsWithPeriods?.map(s => ({
+      id: s.id,
+      current_period_end: s.current_period_end
+    })))
+
+    // Build billing month per subscription from current_period_end
     const billingMonthBySub = {}
     if (subsWithPeriods) {
       subsWithPeriods.forEach(sub => {
@@ -139,16 +144,21 @@ export default function CustomerDashboard() {
       })
     }
 
+    console.log('[Regly] billingMonthBySub:', billingMonthBySub)
+    console.log('[Regly] usage billing_months in DB:', (usage || []).map(u => u.billing_month))
+
     const usageMap = {}
     ;(usage || []).forEach(u => {
-      // Only count rows matching this subscription's billing period
       const expectedMonth = billingMonthBySub[u.subscription_id]
         || new Date().toISOString().slice(0, 7)
+      console.log('[Regly] row billing_month:', u.billing_month, 'expected:', expectedMonth, 'match:', u.billing_month === expectedMonth)
       if (u.billing_month !== expectedMonth) return
       const key = u.subscription_id
       if (!usageMap[key]) usageMap[key] = {}
       usageMap[key][u.perk_index] = (usageMap[key][u.perk_index] || 0) + 1
     })
+
+    console.log('[Regly] final usageMap:', usageMap)
     setPerkUsageMap(usageMap)
   }
 
