@@ -92,7 +92,16 @@ export default function CustomerDashboard() {
             .eq('customer_id', user.id)
             .in('status', ['active', 'past_due'])
           if (subs && subs.length > 0) {
-            await refreshPerkUsage(subs.map(s => s.id))
+            // Fetch full sub data including period end for billing month calc
+            const { data: fullSubs } = await supabase
+              .from('subscriptions')
+              .select('id, current_period_end')
+              .eq('customer_id', user.id)
+              .in('status', ['active', 'past_due'])
+            await refreshPerkUsage(
+              (fullSubs || subs).map(s => s.id),
+              fullSubs || subs
+            )
           }
         })
         .subscribe()
@@ -104,16 +113,38 @@ export default function CustomerDashboard() {
   }, [])
 
   // Standalone perk usage refresh — called on init and via real-time subscription
-  async function refreshPerkUsage(subIds) {
+  // Accepts subs array with current_period_end so billing month matches merchant
+  async function refreshPerkUsage(subIds, subsWithPeriods) {
     if (!subIds || subIds.length === 0) return
-    const billingMonth = new Date().toISOString().slice(0, 7)
+
+    // Fetch without billing_month filter — then filter in JS per subscription
+    // This handles multiple subscriptions that may have different billing dates
     const { data: usage } = await supabase
       .from('perk_usage')
-      .select('subscription_id, perk_index')
+      .select('subscription_id, perk_index, billing_month')
       .in('subscription_id', subIds)
-      .eq('billing_month', billingMonth)
+
+    // Build a billing month map per subscription from current_period_end
+    const billingMonthBySub = {}
+    if (subsWithPeriods) {
+      subsWithPeriods.forEach(sub => {
+        if (sub.current_period_end) {
+          const periodEnd = new Date(sub.current_period_end)
+          const periodStart = new Date(periodEnd)
+          periodStart.setMonth(periodStart.getMonth() - 1)
+          billingMonthBySub[sub.id] = periodStart.toISOString().slice(0, 7)
+        } else {
+          billingMonthBySub[sub.id] = new Date().toISOString().slice(0, 7)
+        }
+      })
+    }
+
     const usageMap = {}
     ;(usage || []).forEach(u => {
+      // Only count rows matching this subscription's billing period
+      const expectedMonth = billingMonthBySub[u.subscription_id]
+        || new Date().toISOString().slice(0, 7)
+      if (u.billing_month !== expectedMonth) return
       const key = u.subscription_id
       if (!usageMap[key]) usageMap[key] = {}
       usageMap[key][u.perk_index] = (usageMap[key][u.perk_index] || 0) + 1
@@ -168,7 +199,7 @@ export default function CustomerDashboard() {
     if (activeSubs.length > 0) {
       const billingMonth = new Date().toISOString().slice(0, 7)
       const subIds = activeSubs.map(s => s.id)
-      await refreshPerkUsage(subIds)
+      await refreshPerkUsage(subIds, activeSubs)
 
       // Fetch full visit log — all perk redemptions across all subscriptions
       const { data: log } = await supabase
