@@ -123,8 +123,6 @@ export default function CustomerDashboard() {
       .select('subscription_id, perk_index, billing_month')
       .in('subscription_id', subIds)
 
-    console.log('[Regly] perk_usage rows fetched:', usage)
-    console.log('[Regly] subsWithPeriods:', subsWithPeriods?.map(s => ({
       id: s.id,
       current_period_end: s.current_period_end
     })))
@@ -144,21 +142,16 @@ export default function CustomerDashboard() {
       })
     }
 
-    console.log('[Regly] billingMonthBySub:', billingMonthBySub)
-    console.log('[Regly] usage billing_months in DB:', (usage || []).map(u => u.billing_month))
 
     const usageMap = {}
     ;(usage || []).forEach(u => {
       const expectedMonth = billingMonthBySub[u.subscription_id]
         || new Date().toISOString().slice(0, 7)
-      console.log('[Regly] row billing_month:', u.billing_month, 'expected:', expectedMonth, 'match:', u.billing_month === expectedMonth)
       if (u.billing_month !== expectedMonth) return
       const key = u.subscription_id
       if (!usageMap[key]) usageMap[key] = {}
       usageMap[key][u.perk_index] = (usageMap[key][u.perk_index] || 0) + 1
     })
-
-    console.log('[Regly] final usageMap:', usageMap)
     setPerkUsageMap(usageMap)
   }
 
@@ -201,15 +194,12 @@ export default function CustomerDashboard() {
       .select('*, restaurants(name), membership_tiers(name, price_monthly, perks, perks_config)')
       .in('status', ['active', 'past_due'])
       .eq('customer_id', u.id)
-      .eq('status', 'active')
     const activeSubs = subs || []
     setMyMemberships(activeSubs)
 
     // Fetch perk usage for all active subs
-    console.log('[Regly] activeSubs:', activeSubs.map(s => ({ id: s.id, status: s.status, current_period_end: s.current_period_end })))
     if (activeSubs.length > 0) {
       const subIds = activeSubs.map(s => s.id)
-      console.log('[Regly] calling refreshPerkUsage with subIds:', subIds)
       await refreshPerkUsage(subIds, activeSubs)
 
       // Fetch full visit log — all perk redemptions across all subscriptions
