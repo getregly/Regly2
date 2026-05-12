@@ -238,8 +238,15 @@ export default function BusinessDashboard() {
       .eq('id', subs[0].tier_id)
       .single()
 
-    // Fetch perk usage for this subscription this billing month
-    const billingMonth = new Date().toISOString().slice(0, 7)
+    // Fetch perk usage using billing period (same logic as insert)
+    const _periodEnd = subs[0].current_period_end
+      ? new Date(subs[0].current_period_end)
+      : null
+    const _periodStart = _periodEnd ? new Date(_periodEnd) : null
+    if (_periodStart) _periodStart.setMonth(_periodStart.getMonth() - 1)
+    const billingMonth = _periodStart
+      ? _periodStart.toISOString().slice(0, 7)
+      : new Date().toISOString().slice(0, 7)
     const { data: usageData } = await supabase
       .from('perk_usage')
       .select('perk_index')
@@ -253,6 +260,7 @@ export default function BusinessDashboard() {
       stripeInfo,
       perksConfig,
       perkUsage: usageData || [],
+      billingMonth,
       cancel_at_period_end: subs[0].cancel_at_period_end || false,
       current_period_end: subs[0].current_period_end || null,
     })
@@ -263,20 +271,9 @@ export default function BusinessDashboard() {
     if (!lookup || !restaurant) return
     setLookup(prev => ({ ...prev, loggingPerk: perkIndex }))
 
-    // Use the subscription's actual billing period start as the month key
-    // This ensures perk resets align with the customer's billing date
-    // not the calendar month (e.g. a member who pays on the 15th
-    // gets their perks reset on the 15th, not the 1st)
-    let billingMonth
-    if (lookup.current_period_end) {
-      // current_period_end is end of this period, subtract 1 month to get start
-      const periodEnd = new Date(lookup.current_period_end)
-      const periodStart = new Date(periodEnd)
-      periodStart.setMonth(periodStart.getMonth() - 1)
-      billingMonth = periodStart.toISOString().slice(0, 7)
-    } else {
-      billingMonth = new Date().toISOString().slice(0, 7)
-    }
+    // Use the billingMonth already calculated during lookup
+    // Guarantees insert and fetch always use the same value
+    const billingMonth = lookup.billingMonth || new Date().toISOString().slice(0, 7)
     const { data: { user } } = await supabase.auth.getUser()
     const { error } = await supabase.from('perk_usage').insert({
       subscription_id: lookup.id,
