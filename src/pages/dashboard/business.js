@@ -275,6 +275,7 @@ export default function BusinessDashboard() {
     // Guarantees insert and fetch always use the same value
     const billingMonth = lookup.billingMonth || new Date().toISOString().slice(0, 7)
     const { data: { user } } = await supabase.auth.getUser()
+    console.log('[Regly] inserting perk_usage:', { subscription_id: lookup.id, billing_month: billingMonth, perk_index: perkIndex })
     const { error } = await supabase.from('perk_usage').insert({
       subscription_id: lookup.id,
       customer_id: lookup.customer_id,
@@ -285,6 +286,7 @@ export default function BusinessDashboard() {
       billing_month: billingMonth,
       logged_by: user?.id,
     })
+    console.log('[Regly] perk_usage insert result — error:', error)
     if (!error) {
       // Flash "Logged!" state
       setLookup(prev => ({
