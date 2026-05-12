@@ -123,10 +123,6 @@ export default function CustomerDashboard() {
       .select('subscription_id, perk_index, billing_month')
       .in('subscription_id', subIds)
 
-      id: s.id,
-      current_period_end: s.current_period_end
-    })))
-
     // Build billing month per subscription from current_period_end
     const billingMonthBySub = {}
     if (subsWithPeriods) {
