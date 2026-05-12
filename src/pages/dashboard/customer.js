@@ -205,10 +205,11 @@ export default function CustomerDashboard() {
     const activeSubs = subs || []
     setMyMemberships(activeSubs)
 
-    // Fetch perk usage for all active subs this billing month
+    // Fetch perk usage for all active subs
+    console.log('[Regly] activeSubs:', activeSubs.map(s => ({ id: s.id, status: s.status, current_period_end: s.current_period_end })))
     if (activeSubs.length > 0) {
-      const billingMonth = new Date().toISOString().slice(0, 7)
       const subIds = activeSubs.map(s => s.id)
+      console.log('[Regly] calling refreshPerkUsage with subIds:', subIds)
       await refreshPerkUsage(subIds, activeSubs)
 
       // Fetch full visit log — all perk redemptions across all subscriptions
