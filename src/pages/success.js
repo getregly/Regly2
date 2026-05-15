@@ -58,7 +58,7 @@ export default function Success() {
   })()
 
   return (
-    <div style={{minHeight:'100vh', background:'#F9FAFB', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'40px 24px', fontFamily:"'Inter', system-ui, sans-serif"}}>
+    <div style={{minHeight:'100vh', background:'#F5F0E8', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'40px 24px', fontFamily:"'DM Sans', system-ui, sans-serif"}}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap'); * { box-sizing: border-box; }`}</style>
 
       {/* Card */}
@@ -76,17 +76,17 @@ export default function Success() {
           You're a Regular!
         </h1>
         {info && (
-          <p style={{color:'#6B7280', fontSize:16, marginBottom:32}}>
+          <p style={{color:'#6A5A50', fontSize:16, marginBottom:32}}>
             Welcome to <span style={{color:'#1A0A06', fontWeight:600}}>{info.restaurants?.name}</span>
           </p>
         )}
 
         {/* Membership details */}
         {info && (
-          <div style={{background:'#F9FAFB', borderRadius:16, padding:'24px', textAlign:'left', marginBottom:24}}>
+          <div style={{background:'#F5F0E8', borderRadius:16, padding:'24px', textAlign:'left', marginBottom:24}}>
             <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:16, paddingBottom:16, borderBottom:'1px solid #F3F4F6'}}>
               <div>
-                <p style={{fontSize:11, color:'#9CA3AF', letterSpacing:'0.1em', textTransform:'uppercase', fontWeight:600, marginBottom:4}}>Your Plan</p>
+                <p style={{fontSize:11, color:'#8A7A6A', letterSpacing:'0.1em', textTransform:'uppercase', fontWeight:600, marginBottom:4}}>Your Plan</p>
                 <p style={{fontSize:18, fontFamily:'Georgia, serif', fontWeight:700, color:'#1A0A06'}}>{info.name}</p>
               </div>
               <div style={{width:40, height:40, background:'rgba(192,68,43,0.1)', borderRadius:10, display:'flex', alignItems:'center', justifyContent:'center'}}>
@@ -98,14 +98,14 @@ export default function Success() {
 
             {perks.length > 0 && (
               <div>
-                <p style={{fontSize:11, color:'#9CA3AF', letterSpacing:'0.1em', textTransform:'uppercase', fontWeight:600, marginBottom:12}}>Your Perks</p>
+                <p style={{fontSize:11, color:'#8A7A6A', letterSpacing:'0.1em', textTransform:'uppercase', fontWeight:600, marginBottom:12}}>Your Perks</p>
                 {perks.map((perk, i) => {
                   const isLimited = perk.type === 'limited'
                   return (
                     <div key={i} style={{display:'flex', alignItems:'center', justifyContent:'space-between', gap:10, marginBottom:10, padding:'10px 12px', background:'white', borderRadius:10, border:'1px solid #F3F4F6'}}>
                       <div style={{display:'flex', alignItems:'center', gap:10}}>
                         <div style={{width:8, height:8, borderRadius:'50%', background:'#C0442B', flexShrink:0}} />
-                        <span style={{fontSize:14, color:'#374151', lineHeight:1.5}}>{perk.description}</span>
+                        <span style={{fontSize:14, color:'#2A1A10', lineHeight:1.5}}>{perk.description}</span>
                       </div>
                       <span style={{
                         fontSize:10, fontWeight:700, padding:'3px 9px', borderRadius:20, whiteSpace:'nowrap', flexShrink:0,
@@ -147,13 +147,13 @@ export default function Success() {
           Go to My Dashboard
         </button>
 
-        <p style={{color:'#9CA3AF', fontSize:12, marginTop:16}}>
+        <p style={{color:'#8A7A6A', fontSize:12, marginTop:16}}>
           Manage or cancel anytime from your dashboard
         </p>
       </div>
 
       {/* Logo */}
-      <p style={{fontFamily:'Georgia, serif', fontSize:18, fontWeight:700, color:'#9CA3AF', marginTop:32}}>
+      <p style={{fontFamily:'Georgia, serif', fontSize:18, fontWeight:700, color:'#8A7A6A', marginTop:32}}>
         <span style={{fontFamily:"'Playfair Display',Georgia,serif",fontWeight:700,fontStyle:"italic",fontSize:"inherit",letterSpacing:"-0.01em"}}>Regly</span>
       </p>
     </div>
