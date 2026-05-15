@@ -122,7 +122,7 @@ export default function Auth() {
   const inputStyle = (field) => ({
     width: '100%', padding: '14px 16px',
     background: '#fff',
-    border: `1.5px solid ${focusedField === field ? '#C0442B' : '#E5E7EB'}`,
+    border: `1.5px solid ${focusedField === field ? '#C0442B' : '#E8E5DF'}`,
     borderRadius: 10, fontSize: 15, color: '#1A0A06', outline: 'none',
     transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
     boxShadow: focusedField === field ? '0 0 0 3px rgba(201,168,76,0.12)' : 'none',
@@ -131,7 +131,7 @@ export default function Auth() {
 
   if (businessSignedUp) {
     return (
-      <div style={{minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'#F9FAFB', padding:'24px', fontFamily:'system-ui, sans-serif'}}>
+      <div style={{minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'#FAFAF8', padding:'24px', fontFamily:'system-ui, sans-serif'}}>
         <div style={{background:'white', borderRadius:20, padding:'48px 40px', maxWidth:440, width:'100%', textAlign:'center', boxShadow:'0 4px 32px rgba(0,0,0,0.08)'}}>
           <div style={{width:64, height:64, background:'rgba(192,68,43,0.1)', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 24px'}}>
             <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
@@ -139,8 +139,8 @@ export default function Auth() {
             </svg>
           </div>
           <h2 style={{fontSize:24, fontWeight:700, color:'#1A0A06', marginBottom:8, fontFamily:'Georgia, serif'}}>Welcome to Regly</h2>
-          <p style={{color:'#6B7280', fontSize:15, lineHeight:1.6, marginBottom:24}}>Your account has been created. Our team will reach out shortly to get your business set up.</p>
-          <p style={{color:'#9CA3AF', fontSize:13, marginBottom:32}}>Questions? <span style={{color:'#C0442B'}}>getregly@gmail.com</span></p>
+          <p style={{color:'#6A5A50', fontSize:15, lineHeight:1.6, marginBottom:24}}>Your account has been created. Our team will reach out shortly to get your business set up.</p>
+          <p style={{color:'#8A7A6A', fontSize:13, marginBottom:32}}>Questions? <span style={{color:'#C0442B'}}>getregly@gmail.com</span></p>
           <button onClick={() => router.push('/dashboard/business')} style={{width:'100%', padding:'14px', background:'#C0442B', color:'#1A0A06', border:'none', borderRadius:10, fontSize:14, fontWeight:700, cursor:'pointer', letterSpacing:'0.05em', textTransform:'uppercase'}}>
             Go to My Dashboard
           </button>
@@ -150,7 +150,7 @@ export default function Auth() {
   }
 
   return (
-    <div style={{minHeight:'100vh', fontFamily:'system-ui, -apple-system, sans-serif', background:'#F9FAFB'}}>
+    <div style={{minHeight:'100vh', fontFamily:'system-ui, -apple-system, sans-serif', background:'#FAFAF8'}}>
     <Head>
       <title>Sign In — Regly</title>
       <meta name="description" content="Sign in or create your Regly account." />
@@ -200,7 +200,7 @@ export default function Auth() {
 
             {/* Back button */}
             <button onClick={() => router.push('/')} className="back-btn"
-              style={{display:'flex', alignItems:'center', gap:6, color:'#9CA3AF', background:'none', border:'none', cursor:'pointer', fontSize:14, marginBottom:32, padding:0, transition:'color 0.2s'}}>
+              style={{display:'flex', alignItems:'center', gap:6, color:'#8A7A6A', background:'none', border:'none', cursor:'pointer', fontSize:14, marginBottom:32, padding:0, transition:'color 0.2s'}}>
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                 <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
@@ -212,7 +212,7 @@ export default function Auth() {
               <p style={{fontSize:26, fontFamily:"'Playfair Display',Georgia,serif", fontWeight:700, fontStyle:'italic', color:'#1A0A06', marginBottom:6, letterSpacing:'-0.01em'}}>
                 {mode === 'login' ? 'Welcome back.' : 'Create your account.'}
               </p>
-              <p style={{color:'#6B7280', fontSize:14, lineHeight:1.6}}>
+              <p style={{color:'#6A5A50', fontSize:14, lineHeight:1.6}}>
                 {mode === 'login'
                   ? 'Sign in to access your Regly dashboard.'
                   : 'Join Regly and start building loyalty with your regulars.'}
@@ -222,15 +222,15 @@ export default function Auth() {
             {/* Role selection — signup only */}
             {mode === 'signup' && (
               <div style={{marginBottom:20}}>
-                <p style={{fontSize:12, fontWeight:600, color:'#6B7280', letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:10}}>I am a</p>
-                <div style={{display:'flex', background:'#F3F4F6', borderRadius:12, padding:4, gap:4}}>
+                <p style={{fontSize:12, fontWeight:600, color:'#6A5A50', letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:10}}>I am a</p>
+                <div style={{display:'flex', background:'#F0EFEC', borderRadius:12, padding:4, gap:4}}>
                   {['customer', 'business'].map(r => (
                     <button key={r} className="role-tab"
                       onClick={() => { setRole(r); setError('') }}
                       style={{
                         flex:1, padding:'10px', borderRadius:9, fontSize:14, fontWeight:600,
                         background: role === r ? 'white' : 'transparent',
-                        color: role === r ? '#1A0A06' : '#9CA3AF',
+                        color: role === r ? '#1A0A06' : '#8A7A6A',
                         boxShadow: role === r ? '0 1px 4px rgba(0,0,0,0.1)' : 'none',
                         fontFamily:'inherit',
                       }}>
@@ -246,39 +246,39 @@ export default function Auth() {
 
               {mode === 'signup' && (
                 <div>
-                  <label style={{display:'block', fontSize:12, fontWeight:600, color:'#374151', marginBottom:6, letterSpacing:'0.03em'}}>
+                  <label style={{display:'block', fontSize:12, fontWeight:600, color:'#2A1A10', marginBottom:6, letterSpacing:'0.03em'}}>
                     {role === 'business' ? 'Your name' : 'Full name'}
                   </label>
                   <input className="auth-input" type="text" value={form.name} onChange={e => set('name', e.target.value)} required
                     placeholder={role === 'business' ? 'Owner name' : 'Your name'}
                     onFocus={() => setFocusedField('name')} onBlur={() => setFocusedField(null)}
-                    style={{width:'100%', padding:'12px 14px', border:`1.5px solid ${focusedField==='name' ? '#1A0A06' : '#E5E7EB'}`, borderRadius:10, fontSize:14, outline:'none', fontFamily:'inherit', color:'#1A0A06', transition:'border-color 0.2s'}}/>
+                    style={{width:'100%', padding:'12px 14px', border:`1.5px solid ${focusedField==='name' ? '#1A0A06' : '#E8E5DF'}`, borderRadius:10, fontSize:14, outline:'none', fontFamily:'inherit', color:'#1A0A06', transition:'border-color 0.2s'}}/>
                 </div>
               )}
 
               <div>
-                <label style={{display:'block', fontSize:12, fontWeight:600, color:'#374151', marginBottom:6, letterSpacing:'0.03em'}}>Email address</label>
+                <label style={{display:'block', fontSize:12, fontWeight:600, color:'#2A1A10', marginBottom:6, letterSpacing:'0.03em'}}>Email address</label>
                 <input className="auth-input" type="email" value={form.email} onChange={e => set('email', e.target.value)} required
                   placeholder="you@example.com"
                   onFocus={() => setFocusedField('email')} onBlur={() => setFocusedField(null)}
-                  style={{width:'100%', padding:'12px 14px', border:`1.5px solid ${focusedField==='email' ? '#1A0A06' : '#E5E7EB'}`, borderRadius:10, fontSize:14, outline:'none', fontFamily:'inherit', color:'#1A0A06', transition:'border-color 0.2s'}}/>
+                  style={{width:'100%', padding:'12px 14px', border:`1.5px solid ${focusedField==='email' ? '#1A0A06' : '#E8E5DF'}`, borderRadius:10, fontSize:14, outline:'none', fontFamily:'inherit', color:'#1A0A06', transition:'border-color 0.2s'}}/>
               </div>
 
               <div>
-                <label style={{display:'block', fontSize:12, fontWeight:600, color:'#374151', marginBottom:6, letterSpacing:'0.03em'}}>Password</label>
+                <label style={{display:'block', fontSize:12, fontWeight:600, color:'#2A1A10', marginBottom:6, letterSpacing:'0.03em'}}>Password</label>
                 <input className="auth-input" type="password" value={form.password} onChange={e => set('password', e.target.value)} required
                   placeholder={mode === 'login' ? 'Your password' : 'Create a password'}
                   onFocus={() => setFocusedField('password')} onBlur={() => setFocusedField(null)}
-                  style={{width:'100%', padding:'12px 14px', border:`1.5px solid ${focusedField==='password' ? '#1A0A06' : '#E5E7EB'}`, borderRadius:10, fontSize:14, outline:'none', fontFamily:'inherit', color:'#1A0A06', transition:'border-color 0.2s'}}/>
+                  style={{width:'100%', padding:'12px 14px', border:`1.5px solid ${focusedField==='password' ? '#1A0A06' : '#E8E5DF'}`, borderRadius:10, fontSize:14, outline:'none', fontFamily:'inherit', color:'#1A0A06', transition:'border-color 0.2s'}}/>
               </div>
 
               {mode === 'signup' && role === 'customer' && (
                 <div>
-                  <label style={{display:'block', fontSize:12, fontWeight:600, color:'#374151', marginBottom:6, letterSpacing:'0.03em'}}>Phone number</label>
+                  <label style={{display:'block', fontSize:12, fontWeight:600, color:'#2A1A10', marginBottom:6, letterSpacing:'0.03em'}}>Phone number</label>
                   <input className="auth-input" type="tel" value={form.phone} onChange={e => set('phone', e.target.value)}
                     placeholder="Your phone number"
                     onFocus={() => setFocusedField('phone')} onBlur={() => setFocusedField(null)}
-                    style={{width:'100%', padding:'12px 14px', border:`1.5px solid ${focusedField==='phone' ? '#1A0A06' : '#E5E7EB'}`, borderRadius:10, fontSize:14, outline:'none', fontFamily:'inherit', color:'#1A0A06', transition:'border-color 0.2s'}}/>
+                    style={{width:'100%', padding:'12px 14px', border:`1.5px solid ${focusedField==='phone' ? '#1A0A06' : '#E8E5DF'}`, borderRadius:10, fontSize:14, outline:'none', fontFamily:'inherit', color:'#1A0A06', transition:'border-color 0.2s'}}/>
                 </div>
               )}
 
@@ -310,18 +310,18 @@ export default function Auth() {
 
             {/* Divider */}
             <div style={{display:'flex', alignItems:'center', gap:12, margin:'20px 0'}}>
-              <div style={{flex:1, height:'1px', background:'#F3F4F6'}}/>
+              <div style={{flex:1, height:'1px', background:'#F0EFEC'}}/>
               <span style={{fontSize:12, color:'#D1D5DB', fontWeight:500}}>
                 {mode === 'login' ? 'New to Regly?' : 'Already have an account?'}
               </span>
-              <div style={{flex:1, height:'1px', background:'#F3F4F6'}}/>
+              <div style={{flex:1, height:'1px', background:'#F0EFEC'}}/>
             </div>
 
             {/* Toggle mode */}
             <button onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError(''); setRole('customer') }}
               style={{width:'100%', padding:'13px', background:'white', color:'#1A0A06', border:'1.5px solid #E5E7EB', borderRadius:10, fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:'inherit', transition:'border-color 0.2s'}}
               onMouseEnter={e => e.currentTarget.style.borderColor='#1A0A06'}
-              onMouseLeave={e => e.currentTarget.style.borderColor='#E5E7EB'}>
+              onMouseLeave={e => e.currentTarget.style.borderColor='#E8E5DF'}>
               {mode === 'login' ? 'Create a free account' : 'Sign in instead'}
             </button>
 
