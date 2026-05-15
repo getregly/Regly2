@@ -35,7 +35,7 @@ export default function Home() {
   }, [])
 
   return (
-    <div style={{minHeight:'100vh', background:'#FFFFFF', fontFamily:"'Inter', system-ui, sans-serif", overflowX:'hidden'}}>
+    <div style={{minHeight:'100vh', background:'#FFFFFF', fontFamily:"'DM Sans', system-ui, sans-serif", overflowX:'hidden'}}>
     <Head>
       <title>Regly — Memberships for the Places You Love</title>
       <meta name="description" content="Regly lets you subscribe to the local businesses you love and get real perks every visit. No points. No punch cards. Actual value, instantly." />
@@ -71,7 +71,7 @@ export default function Home() {
           <button onClick={() => router.push('/browse')}
             style={{padding:'10px 20px', background:'none', color:'#1A0A06', border:'1.5px solid #E5E7EB', borderRadius:8, fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:'inherit', transition:'all 0.2s', marginRight:8}}
             onMouseEnter={e => { e.currentTarget.style.borderColor='#1A0A06' }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor='#E5E7EB' }}>
+            onMouseLeave={e => { e.currentTarget.style.borderColor='#E8E5DF' }}>
             Browse
           </button>
           <button onClick={() => router.push('/auth')}
@@ -218,7 +218,7 @@ export default function Home() {
               </h2>
             </div>
             <div style={{paddingTop:8}}>
-              <p style={{fontSize:16, color:'#6B7280', lineHeight:1.7, fontWeight:300}}>
+              <p style={{fontSize:16, color:'#6A5A50', lineHeight:1.7, fontWeight:300}}>
                 Every business on Regly designs their own membership from scratch. There are no templates and no boxes to fit into. The only limit is creativity. A few ideas to get you thinking:
               </p>
             </div>
@@ -302,7 +302,7 @@ export default function Home() {
               <div key={c.title} style={{padding:'36px', background: i === 1 ? '#1A0A06' : '#FAFAF8', borderRadius:16, border: i === 1 ? 'none' : '1px solid #F3F4F6'}}>
                 <div style={{width:4, height:32, background:'#C0442B', borderRadius:2, marginBottom:24}} />
                 <h3 style={{fontFamily:'Georgia, serif', fontSize:20, fontWeight:700, color: i === 1 ? '#F5F0E8' : '#1A0A06', marginBottom:14, lineHeight:1.3}}>{c.title}</h3>
-                <p style={{fontSize:14, color: i === 1 ? 'rgba(245,240,232,0.6)' : '#6B7280', lineHeight:1.7, fontWeight:300}}>{c.body}</p>
+                <p style={{fontSize:14, color: i === 1 ? 'rgba(245,240,232,0.6)' : '#6A5A50', lineHeight:1.7, fontWeight:300}}>{c.body}</p>
               </div>
             ))}
           </div>
@@ -357,7 +357,7 @@ export default function Home() {
             Your neighborhood spots.<br />
             <span style={{fontStyle:'italic', color:'#1A0A06'}}>Waiting for you.</span>
           </h2>
-          <p style={{fontSize:16, color:'#6B7280', fontWeight:300, lineHeight:1.7, marginBottom:40}}>
+          <p style={{fontSize:16, color:'#6A5A50', fontWeight:300, lineHeight:1.7, marginBottom:40}}>
             Browse local businesses on Regly, choose a membership that fits how you already spend, and start getting real perks from day one.
           </p>
           <button onClick={() => router.push('/browse')}
