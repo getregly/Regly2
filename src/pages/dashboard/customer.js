@@ -51,7 +51,7 @@ function getCardAccent(type) {
     record:   { bg:'#1A0A06', accent:'#C0442B', light:'#1A1410' },
     smoothie: { bg:'#F0FDF4', accent:'#059669', light:'#D1FAE5' },
     bakery:   { bg:'#FDF4FF', accent:'#9333EA', light:'#F3E8FF' },
-    default:  { bg:'#F9FAFB', accent:'#374151', light:'#F3F4F6' },
+    default:  { bg:'#FAFAF8', accent:'#2A1A10', light:'#F0EFEC' },
   }
   return map[type] || map.default
 }
@@ -299,16 +299,16 @@ export default function CustomerDashboard() {
   const hasNoMemberships = myMemberships.length === 0
 
   if (loading) return (
-    <div style={{minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'#F9FAFB'}}>
+    <div style={{minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'#FAFAF8'}}>
       <div style={{textAlign:'center'}}>
         <p style={{fontFamily:'Georgia, serif', fontSize:28, fontWeight:700, color:'#1A0A06', marginBottom:8}}><span style={{fontFamily:"'Playfair Display',Georgia,serif",fontWeight:700,fontStyle:"italic",fontSize:"inherit",letterSpacing:"-0.01em"}}>Regly</span></p>
-        <p style={{color:'#9CA3AF', fontSize:14}}>Loading your memberships...</p>
+        <p style={{color:'#8A7A6A', fontSize:14}}>Loading your memberships...</p>
       </div>
     </div>
   )
 
   return (
-    <div style={{minHeight:'100vh', background:'#F9FAFB', fontFamily:"'Inter', system-ui, sans-serif"}}>
+    <div style={{minHeight:'100vh', background:'#F5F0E8', fontFamily:"'DM Sans', system-ui, sans-serif"}}>
     <Head>
       <title>My Memberships — Regly</title>
       <meta name="description" content="Manage your Regly memberships and browse local businesses." />
@@ -331,17 +331,17 @@ export default function CustomerDashboard() {
       `}</style>
 
       {/* TOP NAV */}
-      <nav style={{background:'white', borderBottom:'1px solid #F3F4F6', position:'sticky', top:0, zIndex:40, padding:'0 24px'}}>
+      <nav style={{background:'#FAFAF8', borderBottom:'1px solid #E8E5DF', position:'sticky', top:0, zIndex:40, padding:'0 32px'}}>
         <div style={{maxWidth:1100, margin:'0 auto', display:'flex', alignItems:'center', justifyContent:'space-between', height:64}}>
-          <p style={{fontFamily:'Georgia, serif', fontSize:22, fontWeight:700, color:'#1A0A06', margin:0}}>
+          <p style={{fontFamily:"'DM Serif Display',Georgia,serif", fontSize:20, fontWeight:400, fontStyle:'italic', color:'#1A0A06', letterSpacing:'-0.01em', margin:0}}>
             <span style={{fontFamily:"'Playfair Display',Georgia,serif",fontWeight:700,fontStyle:"italic",fontSize:"inherit",letterSpacing:"-0.01em"}}>Regly</span>
           </p>
           <div style={{display:'flex', alignItems:'center', gap:20}}>
-            <p style={{color:'#6B7280', fontSize:14, margin:0}}>
+            <p style={{color:'#6A5A50', fontSize:14, margin:0}}>
               Hi, <span style={{color:'#1A0A06', fontWeight:600}}>{user?.name?.split(' ')[0]}</span>
             </p>
             <button onClick={logout} className="nav-link"
-              style={{color:'#9CA3AF', background:'none', border:'1px solid #E5E7EB', borderRadius:8, padding:'8px 16px', fontSize:14, cursor:'pointer', fontFamily:'inherit'}}>
+              style={{color:'#8A7A6A', background:'none', border:'1px solid #E5E7EB', borderRadius:8, padding:'8px 16px', fontSize:14, cursor:'pointer', fontFamily:'inherit'}}>
               Sign Out
             </button>
           </div>
@@ -381,7 +381,7 @@ export default function CustomerDashboard() {
             <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:20}}>
               <div>
                 <h2 style={{fontFamily:'Georgia, serif', fontSize:24, fontWeight:700, color:'#1A0A06', margin:0}}>Your Memberships</h2>
-                <p style={{color:'#9CA3AF', fontSize:14, marginTop:4}}>{myMemberships.length} active membership{myMemberships.length !== 1 ? 's' : ''}</p>
+                <p style={{color:'#8A7A6A', fontSize:14, marginTop:4}}>{myMemberships.length} active membership{myMemberships.length !== 1 ? 's' : ''}</p>
               </div>
             </div>
             <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(300px, 1fr))', gap:16}}>
@@ -390,7 +390,7 @@ export default function CustomerDashboard() {
                 const accent = getCardAccent(type)
                 const isRecord = type === 'record'
                 return (
-                  <div key={sub.id} style={{background: isRecord ? '#1A0A06' : 'white', borderRadius:20, padding:'24px', border:`1px solid ${isRecord ? 'rgba(192,68,43,0.3)' : '#F3F4F6'}`, boxShadow:'0 2px 12px rgba(0,0,0,0.06)', position:'relative', overflow:'hidden'}}>
+                  <div key={sub.id} style={{background: isRecord ? '#1A0A06' : 'white', borderRadius:20, padding:'24px', border:`1px solid ${isRecord ? 'rgba(192,68,43,0.3)' : '#F0EFEC'}`, boxShadow:'0 2px 12px rgba(0,0,0,0.06)', position:'relative', overflow:'hidden'}}>
                     <div style={{position:'absolute', top:0, right:0, width:80, height:80, borderRadius:'0 20px 0 80px', background: isRecord ? 'rgba(192,68,43,0.1)' : accent.light, opacity:0.8}} />
                     <div style={{position:'relative', zIndex:1}}>
                       <div style={{display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:16}}>
@@ -417,16 +417,16 @@ export default function CustomerDashboard() {
                                 const remaining = isLimited ? Math.max(0, limit - used) : null
                                 const exhausted = isLimited && remaining === 0
                                 return (
-                                  <div key={pi} style={{display:'flex', alignItems:'center', justifyContent:'space-between', padding:'7px 0', borderBottom:`1px solid ${isRecord ? 'rgba(192,68,43,0.1)' : '#F9FAFB'}`}}>
+                                  <div key={pi} style={{display:'flex', alignItems:'center', justifyContent:'space-between', padding:'7px 0', borderBottom:`1px solid ${isRecord ? 'rgba(192,68,43,0.1)' : '#FAFAF8'}`}}>
                                     <div style={{display:'flex', alignItems:'center', gap:8}}>
                                       <div style={{width:16, height:16, borderRadius:'50%', background: exhausted ? '#FEE2E2' : '#D1FAE5', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0}}>
                                         <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
                                           <path d="M1.5 4L3 5.5L6.5 2" stroke={exhausted ? '#EF4444' : '#059669'} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
                                         </svg>
                                       </div>
-                                      <span style={{fontSize:12, color: exhausted ? '#9CA3AF' : isRecord ? 'rgba(245,240,232,0.8)' : '#374151', textDecoration: exhausted ? 'line-through' : 'none'}}>{perk.description}</span>
+                                      <span style={{fontSize:12, color: exhausted ? '#8A7A6A' : isRecord ? 'rgba(245,240,232,0.8)' : '#2A1A10', textDecoration: exhausted ? 'line-through' : 'none'}}>{perk.description}</span>
                                     </div>
-                                    <span style={{fontSize:11, fontWeight:600, color: exhausted ? '#EF4444' : isLimited ? (isRecord ? '#C0442B' : '#6B7280') : '#059669', whiteSpace:'nowrap', marginLeft:8}}>
+                                    <span style={{fontSize:11, fontWeight:600, color: exhausted ? '#EF4444' : isLimited ? (isRecord ? '#C0442B' : '#6A5A50') : '#059669', whiteSpace:'nowrap', marginLeft:8}}>
                                       {isLimited ? (exhausted ? `Used up (${limit} total)` : `${remaining} of ${limit} left`) : 'Unlimited'}
                                     </span>
                                   </div>
@@ -436,10 +436,10 @@ export default function CustomerDashboard() {
                           )
                         }
                         // Fallback to plain text perks
-                        return <p style={{color: isRecord ? 'rgba(245,240,232,0.75)' : '#9CA3AF', fontSize:12, marginBottom:16, lineHeight:1.5}}>{sub.membership_tiers?.perks?.split(' | ')[0]}</p>
+                        return <p style={{color: isRecord ? 'rgba(245,240,232,0.75)' : '#8A7A6A', fontSize:12, marginBottom:16, lineHeight:1.5}}>{sub.membership_tiers?.perks?.split(' | ')[0]}</p>
                       })()}
-                      <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', paddingTop:12, borderTop:`1px solid ${isRecord ? 'rgba(192,68,43,0.15)' : '#F3F4F6'}`}}>
-                        <span style={{fontFamily:'Georgia, serif', fontSize:22, fontWeight:700, color: isRecord ? '#C0442B' : '#1A0A06'}}>${sub.membership_tiers?.price_monthly}<span style={{fontSize:12, fontWeight:400, color: isRecord ? 'rgba(245,240,232,0.4)' : '#9CA3AF'}}>/mo</span></span>
+                      <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', paddingTop:12, borderTop:`1px solid ${isRecord ? 'rgba(192,68,43,0.15)' : '#F0EFEC'}`}}>
+                        <span style={{fontFamily:'Georgia, serif', fontSize:22, fontWeight:700, color: isRecord ? '#C0442B' : '#1A0A06'}}>${sub.membership_tiers?.price_monthly}<span style={{fontSize:12, fontWeight:400, color: isRecord ? 'rgba(245,240,232,0.4)' : '#8A7A6A'}}>/mo</span></span>
                         {sub.cancel_at_period_end ? (
                           <div style={{textAlign:'right'}}>
                             <p style={{fontSize:11, color:'#EF4444', fontWeight:600, marginBottom:1}}>Cancels on</p>
@@ -469,7 +469,7 @@ export default function CustomerDashboard() {
             <div style={{marginBottom:40}}>
               <div style={{marginBottom:20}}>
                 <h2 style={{fontFamily:'Georgia, serif', fontSize:24, fontWeight:700, color:'#1A0A06', margin:0}}>Visit History</h2>
-                <p style={{color:'#9CA3AF', fontSize:14, marginTop:4}}>Every perk you have redeemed, most recent first</p>
+                <p style={{color:'#8A7A6A', fontSize:14, marginTop:4}}>Every perk you have redeemed, most recent first</p>
               </div>
               <div style={{background:'white', borderRadius:20, overflow:'hidden', boxShadow:'0 2px 12px rgba(0,0,0,0.06)', border:'1px solid #F3F4F6'}}>
                 {visitLog.map((entry, i) => {
@@ -489,11 +489,11 @@ export default function CustomerDashboard() {
                       </div>
                       <div style={{flex:1, minWidth:0}}>
                         <p style={{fontSize:14, fontWeight:600, color:'#1A0A06', marginBottom:2, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}>{entry.perk_description}</p>
-                        <p style={{fontSize:12, color:'#9CA3AF'}}>{entry.restaurants?.name}{monthLabel ? ` · ${monthLabel}` : ''}</p>
+                        <p style={{fontSize:12, color:'#8A7A6A'}}>{entry.restaurants?.name}{monthLabel ? ` · ${monthLabel}` : ''}</p>
                       </div>
                       <div style={{textAlign:'right', flexShrink:0}}>
-                        <p style={{fontSize:13, fontWeight:500, color:'#374151'}}>{dateLabel}</p>
-                        <p style={{fontSize:11, color:'#9CA3AF'}}>{timeLabel}</p>
+                        <p style={{fontSize:13, fontWeight:500, color:'#2A1A10'}}>{dateLabel}</p>
+                        <p style={{fontSize:11, color:'#8A7A6A'}}>{timeLabel}</p>
                       </div>
                     </div>
                   )
@@ -508,7 +508,7 @@ export default function CustomerDashboard() {
             <h2 style={{fontFamily:'Georgia, serif', fontSize:24, fontWeight:700, color:'#1A0A06', margin:0}}>
               {hasNoMemberships ? 'Browse Memberships Near You' : 'Explore More Spots'}
             </h2>
-            <p style={{color:'#9CA3AF', fontSize:14, marginTop:4}}>
+            <p style={{color:'#8A7A6A', fontSize:14, marginTop:4}}>
               {restaurants.length} local businesses · Chicago, IL
             </p>
           </div>
@@ -523,7 +523,7 @@ export default function CustomerDashboard() {
 
               return (
                 <button key={rest.id} onClick={() => selectRestaurant(rest)} className="rest-card"
-                  style={{textAlign:'left', background: isSelected ? (isRecord ? '#1A0A06' : accent.bg) : 'white', borderRadius:20, padding:'24px', border:`2px solid ${isSelected ? (isRecord ? '#C0442B' : accent.accent) : '#F3F4F6'}`, cursor:'pointer', boxShadow:'0 2px 12px rgba(0,0,0,0.06)', position:'relative', overflow:'hidden', width:'100%', fontFamily:'inherit'}}>
+                  style={{textAlign:'left', background: isSelected ? (isRecord ? '#1A0A06' : accent.bg) : 'white', borderRadius:20, padding:'24px', border:`2px solid ${isSelected ? (isRecord ? '#C0442B' : accent.accent) : '#F0EFEC'}`, cursor:'pointer', boxShadow:'0 2px 12px rgba(0,0,0,0.06)', position:'relative', overflow:'hidden', width:'100%', fontFamily:'inherit'}}>
                   <div style={{position:'absolute', top:0, right:0, width:80, height:80, borderRadius:'0 20px 0 80px', background: isRecord ? 'rgba(192,68,43,0.1)' : accent.light, opacity:0.6}} />
                   <div style={{position:'relative', zIndex:1}}>
                     <div style={{display:'flex', alignItems:'flex-start', justifyContent:'space-between', marginBottom:14}}>
@@ -538,8 +538,8 @@ export default function CustomerDashboard() {
                     </div>
                     <p style={{fontFamily:'Georgia, serif', fontSize:17, fontWeight:700, color: isRecord ? '#F5F0E8' : '#1A0A06', marginBottom:4}}>{rest.name}</p>
                     <p style={{color: isRecord ? '#C0442B' : accent.accent, fontSize:12, fontWeight:600, marginBottom:8, textTransform:'uppercase', letterSpacing:'0.08em'}}>{rest.city}</p>
-                    <p style={{color: isRecord ? 'rgba(245,240,232,0.75)' : '#6B7280', fontSize:13, lineHeight:1.5, marginBottom:12}}>{rest.description}</p>
-                    <p style={{color: isRecord ? 'rgba(245,240,232,0.6)' : '#9CA3AF', fontSize:12}}>{rest.address}</p>
+                    <p style={{color: isRecord ? 'rgba(245,240,232,0.75)' : '#6A5A50', fontSize:13, lineHeight:1.5, marginBottom:12}}>{rest.description}</p>
+                    <p style={{color: isRecord ? 'rgba(245,240,232,0.6)' : '#8A7A6A', fontSize:12}}>{rest.address}</p>
                   </div>
                 </button>
               )
@@ -556,8 +556,8 @@ export default function CustomerDashboard() {
                 <CategoryIcon type={getCategoryType(selected.name)} />
               </div>
               <div>
-                <h3 style={{fontFamily:'Georgia, serif', fontSize:22, fontWeight:700, color:'#1A0A06', margin:0}}>{selected.name}</h3>
-                <p style={{color:'#9CA3AF', fontSize:13, marginTop:2}}>Choose your membership tier</p>
+                <h3 style={{fontFamily:"'DM Serif Display',Georgia,serif", fontSize:20, fontWeight:400, fontStyle:'italic', color:'#1A0A06', letterSpacing:'-0.01em', margin:0}}>{selected.name}</h3>
+                <p style={{color:'#8A7A6A', fontSize:13, marginTop:2}}>Choose your membership tier</p>
               </div>
             </div>
 
@@ -579,7 +579,7 @@ export default function CustomerDashboard() {
 
                 return (
                   <div key={tier.id} className="tier-card-new"
-                    style={{background: isPaused ? '#FAFAFA' : 'white', borderRadius:20, padding:'28px', border:`2px solid ${isThisTierActive ? '#059669' : isPopular && !isPaused ? '#C0442B' : isPaused ? '#E5E7EB' : '#F3F4F6'}`, boxShadow:'0 4px 24px rgba(0,0,0,0.08)', opacity: isPaused ? 0.75 : 1, position:'relative', display:'flex', flexDirection:'column'}}>
+                    style={{background: isPaused ? '#FAFAFA' : 'white', borderRadius:20, padding:'28px', border:`2px solid ${isThisTierActive ? '#059669' : isPopular && !isPaused ? '#C0442B' : isPaused ? '#E8E5DF' : '#F0EFEC'}`, boxShadow:'0 4px 24px rgba(0,0,0,0.08)', opacity: isPaused ? 0.75 : 1, position:'relative', display:'flex', flexDirection:'column'}}>
 
                     {tier.is_paused && !isThisTierActive && (
                       <div style={{position:'absolute', top:-13, left:'50%', transform:'translateX(-50%)', background:'#1A0A06', color:'#F5F0E8', fontSize:10, fontWeight:700, padding:'5px 14px', borderRadius:20, letterSpacing:'0.1em', textTransform:'uppercase', whiteSpace:'nowrap', zIndex:1}}>
@@ -594,14 +594,14 @@ export default function CustomerDashboard() {
                     )}
 
                     <div style={{marginBottom:20}}>
-                      <p style={{color: '#9CA3AF', fontSize:11, fontWeight:600, letterSpacing:'0.1em', textTransform:'uppercase', marginBottom:8}}>
+                      <p style={{color: '#8A7A6A', fontSize:11, fontWeight:600, letterSpacing:'0.1em', textTransform:'uppercase', marginBottom:8}}>
                         {tier.name}
                       </p>
                       <div style={{display:'flex', alignItems:'baseline', gap:4, marginBottom:4}}>
                         <span style={{fontFamily:'Georgia, serif', fontSize:40, fontWeight:900, color: '#1A0A06', lineHeight:1}}>${tier.price_monthly}</span>
-                        <span style={{color: '#9CA3AF', fontSize:14}}>/month</span>
+                        <span style={{color: '#8A7A6A', fontSize:14}}>/month</span>
                       </div>
-                      <p style={{color: '#9CA3AF', fontSize:12}}>Cancel anytime</p>
+                      <p style={{color: '#8A7A6A', fontSize:12}}>Cancel anytime</p>
                     </div>
 
                     <div style={{flex:1, marginBottom:24}}>
@@ -614,7 +614,7 @@ export default function CustomerDashboard() {
                                 <circle cx="8" cy="8" r="7" fill='#F0FDF4'/>
                                 <path d="M5 8L7 10L11 6" stroke='#059669' strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                               </svg>
-                              <span style={{color:'#374151', fontSize:14, lineHeight:1.4, fontWeight:300}}>{perk.description}</span>
+                              <span style={{color:'#2A1A10', fontSize:14, lineHeight:1.4, fontWeight:300}}>{perk.description}</span>
                             </div>
                             <span style={{
                               fontSize:10, fontWeight:700, padding:'3px 8px', borderRadius:20, whiteSpace:'nowrap', flexShrink:0, marginTop:2,
@@ -637,13 +637,13 @@ export default function CustomerDashboard() {
                         cursor: isThisTierActive || tier.is_paused ? 'default' : 'pointer',
                         border: tier.is_paused ? '1.5px solid #E5E7EB' : 'none',
                         letterSpacing:'0.02em', fontFamily:'inherit',
-                        background: isThisTierActive ? '#D1FAE5' : tier.is_paused ? '#F9FAFB' : isPopular ? '#C0442B' : '#1A0A06',
-                        color: isThisTierActive ? '#059669' : tier.is_paused ? '#9CA3AF' : isPopular ? '#1A0A06' : '#F9FAFB',
+                        background: isThisTierActive ? '#D1FAE5' : tier.is_paused ? '#FAFAF8' : isPopular ? '#C0442B' : '#1A0A06',
+                        color: isThisTierActive ? '#059669' : tier.is_paused ? '#8A7A6A' : isPopular ? '#1A0A06' : '#FAFAF8',
                       }}>
                       {isThisTierActive ? '✓ Current Plan' : tier.is_paused ? 'Currently Not Accepting New Members' : hasOtherActive ? 'Switch Plan' : subscribing === tier.id ? 'Redirecting...' : 'Get Started'}
                     </button>
                     {tier.is_paused && !isThisTierActive && (
-                      <p style={{fontSize:11, color:'#9CA3AF', textAlign:'center', marginTop:8, letterSpacing:'0.03em'}}>
+                      <p style={{fontSize:11, color:'#8A7A6A', textAlign:'center', marginTop:8, letterSpacing:'0.03em'}}>
                         Check back soon — spots may open up.
                       </p>
                     )}
