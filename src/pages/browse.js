@@ -89,14 +89,14 @@ export default function Browse() {
         <meta name="description" content="Discover local business memberships in your area. Get exclusive perks and support the places you love." />
       </Head>
 
-      <div style={{minHeight:'100vh', background:'#F5F0E8', fontFamily:"'Inter',system-ui,sans-serif"}}>
+      <div style={{minHeight:'100vh', background:'#F5F0E8', fontFamily:"'DM Sans',system-ui,sans-serif"}}>
 
         {/* ── NAV ────────────────────────────────────────────── */}
         <nav style={{background:'white', borderBottom:'1px solid #F0EFEC', padding:'0 24px', height:64, display:'flex', alignItems:'center', justifyContent:'space-between', position:'sticky', top:0, zIndex:100}}>
           <button onClick={() => router.push('/')}
             style={{display:'flex', alignItems:'center', gap:10, background:'none', border:'none', cursor:'pointer', padding:0}}>
             <img src="/favicon.svg" width="22" height="26" alt="Regly" style={{display:'inline-block', verticalAlign:'middle'}}/>
-            <span style={{fontFamily:"'Playfair Display',Georgia,serif", fontWeight:700, fontStyle:'italic', fontSize:20, color:'#1A0A06', letterSpacing:'-0.01em'}}>Regly</span>
+            <span style={{fontFamily:"'DM Serif Display',Georgia,serif", fontWeight:400, fontStyle:'italic', fontSize:22, color:'#1A0A06', letterSpacing:'-0.01em'}}>Regly</span>
           </button>
           <button onClick={() => router.push('/auth')}
             style={{padding:'9px 20px', background:'#1A0A06', color:'#F5F0E8', border:'none', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer', fontFamily:'inherit'}}
@@ -125,17 +125,17 @@ export default function Browse() {
         <div style={{maxWidth:860, margin:'0 auto', padding:'40px 24px 80px'}}>
 
           {loading && (
-            <div style={{textAlign:'center', padding:'80px 0', color:'#9CA3AF', fontSize:14}}>
+            <div style={{textAlign:'center', padding:'80px 0', color:'#8A7A6A', fontSize:14}}>
               Loading memberships...
             </div>
           )}
 
           {!loading && filtered.length === 0 && (
             <div style={{textAlign:'center', padding:'80px 0'}}>
-              <p style={{fontSize:16, fontWeight:600, color:'#374151', marginBottom:8}}>
+              <p style={{fontSize:16, fontWeight:600, color:'#2A1A10', marginBottom:8}}>
                 'No memberships available yet'
               </p>
-              <p style={{fontSize:14, color:'#9CA3AF'}}>
+              <p style={{fontSize:14, color:'#8A7A6A'}}>
                 'Check back soon. Businesses are joining Regly.'
               </p>
             </div>
@@ -163,7 +163,7 @@ function RestaurantCard({ restaurant, onTierClick }) {
   const [expanded, setExpanded] = useState(true)
 
   return (
-    <div style={{background:'white', borderRadius:20, overflow:'hidden', boxShadow:'0 2px 16px rgba(0,0,0,0.07)'}}>
+    <div style={{background:'white', borderRadius:16, overflow:'hidden', boxShadow:'0 1px 12px rgba(26,10,6,0.06)', border:'1px solid #EDE9E3'}}>
 
       {/* Restaurant header */}
       <div style={{padding:'24px 28px', display:'flex', alignItems:'center', justifyContent:'space-between', borderBottom:'1px solid #F3F4F6', cursor:'pointer'}}
@@ -171,7 +171,7 @@ function RestaurantCard({ restaurant, onTierClick }) {
         <div style={{display:'flex', alignItems:'center', gap:16}}>
           {/* Initial avatar */}
           <div style={{width:48, height:48, background:'#C0442B', borderRadius:14, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0}}>
-            <span style={{fontFamily:"'Playfair Display',Georgia,serif", fontWeight:700, fontSize:22, color:'#F5F0E8'}}>
+            <span style={{fontFamily:"'DM Serif Display',Georgia,serif", fontWeight:400, fontSize:24, color:'#F5F0E8'}}>
               {restaurant.name.charAt(0)}
             </span>
           </div>
@@ -180,7 +180,7 @@ function RestaurantCard({ restaurant, onTierClick }) {
               {restaurant.name}
             </h2>
             {(restaurant.address || restaurant.city) && (
-              <p style={{fontSize:13, color:'#9CA3AF', margin:'3px 0 0', display:'flex', alignItems:'center', gap:4}}>
+              <p style={{fontSize:13, color:'#8A7A6A', margin:'3px 0 0', display:'flex', alignItems:'center', gap:4}}>
                 <svg width="11" height="13" viewBox="0 0 110 132" fill="none" style={{opacity:0.5}}>
                   <path d="M55 3C27 3 5 25 5 53C5 81 55 129 55 129C55 129 105 81 105 53C105 25 83 3 55 3Z" fill="#9CA3AF"/>
                 </svg>
@@ -190,7 +190,7 @@ function RestaurantCard({ restaurant, onTierClick }) {
           </div>
         </div>
         <div style={{display:'flex', alignItems:'center', gap:10}}>
-          <span style={{fontSize:12, color:'#9CA3AF'}}>
+          <span style={{fontSize:12, color:'#8A7A6A'}}>
             {restaurant.tiers.length} tier{restaurant.tiers.length !== 1 ? 's' : ''}
           </span>
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
@@ -203,7 +203,7 @@ function RestaurantCard({ restaurant, onTierClick }) {
       {/* Description */}
       {expanded && restaurant.description && (
         <div style={{padding:'16px 28px 0', borderBottom:'none'}}>
-          <p style={{fontSize:13, color:'#6B7280', lineHeight:1.65, margin:0}}>{restaurant.description}</p>
+          <p style={{fontSize:13, color:'#6A5A50', lineHeight:1.65, margin:0}}>{restaurant.description}</p>
         </div>
       )}
 
@@ -261,7 +261,7 @@ function TierCard({ tier, isPopular, onSelect }) {
       <div style={{padding:'20px 18px 14px'}}>
         <p style={{fontSize:14, fontWeight:700, color:'#1A0A06', marginBottom:4}}>{tier.name.replace(/^.* - /, '')}</p>
         <p style={{fontSize:24, fontWeight:700, color:'#1A0A06', fontFamily:"'Playfair Display',Georgia,serif", marginBottom:14}}>
-          ${tier.price_monthly}<span style={{fontSize:12, fontWeight:400, color:'#9CA3AF'}}>/mo</span>
+          ${tier.price_monthly}<span style={{fontSize:12, fontWeight:400, color:'#8A7A6A'}}>/mo</span>
         </p>
 
         {/* Perks list */}
@@ -275,14 +275,14 @@ function TierCard({ tier, isPopular, onSelect }) {
               <span style={{fontSize:12, color:'#4B5563', lineHeight:1.5}}>
                 {perk.description}
                 {perk.type === 'limited' && perk.limit
-                  ? <span style={{color:'#9CA3AF'}}> ({perk.limit}x/month)</span>
-                  : <span style={{color:'#9CA3AF'}}> (unlimited)</span>
+                  ? <span style={{color:'#8A7A6A'}}> ({perk.limit}x/month)</span>
+                  : <span style={{color:'#8A7A6A'}}> (unlimited)</span>
                 }
               </span>
             </div>
           ))}
           {perks.length > 4 && (
-            <p style={{fontSize:11, color:'#9CA3AF', margin:0}}>+{perks.length - 4} more perks</p>
+            <p style={{fontSize:11, color:'#8A7A6A', margin:0}}>+{perks.length - 4} more perks</p>
           )}
         </div>
       </div>
@@ -294,8 +294,8 @@ function TierCard({ tier, isPopular, onSelect }) {
           disabled={isPaused}
           style={{
             width:'100%', padding:'11px', borderRadius:9,
-            background: isPaused ? '#F9FAFB' : isPopular ? '#C0442B' : '#1A0A06',
-            color: isPaused ? '#9CA3AF' : '#F5F0E8',
+            background: isPaused ? '#FAFAF8' : isPopular ? '#C0442B' : '#1A0A06',
+            color: isPaused ? '#8A7A6A' : '#F5F0E8',
             border: isPaused ? '1px solid #E5E7EB' : 'none',
             fontSize:13, fontWeight:700,
             cursor: isPaused ? 'default' : 'pointer',
