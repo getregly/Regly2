@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabase'
 const ADMIN_EMAIL = 'sarrafian.josh@gmail.com'
 
 const S = {
-  page:    { minHeight:'100vh', background:'#F9FAFB', fontFamily:"'Inter', system-ui, sans-serif" },
+  page:    { minHeight:'100vh', background:'#F5F0E8', fontFamily:"'DM Sans', system-ui, sans-serif" },
   nav:     { background:'white', borderBottom:'1px solid #F3F4F6', padding:'0 24px' },
   navInner:{ maxWidth:900, margin:'0 auto', display:'flex', alignItems:'center', justifyContent:'space-between', height:64 },
   logo:    { fontFamily:'Georgia, serif', fontSize:22, fontWeight:700, color:'#1A0A06' },
@@ -224,7 +224,7 @@ export default function Admin() {
 
   if (loading) return (
     <div style={{...S.page, display:'flex', alignItems:'center', justifyContent:'center'}}>
-      <p style={{color:'#9CA3AF'}}>Loading...</p>
+      <p style={{color:'#8A7A6A'}}>Loading...</p>
     </div>
   )
   if (!authorized) return null
@@ -236,14 +236,14 @@ export default function Admin() {
       {/* Nav */}
       <nav style={S.nav}>
         <div style={S.navInner}>
-          <p style={S.logo}><span style={{fontFamily:"'Playfair Display',Georgia,serif",fontWeight:700,fontStyle:"italic",fontSize:"inherit",letterSpacing:"-0.01em"}}>Regly</span> <span style={{fontSize:13, color:'#9CA3AF', fontFamily:'system-ui', fontWeight:400}}>Admin</span></p>
+          <p style={S.logo}><span style={{fontFamily:"'Playfair Display',Georgia,serif",fontWeight:700,fontStyle:"italic",fontSize:"inherit",letterSpacing:"-0.01em"}}>Regly</span> <span style={{fontSize:13, color:'#8A7A6A', fontFamily:'system-ui', fontWeight:400}}>Admin</span></p>
           <div style={{display:'flex', gap:12, alignItems:'center'}}>
             <button onClick={() => router.push('/dashboard/business')}
-              style={{...S.btn, background:'none', color:'#6B7280', border:'1px solid #E5E7EB', padding:'8px 16px', fontSize:13}}>
+              style={{...S.btn, background:'none', color:'#6A5A50', border:'1px solid #E5E7EB', padding:'8px 16px', fontSize:13}}>
               My Dashboard
             </button>
             <button onClick={logout}
-              style={{...S.btn, background:'none', color:'#9CA3AF', border:'none', padding:'8px 12px', fontSize:13}}>
+              style={{...S.btn, background:'none', color:'#8A7A6A', border:'none', padding:'8px 12px', fontSize:13}}>
               Sign Out
             </button>
           </div>
@@ -256,7 +256,7 @@ export default function Admin() {
         <div style={{marginBottom:32}}>
           <p style={{...S.label, color:'#C0442B', marginBottom:6}}>Business Onboarding</p>
           <h1 style={{fontFamily:'Georgia, serif', fontSize:28, fontWeight:700, color:'#1A0A06', marginBottom:4}}>Review Queue</h1>
-          <p style={{color:'#9CA3AF', fontSize:14}}>{pending.length} pending review</p>
+          <p style={{color:'#8A7A6A', fontSize:14}}>{pending.length} pending review</p>
         </div>
 
         {/* Message */}
@@ -274,18 +274,18 @@ export default function Admin() {
         {/* Pending */}
         <div style={{marginBottom:40}}>
           <h2 style={{fontFamily:'Georgia, serif', fontSize:20, fontWeight:700, color:'#1A0A06', marginBottom:16}}>
-            Pending Review <span style={{fontSize:15, fontWeight:400, color:'#9CA3AF'}}>({pending.length})</span>
+            Pending Review <span style={{fontSize:15, fontWeight:400, color:'#8A7A6A'}}>({pending.length})</span>
           </h2>
 
           {pending.length === 0 ? (
             <div style={{...S.card, textAlign:'center', padding:'48px'}}>
-              <div style={{width:48, height:48, background:'#F3F4F6', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 16px'}}>
+              <div style={{width:48, height:48, background:'#F0EFEC', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 16px'}}>
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                   <path d="M10 2C5.58 2 2 5.58 2 10s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8zm0 12c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm1-4H9V6h2v4z" fill="#9CA3AF"/>
                 </svg>
               </div>
-              <p style={{color:'#6B7280', fontSize:15, fontWeight:500, marginBottom:4}}>All caught up</p>
-              <p style={{color:'#9CA3AF', fontSize:13}}>No pending submissions right now.</p>
+              <p style={{color:'#6A5A50', fontSize:15, fontWeight:500, marginBottom:4}}>All caught up</p>
+              <p style={{color:'#8A7A6A', fontSize:13}}>No pending submissions right now.</p>
             </div>
           ) : (
             <div>
@@ -313,13 +313,13 @@ export default function Admin() {
                           </div>
                           {statusChip(sub.status)}
                         </div>
-                        <p style={{color:'#6B7280', fontSize:14, marginBottom:2}}>{sub.address}, {sub.city}</p>
-                        <p style={{color:'#9CA3AF', fontSize:12}}>
+                        <p style={{color:'#6A5A50', fontSize:14, marginBottom:2}}>{sub.address}, {sub.city}</p>
+                        <p style={{color:'#8A7A6A', fontSize:12}}>
                           Submitted {new Date(sub.created_at).toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'})}
                         </p>
                       </div>
                       <button onClick={() => setExpanded(isOpen ? null : sub.id)}
-                        style={{...S.btn, background:'#F9FAFB', color:'#374151', border:'1px solid #E5E7EB', padding:'8px 16px', fontSize:13, marginLeft:16, flexShrink:0}}>
+                        style={{...S.btn, background:'#F5F0E8', color:'#2A1A10', border:'1px solid #E5E7EB', padding:'8px 16px', fontSize:13, marginLeft:16, flexShrink:0}}>
                         {isOpen ? 'Hide' : 'Review'}
                       </button>
                     </div>
@@ -328,18 +328,18 @@ export default function Admin() {
                     {isOpen && (
                       <div style={{marginTop:24, paddingTop:24, borderTop:'1px solid #F3F4F6'}}>
                         <div style={{marginBottom:20}}>
-                          <p style={{...S.label, color:'#9CA3AF', marginBottom:6}}>Description</p>
-                          <p style={{color:'#374151', fontSize:14, lineHeight:1.6}}>{sub.description}</p>
+                          <p style={{...S.label, color:'#8A7A6A', marginBottom:6}}>Description</p>
+                          <p style={{color:'#2A1A10', fontSize:14, lineHeight:1.6}}>{sub.description}</p>
                         </div>
 
                         <div style={{marginBottom:24}}>
-                          <p style={{...S.label, color:'#9CA3AF', marginBottom:12}}>Membership Tiers</p>
+                          <p style={{...S.label, color:'#8A7A6A', marginBottom:12}}>Membership Tiers</p>
                           <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(220px, 1fr))', gap:12}}>
                             {tiers.map((tier, i) => (
-                              <div key={i} style={{background:'#F9FAFB', borderRadius:14, padding:'16px', border:'1px solid #F3F4F6'}}>
+                              <div key={i} style={{background:'#F5F0E8', borderRadius:14, padding:'16px', border:'1px solid #F3F4F6'}}>
                                 <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:10}}>
                                   <p style={{fontSize:15, fontWeight:600, color:'#1A0A06', margin:0}}>{tier.name}</p>
-                                  <span style={{fontFamily:'Georgia, serif', fontSize:18, fontWeight:700, color:'#C0442B'}}>${tier.price}<span style={{fontSize:11, color:'#9CA3AF', fontWeight:400}}>/mo</span></span>
+                                  <span style={{fontFamily:'Georgia, serif', fontSize:18, fontWeight:700, color:'#C0442B'}}>${tier.price}<span style={{fontSize:11, color:'#8A7A6A', fontWeight:400}}>/mo</span></span>
                                 </div>
                                 {(Array.isArray(tier.perks) ? tier.perks : [tier.perks]).map((perk, j) => {
                                   const isObj = perk && typeof perk === 'object'
@@ -352,7 +352,7 @@ export default function Admin() {
                                           <path d="M1.5 4L3 5.5L6.5 2" stroke="#059669" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
                                         </svg>
                                       </div>
-                                      <span style={{fontSize:13, color:'#6B7280', lineHeight:1.4, flex:1}}>{label}</span>
+                                      <span style={{fontSize:13, color:'#6A5A50', lineHeight:1.4, flex:1}}>{label}</span>
                                       {badge && (
                                         <span style={{fontSize:10, fontWeight:600, padding:'2px 7px', borderRadius:20, background: perk.type === 'unlimited' ? '#D1FAE5' : '#FEF9EC', color: perk.type === 'unlimited' ? '#065F46' : '#92400E', flexShrink:0}}>
                                           {badge}
@@ -400,14 +400,14 @@ export default function Admin() {
         {reviewed.length > 0 && (
           <div>
             <h2 style={{fontFamily:'Georgia, serif', fontSize:20, fontWeight:700, color:'#1A0A06', marginBottom:16}}>
-              Previously Reviewed <span style={{fontSize:15, fontWeight:400, color:'#9CA3AF'}}>({reviewed.length})</span>
+              Previously Reviewed <span style={{fontSize:15, fontWeight:400, color:'#8A7A6A'}}>({reviewed.length})</span>
             </h2>
             <div style={{background:'white', borderRadius:20, overflow:'hidden', boxShadow:'0 2px 12px rgba(0,0,0,0.06)'}}>
               {reviewed.map((sub, i) => (
                 <div key={sub.id} className="hover-row" style={{display:'flex', alignItems:'center', justifyContent:'space-between', padding:'18px 24px', borderBottom: i<reviewed.length-1 ? '1px solid #F9FAFB' : 'none'}}>
                   <div>
                     <p style={{fontSize:15, fontWeight:600, color:'#1A0A06', marginBottom:2}}>{sub.business_name}</p>
-                    <p style={{fontSize:13, color:'#9CA3AF'}}>{sub.address}, {sub.city}</p>
+                    <p style={{fontSize:13, color:'#8A7A6A'}}>{sub.address}, {sub.city}</p>
                   </div>
                   {statusChip(sub.status)}
                 </div>
