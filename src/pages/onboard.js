@@ -11,7 +11,7 @@ function newTier() { return { name: '', price: '', perks: [newPerk()] } }
 const inp = (focused) => ({
   width:'100%', padding:'11px 14px',
   background:'white',
-  border:`1.5px solid ${focused ? '#C0442B' : '#E5E7EB'}`,
+  border:`1.5px solid ${focused ? '#C0442B' : '#E8E5DF'}`,
   borderRadius:8, fontSize:13, color:'#1A0A06', outline:'none',
   boxShadow: focused ? '0 0 0 3px rgba(192,68,43,0.1)' : 'none',
   fontFamily:'inherit', transition:'all 0.15s',
@@ -124,14 +124,14 @@ export default function Onboard() {
   }
 
   if (loading) return (
-    <div style={{minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'#F9FAFB'}}>
-      <p style={{color:'#9CA3AF', fontFamily:'system-ui'}}>Loading...</p>
+    <div style={{minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'#F5F0E8'}}>
+      <p style={{color:'#8A7A6A', fontFamily:'system-ui'}}>Loading...</p>
     </div>
   )
 
   if (done) return (
-    <div style={{minHeight:'100vh', background:'#F9FAFB', display:'flex', alignItems:'center', justifyContent:'center', padding:'40px 24px', fontFamily:"'Inter', system-ui, sans-serif"}}>
-      <div style={{background:'white', borderRadius:20, padding:'48px 40px', maxWidth:440, width:'100%', textAlign:'center', boxShadow:'0 4px 24px rgba(0,0,0,0.08)'}}>
+    <div style={{minHeight:'100vh', background:'#F5F0E8', display:'flex', alignItems:'center', justifyContent:'center', padding:'40px 24px', fontFamily:"'DM Sans', system-ui, sans-serif"}}>
+      <div style={{background:'white', borderRadius:16, padding:'48px 40px', maxWidth:440, width:'100%', textAlign:'center', boxShadow:'0 4px 24px rgba(0,0,0,0.08)'}}>
         <div style={{width:64, height:64, background:'linear-gradient(135deg,#C0442B,#8A2A14)', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 24px'}}>
           <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
             <path d="M5 14L11 20L23 8" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -139,7 +139,7 @@ export default function Onboard() {
         </div>
         <p style={{color:'#C0442B', fontSize:11, letterSpacing:'0.3em', textTransform:'uppercase', fontWeight:600, marginBottom:8}}>Submitted</p>
         <h2 style={{fontFamily:'Georgia, serif', fontSize:24, fontWeight:700, color:'#1A0A06', marginBottom:12}}>Application Received</h2>
-        <p style={{color:'#6B7280', fontSize:14, lineHeight:1.6, marginBottom:24}}>Our team will review your details and reach out within 1 to 2 business days.</p>
+        <p style={{color:'#6A5A50', fontSize:14, lineHeight:1.6, marginBottom:24}}>Our team will review your details and reach out within 1 to 2 business days.</p>
         <button onClick={() => router.push('/dashboard/business')}
           style={{width:'100%', padding:'13px', background:'#1A0A06', color:'white', border:'none', borderRadius:10, fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:'inherit'}}>
           Back to Dashboard
@@ -149,7 +149,7 @@ export default function Onboard() {
   )
 
   return (
-    <div style={{minHeight:'100vh', background:'#F9FAFB', fontFamily:"'Inter', system-ui, sans-serif"}}>
+    <div style={{minHeight:'100vh', background:'#F5F0E8', fontFamily:"'DM Sans', system-ui, sans-serif"}}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         * { box-sizing:border-box; }
@@ -161,7 +161,7 @@ export default function Onboard() {
       <nav style={{background:'white', borderBottom:'1px solid #F3F4F6', padding:'0 24px'}}>
         <div style={{maxWidth:740, margin:'0 auto', display:'flex', alignItems:'center', height:60}}>
           <button onClick={() => router.push('/dashboard/business')}
-            style={{display:'flex', alignItems:'center', gap:6, color:'#9CA3AF', background:'none', border:'none', cursor:'pointer', fontSize:13, fontFamily:'inherit'}}>
+            style={{display:'flex', alignItems:'center', gap:6, color:'#8A7A6A', background:'none', border:'none', cursor:'pointer', fontSize:13, fontFamily:'inherit'}}>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
@@ -178,7 +178,7 @@ export default function Onboard() {
         <div style={{marginBottom:32}}>
           <p style={{color:'#C0442B', fontSize:11, letterSpacing:'0.3em', textTransform:'uppercase', fontWeight:600, marginBottom:6}}>Business Setup</p>
           <h1 style={{fontFamily:'Georgia, serif', fontSize:28, fontWeight:700, color:'#1A0A06', marginBottom:6}}>Set Up Your Business</h1>
-          <p style={{color:'#6B7280', fontSize:14}}>Reviewed and approved within 24 hours. No setup cost.</p>
+          <p style={{color:'#6A5A50', fontSize:14}}>Reviewed and approved within 24 hours. No setup cost.</p>
         </div>
 
         <form onSubmit={handleSubmit} style={{display:'flex', flexDirection:'column', gap:20}}>
@@ -193,7 +193,7 @@ export default function Onboard() {
                 {k:'city',          label:'City',           ph:'Chicago'},
               ].map(f => (
                 <div key={f.k}>
-                  <label style={{display:'block', fontSize:12, fontWeight:500, color:'#374151', marginBottom:5}}>{f.label}</label>
+                  <label style={{display:'block', fontSize:12, fontWeight:500, color:'#2A1A10', marginBottom:5}}>{f.label}</label>
                   <input className="ob-input" style={inp(focused===f.k)}
                     value={form[f.k]} onChange={e => setField(f.k, e.target.value)}
                     onFocus={() => setFocused(f.k)} onBlur={() => setFocused(null)}
@@ -201,7 +201,7 @@ export default function Onboard() {
                 </div>
               ))}
               <div>
-                <label style={{display:'block', fontSize:12, fontWeight:500, color:'#374151', marginBottom:5}}>Short Description</label>
+                <label style={{display:'block', fontSize:12, fontWeight:500, color:'#2A1A10', marginBottom:5}}>Short Description</label>
                 <textarea className="ob-input" style={{...inp(focused==='desc'), resize:'vertical', minHeight:72}}
                   value={form.description} onChange={e => setField('description', e.target.value)}
                   onFocus={() => setFocused('desc')} onBlur={() => setFocused(null)}
@@ -213,7 +213,7 @@ export default function Onboard() {
           {/* Tiers */}
           <div style={{background:'white', borderRadius:16, padding:'28px', boxShadow:'0 2px 12px rgba(0,0,0,0.06)'}}>
             <h2 style={{fontFamily:'Georgia, serif', fontSize:18, fontWeight:700, color:'#1A0A06', marginBottom:4}}>Membership Tiers</h2>
-            <p style={{color:'#9CA3AF', fontSize:13, marginBottom:24}}>Up to {MAX_TIERS} tiers. Each perk can be unlimited or limited to a set number of uses per month.</p>
+            <p style={{color:'#8A7A6A', fontSize:13, marginBottom:24}}>Up to {MAX_TIERS} tiers. Each perk can be unlimited or limited to a set number of uses per month.</p>
 
             <div style={{display:'flex', flexDirection:'column', gap:24}}>
               {form.tiers.map((tier, ti) => (
@@ -225,11 +225,11 @@ export default function Onboard() {
                       <div style={{width:26, height:26, background:'#C0442B', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center'}}>
                         <span style={{color:'#1A0A06', fontSize:11, fontWeight:700}}>{ti+1}</span>
                       </div>
-                      <span style={{fontSize:13, fontWeight:600, color:'#374151'}}>Tier {ti+1}</span>
+                      <span style={{fontSize:13, fontWeight:600, color:'#2A1A10'}}>Tier {ti+1}</span>
                     </div>
                     {form.tiers.length > 1 && (
                       <button type="button" onClick={() => removeTier(ti)}
-                        style={{color:'#9CA3AF', background:'none', border:'none', cursor:'pointer', fontSize:12, fontFamily:'inherit'}}>
+                        style={{color:'#8A7A6A', background:'none', border:'none', cursor:'pointer', fontSize:12, fontFamily:'inherit'}}>
                         Remove tier
                       </button>
                     )}
@@ -238,16 +238,16 @@ export default function Onboard() {
                   {/* Name + Price */}
                   <div style={{display:'grid', gridTemplateColumns:'1fr 130px', gap:10, marginBottom:18}}>
                     <div>
-                      <label style={{display:'block', fontSize:12, fontWeight:500, color:'#374151', marginBottom:5}}>Tier Name</label>
+                      <label style={{display:'block', fontSize:12, fontWeight:500, color:'#2A1A10', marginBottom:5}}>Tier Name</label>
                       <input className="ob-input" style={inp(focused===`n-${ti}`)}
                         value={tier.name} onChange={e => setTierField(ti,'name',e.target.value)}
                         onFocus={() => setFocused(`n-${ti}`)} onBlur={() => setFocused(null)}
                         required placeholder="e.g. Regular, VIP..." />
                     </div>
                     <div>
-                      <label style={{display:'block', fontSize:12, fontWeight:500, color:'#374151', marginBottom:5}}>Price / mo</label>
+                      <label style={{display:'block', fontSize:12, fontWeight:500, color:'#2A1A10', marginBottom:5}}>Price / mo</label>
                       <div style={{position:'relative'}}>
-                        <span style={{position:'absolute', left:11, top:'50%', transform:'translateY(-50%)', color:'#9CA3AF', fontSize:13}}>$</span>
+                        <span style={{position:'absolute', left:11, top:'50%', transform:'translateY(-50%)', color:'#8A7A6A', fontSize:13}}>$</span>
                         <input className="ob-input" style={{...inp(focused===`p-${ti}`), paddingLeft:22}}
                           type="number" min="1" value={tier.price}
                           onChange={e => setTierField(ti,'price',e.target.value)}
@@ -260,8 +260,8 @@ export default function Onboard() {
                   {/* Perks */}
                   <div>
                     <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:8}}>
-                      <label style={{fontSize:12, fontWeight:500, color:'#374151'}}>Perks</label>
-                      <span style={{fontSize:11, color:'#9CA3AF'}}>Set unlimited or limited uses per month</span>
+                      <label style={{fontSize:12, fontWeight:500, color:'#2A1A10'}}>Perks</label>
+                      <span style={{fontSize:11, color:'#8A7A6A'}}>Set unlimited or limited uses per month</span>
                     </div>
 
                     <div style={{display:'flex', flexDirection:'column', gap:10}}>
@@ -288,16 +288,16 @@ export default function Onboard() {
 
                           {/* Usage type toggle */}
                           <div style={{display:'flex', alignItems:'center', gap:10, paddingLeft:14}}>
-                            <span style={{fontSize:12, color:'#6B7280', marginRight:4}}>Uses per month:</span>
+                            <span style={{fontSize:12, color:'#6A5A50', marginRight:4}}>Uses per month:</span>
 
                             {/* Unlimited toggle */}
                             <button type="button"
                               onClick={() => setPerkField(ti, pi, 'type', 'unlimited')}
                               style={{
                                 padding:'4px 12px', borderRadius:20, fontSize:11, fontWeight:600,
-                                border:`1.5px solid ${perk.type==='unlimited' ? '#C0442B' : '#E5E7EB'}`,
+                                border:`1.5px solid ${perk.type==='unlimited' ? '#C0442B' : '#E8E5DF'}`,
                                 background: perk.type==='unlimited' ? 'rgba(192,68,43,0.1)' : 'white',
-                                color: perk.type==='unlimited' ? '#1A0A06' : '#9CA3AF',
+                                color: perk.type==='unlimited' ? '#1A0A06' : '#8A7A6A',
                                 cursor:'pointer', fontFamily:'inherit',
                               }}>
                               Unlimited
@@ -308,9 +308,9 @@ export default function Onboard() {
                               onClick={() => setPerkField(ti, pi, 'type', 'limited')}
                               style={{
                                 padding:'4px 12px', borderRadius:20, fontSize:11, fontWeight:600,
-                                border:`1.5px solid ${perk.type==='limited' ? '#C0442B' : '#E5E7EB'}`,
+                                border:`1.5px solid ${perk.type==='limited' ? '#C0442B' : '#E8E5DF'}`,
                                 background: perk.type==='limited' ? 'rgba(192,68,43,0.1)' : 'white',
-                                color: perk.type==='limited' ? '#1A0A06' : '#9CA3AF',
+                                color: perk.type==='limited' ? '#1A0A06' : '#8A7A6A',
                                 cursor:'pointer', fontFamily:'inherit',
                               }}>
                               Limited
@@ -328,7 +328,7 @@ export default function Onboard() {
                                     borderRadius:8, fontSize:13, color:'#1A0A06', outline:'none',
                                     textAlign:'center', fontFamily:'inherit', background:'white',
                                   }} />
-                                <span style={{fontSize:12, color:'#6B7280'}}>times</span>
+                                <span style={{fontSize:12, color:'#6A5A50'}}>times</span>
                               </div>
                             )}
                           </div>
@@ -348,7 +348,7 @@ export default function Onboard() {
 
               {form.tiers.length < MAX_TIERS && (
                 <button type="button" onClick={addTier}
-                  style={{padding:'13px', border:'2px dashed #E5E7EB', borderRadius:14, background:'transparent', color:'#9CA3AF', fontSize:13, cursor:'pointer', fontFamily:'inherit', fontWeight:500}}>
+                  style={{padding:'13px', border:'2px dashed #E5E7EB', borderRadius:14, background:'transparent', color:'#8A7A6A', fontSize:13, cursor:'pointer', fontFamily:'inherit', fontWeight:500}}>
                   + Add Another Tier
                 </button>
               )}
@@ -369,7 +369,7 @@ export default function Onboard() {
           <div style={{background:'white', borderRadius:14, padding:'18px 20px', boxShadow:'0 2px 12px rgba(0,0,0,0.06)', display:'flex', alignItems:'flex-start', gap:12}}>
             <input type="checkbox" id="terms" checked={agreed} onChange={e => setAgreed(e.target.checked)}
               style={{marginTop:3, width:16, height:16, accentColor:'#C0442B', cursor:'pointer', flexShrink:0}} />
-            <label htmlFor="terms" style={{fontSize:13, color:'#374151', lineHeight:1.6, cursor:'pointer'}}>
+            <label htmlFor="terms" style={{fontSize:13, color:'#2A1A10', lineHeight:1.6, cursor:'pointer'}}>
               I have read and agree to the{' '}
               <a href="/merchant-terms" target="_blank" style={{color:'#C0442B', fontWeight:600, textDecoration:'none'}}>
                 Regly Merchant Terms of Service
