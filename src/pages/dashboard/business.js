@@ -4,13 +4,13 @@ import { useRouter } from 'next/router'
 import { supabase } from '../../lib/supabase'
 
 const S = {
-  page:     { minHeight:'100vh', background:'#F9FAFB', fontFamily:"'Inter', system-ui, sans-serif" },
+  page:     { minHeight:'100vh', background:'#F5F0E8', fontFamily:"'DM Sans', system-ui, sans-serif" },
   nav:      { background:'white', borderBottom:'1px solid #F3F4F6', padding:'0 24px', position:'sticky', top:0, zIndex:40 },
   navInner: { maxWidth:960, margin:'0 auto', display:'flex', alignItems:'center', justifyContent:'space-between', height:64 },
   logo:     { fontFamily:'Georgia, serif', fontSize:22, fontWeight:700, color:'#1A0A06' },
   body:     { maxWidth:960, margin:'0 auto', padding:'40px 24px' },
   card:     { background:'white', borderRadius:20, padding:'28px', boxShadow:'0 2px 12px rgba(0,0,0,0.06)', marginBottom:0 },
-  label:    { fontSize:11, letterSpacing:'0.2em', textTransform:'uppercase', fontWeight:600, color:'#9CA3AF' },
+  label:    { fontSize:11, letterSpacing:'0.2em', textTransform:'uppercase', fontWeight:600, color:'#8A7A6A' },
   h2:       { fontFamily:'Georgia, serif', fontSize:20, fontWeight:700, color:'#1A0A06', margin:0 },
   btn:      { border:'none', borderRadius:10, fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:'inherit', transition:'all 0.2s ease' },
 }
@@ -491,7 +491,7 @@ export default function BusinessDashboard() {
   if (loading) return (
     <div style={{...S.page, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center'}}>
       <p style={{fontFamily:'Georgia, serif', fontSize:24, fontWeight:700, color:'#1A0A06'}}><span style={{fontFamily:"'Playfair Display',Georgia,serif",fontWeight:700,fontStyle:"italic",fontSize:"inherit",letterSpacing:"-0.01em"}}>Regly</span></p>
-      <p style={{color:'#9CA3AF', fontSize:14, marginTop:8}}>Loading your dashboard...</p>
+      <p style={{color:'#8A7A6A', fontSize:14, marginTop:8}}>Loading your dashboard...</p>
     </div>
   )
 
@@ -510,11 +510,11 @@ export default function BusinessDashboard() {
         <div style={S.navInner}>
           <div style={{display:'flex', alignItems:'center', gap:16}}>
             <p style={S.logo}><span style={{fontFamily:"'Playfair Display',Georgia,serif",fontWeight:700,fontStyle:"italic",fontSize:"inherit",letterSpacing:"-0.01em"}}>Regly</span></p>
-            <span style={{color:'#E5E7EB'}}>|</span>
-            <p style={{fontSize:14, color:'#6B7280', margin:0}}>{displayName}</p>
+            <span style={{color:'#E8E5DF'}}>|</span>
+            <p style={{fontSize:14, color:'#6A5A50', margin:0}}>{displayName}</p>
           </div>
           <button onClick={logout} className="logout-btn"
-            style={{...S.btn, background:'none', color:'#9CA3AF', border:'1px solid #E5E7EB', padding:'8px 16px', fontSize:13}}>
+            style={{...S.btn, background:'none', color:'#8A7A6A', border:'1px solid #E5E7EB', padding:'8px 16px', fontSize:13}}>
             Sign Out
           </button>
         </div>
@@ -548,7 +548,7 @@ export default function BusinessDashboard() {
                       <span style={{fontSize:11, fontWeight:700, color:'#34D399', letterSpacing:'0.1em', textTransform:'uppercase'}}>You are live on Regly</span>
                     </div>
 
-                    <h2 style={{fontFamily:"'Playfair Display',Georgia,serif", fontWeight:700, fontStyle:'italic', fontSize:32, color:'#F5F0E8', marginBottom:10, lineHeight:1.2}}>
+                    <h2 style={{fontFamily:"'DM Serif Display',Georgia,serif", fontWeight:400, fontStyle:'italic', fontSize:34, color:'#F5F0E8', marginBottom:10, lineHeight:1.2}}>
                       {displayName} is open<br/>for memberships.
                     </h2>
                     <p style={{fontSize:14, color:'rgba(245,240,232,0.55)', lineHeight:1.65, maxWidth:440, marginBottom:24, fontWeight:300}}>
@@ -619,7 +619,7 @@ export default function BusinessDashboard() {
                     <span style={{fontSize:11, fontWeight:700, color:'#059669', letterSpacing:'0.1em', textTransform:'uppercase'}}>Application Approved</span>
                   </div>
 
-                  <h2 style={{fontFamily:"'Playfair Display',Georgia,serif", fontWeight:700, fontStyle:'italic', fontSize:36, color:'#F5F0E8', marginBottom:12, lineHeight:1.2}}>
+                  <h2 style={{fontFamily:"'DM Serif Display',Georgia,serif", fontWeight:400, fontStyle:'italic', fontSize:38, color:'#F5F0E8', marginBottom:12, lineHeight:1.2}}>
                     Welcome to Regly,<br/>{displayName}.
                   </h2>
                   <p style={{fontSize:15, color:'rgba(245,240,232,0.6)', maxWidth:480, lineHeight:1.65, marginBottom:0, fontWeight:300}}>
@@ -640,7 +640,7 @@ export default function BusinessDashboard() {
                     </div>
                     <div style={{paddingTop:4}}>
                       <p style={{fontSize:14, fontWeight:600, color:'#059669', marginBottom:2}}>Application submitted</p>
-                      <p style={{fontSize:13, color:'#9CA3AF'}}>Your business details and membership tiers have been reviewed and approved.</p>
+                      <p style={{fontSize:13, color:'#8A7A6A'}}>Your business details and membership tiers have been reviewed and approved.</p>
                     </div>
                   </div>
 
@@ -653,7 +653,7 @@ export default function BusinessDashboard() {
                     </div>
                     <div style={{paddingTop:4}}>
                       <p style={{fontSize:14, fontWeight:600, color:'#059669', marginBottom:2}}>Membership tiers created</p>
-                      <p style={{fontSize:13, color:'#9CA3AF'}}>Your tiers are set up and ready to go live the moment you complete setup.</p>
+                      <p style={{fontSize:13, color:'#8A7A6A'}}>Your tiers are set up and ready to go live the moment you complete setup.</p>
                     </div>
                   </div>
 
@@ -664,7 +664,7 @@ export default function BusinessDashboard() {
                     </div>
                     <div style={{flex:1}}>
                       <p style={{fontSize:14, fontWeight:700, color:'#1A0A06', marginBottom:4}}>Set up payouts to go live</p>
-                      <p style={{fontSize:13, color:'#6B7280', marginBottom:16, lineHeight:1.6}}>Connect your bank account through Stripe to start receiving payouts. Takes about 2 minutes. Your business will be immediately visible to customers once complete.</p>
+                      <p style={{fontSize:13, color:'#6A5A50', marginBottom:16, lineHeight:1.6}}>Connect your bank account through Stripe to start receiving payouts. Takes about 2 minutes. Your business will be immediately visible to customers once complete.</p>
                       <div style={{display:'flex', alignItems:'center', gap:12, flexWrap:'wrap'}}>
                         <button onClick={startConnectOnboarding} disabled={connectLoading}
                           style={{padding:'12px 28px', background: connectLoading ? '#D1D5DB' : '#C0442B', color:'white', border:'none', borderRadius:10, fontSize:14, fontWeight:600, cursor: connectLoading ? 'not-allowed' : 'pointer', fontFamily:'inherit'}}>
@@ -675,7 +675,7 @@ export default function BusinessDashboard() {
                             <path d="M7 1C3.7 1 1 3.7 1 7C1 10.3 3.7 13 7 13C10.3 13 13 10.3 13 7C13 3.7 10.3 1 7 1Z" stroke="#9CA3AF" strokeWidth="1.2"/>
                             <path d="M7 6V10M7 4.5V5" stroke="#9CA3AF" strokeWidth="1.2" strokeLinecap="round"/>
                           </svg>
-                          <span style={{fontSize:12, color:'#9CA3AF'}}>Secured by Stripe</span>
+                          <span style={{fontSize:12, color:'#8A7A6A'}}>Secured by Stripe</span>
                         </div>
                       </div>
                     </div>
@@ -684,7 +684,7 @@ export default function BusinessDashboard() {
 
                 {/* What happens next */}
                 <div style={{background:'white', borderRadius:24, padding:'28px 36px', boxShadow:'0 2px 12px rgba(0,0,0,0.06)'}}>
-                  <p style={{fontSize:11, fontWeight:700, color:'#9CA3AF', letterSpacing:'0.15em', textTransform:'uppercase', marginBottom:20}}>What happens after you connect</p>
+                  <p style={{fontSize:11, fontWeight:700, color:'#8A7A6A', letterSpacing:'0.15em', textTransform:'uppercase', marginBottom:20}}>What happens after you connect</p>
                   <div style={{display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:20}}>
                     {/* Go live */}
                     <div style={{textAlign:'center', padding:'4px 0'}}>
@@ -694,7 +694,7 @@ export default function BusinessDashboard() {
                         </svg>
                       </div>
                       <p style={{fontSize:13, fontWeight:600, color:'#1A0A06', marginBottom:6}}>Go live instantly</p>
-                      <p style={{fontSize:12, color:'#9CA3AF', lineHeight:1.6}}>Your business appears on Regly and customers can subscribe to your memberships immediately.</p>
+                      <p style={{fontSize:12, color:'#8A7A6A', lineHeight:1.6}}>Your business appears on Regly and customers can subscribe to your memberships immediately.</p>
                     </div>
 
                     {/* Customers subscribe */}
@@ -707,7 +707,7 @@ export default function BusinessDashboard() {
                         </svg>
                       </div>
                       <p style={{fontSize:13, fontWeight:600, color:'#1A0A06', marginBottom:6}}>Customers subscribe</p>
-                      <p style={{fontSize:12, color:'#9CA3AF', lineHeight:1.6}}>Members pay monthly and get their perks every visit. You look them up by phone number right here.</p>
+                      <p style={{fontSize:12, color:'#8A7A6A', lineHeight:1.6}}>Members pay monthly and get their perks every visit. You look them up by phone number right here.</p>
                     </div>
 
                     {/* Get paid regularly */}
@@ -721,7 +721,7 @@ export default function BusinessDashboard() {
                         </svg>
                       </div>
                       <p style={{fontSize:13, fontWeight:600, color:'#1A0A06', marginBottom:6}}>Get paid regularly</p>
-                      <p style={{fontSize:12, color:'#9CA3AF', lineHeight:1.6}}>85% of every subscription goes directly to your bank account on a regular payout schedule.</p>
+                      <p style={{fontSize:12, color:'#8A7A6A', lineHeight:1.6}}>85% of every subscription goes directly to your bank account on a regular payout schedule.</p>
                     </div>
                   </div>
                 </div>
@@ -744,12 +744,12 @@ export default function BusinessDashboard() {
             </div>
             <p style={{...S.label, color:'#92400E', marginBottom:8}}>Under Review</p>
             <h2 style={{fontFamily:'Georgia, serif', fontSize:26, fontWeight:700, color:'#1A0A06', marginBottom:8}}>Application Received</h2>
-            <p style={{color:'#374151', fontSize:16, fontWeight:500, marginBottom:4}}>{submission.business_name}</p>
-            <p style={{color:'#6B7280', fontSize:14, lineHeight:1.6, maxWidth:420, margin:'0 auto 24px'}}>
+            <p style={{color:'#2A1A10', fontSize:16, fontWeight:500, marginBottom:4}}>{submission.business_name}</p>
+            <p style={{color:'#6A5A50', fontSize:14, lineHeight:1.6, maxWidth:420, margin:'0 auto 24px'}}>
               Our team is reviewing your details. We'll reach out within 1 to 2 business days to get you live on Regly.
             </p>
-            <div style={{display:'inline-flex', alignItems:'center', gap:8, background:'#F9FAFB', border:'1px solid #E5E7EB', borderRadius:10, padding:'10px 16px'}}>
-              <span style={{fontSize:13, color:'#6B7280'}}>Questions?</span>
+            <div style={{display:'inline-flex', alignItems:'center', gap:8, background:'#FAFAF8', border:'1px solid #E5E7EB', borderRadius:10, padding:'10px 16px'}}>
+              <span style={{fontSize:13, color:'#6A5A50'}}>Questions?</span>
               <span style={{fontSize:13, color:'#C0442B', fontWeight:500}}>getregly@gmail.com</span>
             </div>
           </div>
@@ -765,7 +765,7 @@ export default function BusinessDashboard() {
             </div>
             <p style={{...S.label, color:'#C0442B', marginBottom:8}}>Get Started</p>
             <h2 style={{fontFamily:'Georgia, serif', fontSize:26, fontWeight:700, color:'#1A0A06', marginBottom:8}}>Set Up Your Business</h2>
-            <p style={{color:'#6B7280', fontSize:15, lineHeight:1.6, maxWidth:420, margin:'0 auto 28px'}}>
+            <p style={{color:'#6A5A50', fontSize:15, lineHeight:1.6, maxWidth:420, margin:'0 auto 28px'}}>
               Create your membership tiers, set your perks, and start earning from the customers who already love your business.
             </p>
             <button onClick={() => router.push('/onboard')}
@@ -786,14 +786,14 @@ export default function BusinessDashboard() {
             <div style={S.card}>
               <div style={{marginBottom:20}}>
                 <h2 style={S.h2}>Member Lookup</h2>
-                <p style={{color:'#9CA3AF', fontSize:13, marginTop:4}}>Enter a customer's phone number to verify their membership.</p>
+                <p style={{color:'#8A7A6A', fontSize:13, marginTop:4}}>Enter a customer's phone number to verify their membership.</p>
               </div>
               <form onSubmit={handlePhoneLookup} style={{display:'flex', gap:12}}>
                 <input
                   value={phone} onChange={e => setPhone(e.target.value)}
                   onFocus={() => setPhoneFocused(true)} onBlur={() => setPhoneFocused(false)}
                   required placeholder="(312) 555-0000"
-                  style={{flex:1, padding:'12px 14px', border:`1.5px solid ${phoneFocused ? '#C0442B' : '#E5E7EB'}`, borderRadius:10, fontSize:14, color:'#1A0A06', outline:'none', fontFamily:'inherit', boxShadow: phoneFocused ? '0 0 0 3px rgba(201,168,76,0.12)' : 'none', transition:'all 0.2s'}}
+                  style={{flex:1, padding:'12px 14px', border:`1.5px solid ${phoneFocused ? '#C0442B' : '#E8E5DF'}`, borderRadius:10, fontSize:14, color:'#1A0A06', outline:'none', fontFamily:'inherit', boxShadow: phoneFocused ? '0 0 0 3px rgba(201,168,76,0.12)' : 'none', transition:'all 0.2s'}}
                 />
                 <button type="submit" disabled={searching} className="search-btn"
                   style={{...S.btn, background:'#1A0A06', color:'white', padding:'12px 24px', opacity: searching ? 0.7 : 1}}>
@@ -802,12 +802,12 @@ export default function BusinessDashboard() {
               </form>
 
               {lookup === false && (
-                <div style={{marginTop:16, padding:'16px', background:'#F9FAFB', borderRadius:12, border:'1px solid #F3F4F6', display:'flex', alignItems:'center', gap:10}}>
+                <div style={{marginTop:16, padding:'16px', background:'#FAFAF8', borderRadius:12, border:'1px solid #F3F4F6', display:'flex', alignItems:'center', gap:10}}>
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                     <circle cx="8" cy="8" r="7" stroke="#9CA3AF" strokeWidth="1.5"/>
                     <path d="M5 8h6" stroke="#9CA3AF" strokeWidth="1.5" strokeLinecap="round"/>
                   </svg>
-                  <p style={{fontSize:14, color:'#6B7280', margin:0}}>No Regly membership found for this number.</p>
+                  <p style={{fontSize:14, color:'#6A5A50', margin:0}}>No Regly membership found for this number.</p>
                 </div>
               )}
 
@@ -857,7 +857,7 @@ export default function BusinessDashboard() {
                         lookup.stripeInfo ? [lookup.stripeInfo.cancel_at_period_end ? 'Cancels on' : 'Renews on', formatDate(lookup.stripeInfo.current_period_end)] : null,
                       ].filter(Boolean).map(([label, val]) => (
                         <div key={label}>
-                          <p style={{fontSize:10, color:'#6B7280', fontWeight:600, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:1}}>{label}</p>
+                          <p style={{fontSize:10, color:'#6A5A50', fontWeight:600, letterSpacing:'0.08em', textTransform:'uppercase', marginBottom:1}}>{label}</p>
                           <p style={{fontSize:13, color:'#1A0A06', fontWeight:500}}>{val}</p>
                         </div>
                       ))}
@@ -886,7 +886,7 @@ export default function BusinessDashboard() {
                           </svg>
                           <p style={{fontSize:13, fontWeight:600, color:'#1A0A06', margin:0}}>Redeem Perks</p>
                         </div>
-                        <p style={{fontSize:11, color:'#9CA3AF', margin:0}}>{new Date().toLocaleDateString('en-US',{month:'long', year:'numeric'})}</p>
+                        <p style={{fontSize:11, color:'#8A7A6A', margin:0}}>{new Date().toLocaleDateString('en-US',{month:'long', year:'numeric'})}</p>
                       </div>
 
                       {/* Perks list */}
@@ -903,15 +903,15 @@ export default function BusinessDashboard() {
                             <div key={pi} style={{
                               display:'flex', alignItems:'center', gap:12,
                               padding:'12px 14px', borderRadius:10,
-                              background: exhausted ? '#FEF2F2' : justLogged ? '#F0FDF4' : '#F9FAFB',
-                              border:`1px solid ${exhausted ? '#FECACA' : justLogged ? '#6EE7B7' : '#F3F4F6'}`,
+                              background: exhausted ? '#FEF2F2' : justLogged ? '#F0FDF4' : '#FAFAF8',
+                              border:`1px solid ${exhausted ? '#FECACA' : justLogged ? '#6EE7B7' : '#F0EFEC'}`,
                               transition:'all 0.3s ease',
                             }}>
                               {/* Perk info */}
                               <div style={{flex:1, minWidth:0}}>
                                 <p style={{
                                   fontSize:13, fontWeight:500, marginBottom:3,
-                                  color: exhausted ? '#9CA3AF' : '#1A0A06',
+                                  color: exhausted ? '#8A7A6A' : '#1A0A06',
                                   textDecoration: exhausted ? 'line-through' : 'none',
                                 }}>
                                   {perk.description}
@@ -929,7 +929,7 @@ export default function BusinessDashboard() {
                                           }} />
                                         ))}
                                       </div>
-                                      <span style={{fontSize:11, color: exhausted ? '#EF4444' : '#6B7280'}}>
+                                      <span style={{fontSize:11, color: exhausted ? '#EF4444' : '#6A5A50'}}>
                                         {exhausted ? 'Limit reached' : `${limit - usedCount} of ${limit} remaining`}
                                       </span>
                                     </>
@@ -963,8 +963,8 @@ export default function BusinessDashboard() {
                                     padding:'7px 16px', borderRadius:8, fontSize:12, fontWeight:600,
                                     cursor: isLogging ? 'not-allowed' : 'pointer',
                                     border:'none', fontFamily:'inherit', flexShrink:0,
-                                    background: isLogging ? '#F3F4F6' : '#1A0A06',
-                                    color: isLogging ? '#9CA3AF' : 'white',
+                                    background: isLogging ? '#F0EFEC' : '#1A0A06',
+                                    color: isLogging ? '#8A7A6A' : 'white',
                                     transition:'all 0.2s',
                                   }}>
                                   {isLogging ? (
@@ -990,7 +990,7 @@ export default function BusinessDashboard() {
                         })}
                       </div>
                       <div style={{padding:'10px 18px', borderTop:'1px solid #F3F4F6', background:'#FAFAFA'}}>
-                        <p style={{fontSize:11, color:'#9CA3AF', margin:0}}>All redemptions are logged and visible in member analytics. Usage resets monthly.</p>
+                        <p style={{fontSize:11, color:'#8A7A6A', margin:0}}>All redemptions are logged and visible in member analytics. Usage resets monthly.</p>
                       </div>
                     </div>
                   )}
@@ -1062,7 +1062,7 @@ export default function BusinessDashboard() {
                 <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:20}}>
                   <div>
                     <h2 style={S.h2}>Your Membership Tiers</h2>
-                    <p style={{color:'#9CA3AF', fontSize:13, marginTop:4}}>Your current offerings, contact us to make major changes</p>
+                    <p style={{color:'#8A7A6A', fontSize:13, marginTop:4}}>Your current offerings, contact us to make major changes</p>
                   </div>
                 </div>
                 <div style={{display:'flex', flexDirection:'column', gap:16}}>
@@ -1096,13 +1096,13 @@ export default function BusinessDashboard() {
                                       <div style={{width:5, height:5, borderRadius:'50%', background:'#F59E0B'}}/>
                                       <span style={{fontSize:10, fontWeight:700, color:'#92400E', letterSpacing:'0.05em', textTransform:'uppercase'}}>Pending Payout Setup</span>
                                     </span>
-                                  : <span style={{display:'inline-flex', alignItems:'center', gap:5, background:'#F3F4F6', border:'1px solid #E5E7EB', borderRadius:20, padding:'2px 10px'}}>
-                                      <div style={{width:5, height:5, borderRadius:'50%', background:'#9CA3AF'}}/>
-                                      <span style={{fontSize:10, fontWeight:700, color:'#6B7280', letterSpacing:'0.05em', textTransform:'uppercase'}}>Pending Review</span>
+                                  : <span style={{display:'inline-flex', alignItems:'center', gap:5, background:'#F0EFEC', border:'1px solid #E5E7EB', borderRadius:20, padding:'2px 10px'}}>
+                                      <div style={{width:5, height:5, borderRadius:'50%', background:'#8A7A6A'}}/>
+                                      <span style={{fontSize:10, fontWeight:700, color:'#6A5A50', letterSpacing:'0.05em', textTransform:'uppercase'}}>Pending Review</span>
                                     </span>
                                 }
                               </div>
-                              <p style={{fontSize:12, color:'#9CA3AF', marginTop:2}}>
+                              <p style={{fontSize:12, color:'#8A7A6A', marginTop:2}}>
                                 {memberCount} active member{memberCount !== 1 ? 's' : ''}
                               </p>
                             </div>
@@ -1116,10 +1116,10 @@ export default function BusinessDashboard() {
                                 style={{
                                   display:'flex', alignItems:'center', gap:6,
                                   padding:'6px 12px',
-                                  background: tier.is_paused ? '#FEF3C7' : '#F3F4F6',
-                                  border: `1px solid ${tier.is_paused ? '#FCD34D' : '#E5E7EB'}`,
+                                  background: tier.is_paused ? '#FEF3C7' : '#F0EFEC',
+                                  border: `1px solid ${tier.is_paused ? '#FCD34D' : '#E8E5DF'}`,
                                   borderRadius:8, fontSize:12, fontWeight:600,
-                                  color: tier.is_paused ? '#92400E' : '#6B7280',
+                                  color: tier.is_paused ? '#92400E' : '#6A5A50',
                                   cursor:'pointer', fontFamily:'inherit',
                                 }}>
                                 {tier.is_paused
@@ -1134,11 +1134,11 @@ export default function BusinessDashboard() {
                               </button>
                             )}
                             <span style={{fontFamily:'Georgia, serif', fontSize:20, fontWeight:700, color:'#1A0A06'}}>
-                              ${tier.price_monthly}<span style={{fontSize:12, fontWeight:400, color:'#9CA3AF'}}>/mo</span>
+                              ${tier.price_monthly}<span style={{fontSize:12, fontWeight:400, color:'#8A7A6A'}}>/mo</span>
                             </span>
                             <button
                               onClick={() => { setAddingPerkTo(isAdding ? null : tier.id); setNewPerkText(''); setNewPerkType('unlimited'); setNewPerkLimit(2) }}
-                              style={{padding:'6px 14px', background: isAdding ? '#F3F4F6' : '#1A0A06', color: isAdding ? '#6B7280' : 'white', border:'none', borderRadius:8, fontSize:12, fontWeight:600, cursor:'pointer', fontFamily:'inherit'}}>
+                              style={{padding:'6px 14px', background: isAdding ? '#F0EFEC' : '#1A0A06', color: isAdding ? '#6A5A50' : 'white', border:'none', borderRadius:8, fontSize:12, fontWeight:600, cursor:'pointer', fontFamily:'inherit'}}>
                               {isAdding ? 'Cancel' : '+ Add Perk'}
                             </button>
                           </div>
@@ -1154,7 +1154,7 @@ export default function BusinessDashboard() {
                                 <div key={pi} style={{display:'flex', alignItems:'center', justifyContent:'space-between'}}>
                                   <div style={{display:'flex', alignItems:'center', gap:8}}>
                                     <div style={{width:6, height:6, borderRadius:'50%', background:'#C0442B', flexShrink:0}} />
-                                    <span style={{fontSize:13, color:'#374151'}}>{perk.description}</span>
+                                    <span style={{fontSize:13, color:'#2A1A10'}}>{perk.description}</span>
                                   </div>
                                   <span style={{
                                     fontSize:11, fontWeight:600, padding:'3px 9px', borderRadius:20,
@@ -1171,7 +1171,7 @@ export default function BusinessDashboard() {
                           {/* Add perk form */}
                           {isAdding && (
                             <div style={{marginTop:16, paddingTop:16, borderTop:'1px solid #F3F4F6'}}>
-                              <p style={{fontSize:12, fontWeight:600, color:'#374151', marginBottom:10}}>New Perk</p>
+                              <p style={{fontSize:12, fontWeight:600, color:'#2A1A10', marginBottom:10}}>New Perk</p>
                               <input
                                 value={newPerkText}
                                 onChange={e => setNewPerkText(e.target.value)}
@@ -1179,14 +1179,14 @@ export default function BusinessDashboard() {
                                 style={{width:'100%', padding:'10px 12px', border:'1.5px solid #C0442B', borderRadius:8, fontSize:13, color:'#1A0A06', outline:'none', fontFamily:'inherit', marginBottom:10}}
                               />
                               <div style={{display:'flex', alignItems:'center', gap:8, marginBottom:12}}>
-                                <span style={{fontSize:12, color:'#6B7280'}}>Uses per month:</span>
+                                <span style={{fontSize:12, color:'#6A5A50'}}>Uses per month:</span>
                                 {['unlimited','limited'].map(t => (
                                   <button key={t} type="button"
                                     onClick={() => setNewPerkType(t)}
                                     style={{padding:'4px 12px', borderRadius:20, fontSize:11, fontWeight:600, cursor:'pointer', fontFamily:'inherit',
-                                      border:`1.5px solid ${newPerkType===t ? '#C0442B' : '#E5E7EB'}`,
+                                      border:`1.5px solid ${newPerkType===t ? '#C0442B' : '#E8E5DF'}`,
                                       background: newPerkType===t ? 'rgba(192,68,43,0.1)' : 'white',
-                                      color: newPerkType===t ? '#1A0A06' : '#9CA3AF',
+                                      color: newPerkType===t ? '#1A0A06' : '#8A7A6A',
                                     }}>
                                     {t.charAt(0).toUpperCase()+t.slice(1)}
                                   </button>
@@ -1198,7 +1198,7 @@ export default function BusinessDashboard() {
                                       onChange={e => setNewPerkLimit(e.target.value)}
                                       style={{width:48, padding:'4px 8px', border:'1.5px solid #C0442B', borderRadius:8, fontSize:13, textAlign:'center', fontFamily:'inherit', outline:'none'}}
                                     />
-                                    <span style={{fontSize:12, color:'#6B7280'}}>times</span>
+                                    <span style={{fontSize:12, color:'#6A5A50'}}>times</span>
                                   </div>
                                 )}
                               </div>
@@ -1208,7 +1208,7 @@ export default function BusinessDashboard() {
                                 style={{padding:'9px 20px', background: savingPerk || !newPerkText.trim() ? '#D1D5DB' : '#1A0A06', color:'white', border:'none', borderRadius:8, fontSize:13, fontWeight:600, cursor: savingPerk || !newPerkText.trim() ? 'not-allowed' : 'pointer', fontFamily:'inherit'}}>
                                 {savingPerk ? 'Saving...' : 'Save Perk'}
                               </button>
-                              <p style={{fontSize:11, color:'#9CA3AF', marginTop:8}}>This will immediately appear for all subscribers of this tier.</p>
+                              <p style={{fontSize:11, color:'#8A7A6A', marginTop:8}}>This will immediately appear for all subscribers of this tier.</p>
                             </div>
                           )}
                         </div>
@@ -1218,11 +1218,11 @@ export default function BusinessDashboard() {
                 </div>
                 <div style={{marginTop:16, paddingTop:16, borderTop:'1px solid #F3F4F6'}}>
                   <div style={{display:'flex', alignItems:'center', justifyContent:'space-between'}}>
-                    <p style={{fontSize:12, color:'#9CA3AF'}}>
+                    <p style={{fontSize:12, color:'#8A7A6A'}}>
                       Need to change pricing or remove a tier? Email <span style={{color:'#C0442B'}}>getregly@gmail.com</span>
                     </p>
                     <button onClick={() => setAddingTier(v => !v)}
-                      style={{padding:'8px 16px', background: addingTier ? '#F3F4F6' : '#1A0A06', color: addingTier ? '#6B7280' : 'white', border:'none', borderRadius:8, fontSize:12, fontWeight:600, cursor:'pointer', fontFamily:'inherit', flexShrink:0, marginLeft:16}}>
+                      style={{padding:'8px 16px', background: addingTier ? '#F0EFEC' : '#1A0A06', color: addingTier ? '#6A5A50' : 'white', border:'none', borderRadius:8, fontSize:12, fontWeight:600, cursor:'pointer', fontFamily:'inherit', flexShrink:0, marginLeft:16}}>
                       {addingTier ? 'Cancel' : '+ New Tier'}
                     </button>
                   </div>
@@ -1242,7 +1242,7 @@ export default function BusinessDashboard() {
                         <div>
                           <label style={{display:'block', fontSize:12, fontWeight:500, color:'#1A0A06', marginBottom:5}}>Price / mo</label>
                           <div style={{position:'relative'}}>
-                            <span style={{position:'absolute', left:10, top:'50%', transform:'translateY(-50%)', color:'#9CA3AF', fontSize:13}}>$</span>
+                            <span style={{position:'absolute', left:10, top:'50%', transform:'translateY(-50%)', color:'#8A7A6A', fontSize:13}}>$</span>
                             <input type="number" min="1" value={newTier.price} onChange={e => setNewTier(p => ({...p, price:e.target.value}))}
                               placeholder="0"
                               style={{width:'100%', padding:'10px 12px 10px 22px', border:'1.5px solid #E5E7EB', borderRadius:8, fontSize:13, outline:'none', fontFamily:'inherit', color:'#1A0A06'}} />
@@ -1265,13 +1265,13 @@ export default function BusinessDashboard() {
                               )}
                             </div>
                             <div style={{display:'flex', alignItems:'center', gap:8, paddingLeft:14}}>
-                              <span style={{fontSize:11, color:'#6B7280'}}>Uses:</span>
+                              <span style={{fontSize:11, color:'#6A5A50'}}>Uses:</span>
                               {['unlimited','limited'].map(t => (
                                 <button key={t} type="button" onClick={() => setNewTierPerkField(pi,'type',t)}
                                   style={{padding:'3px 10px', borderRadius:20, fontSize:11, fontWeight:600, cursor:'pointer', fontFamily:'inherit',
-                                    border:`1.5px solid ${perk.type===t ? '#C0442B' : '#E5E7EB'}`,
+                                    border:`1.5px solid ${perk.type===t ? '#C0442B' : '#E8E5DF'}`,
                                     background: perk.type===t ? 'rgba(192,68,43,0.1)' : 'white',
-                                    color: perk.type===t ? '#1A0A06' : '#9CA3AF',
+                                    color: perk.type===t ? '#1A0A06' : '#8A7A6A',
                                   }}>
                                   {t.charAt(0).toUpperCase()+t.slice(1)}
                                 </button>
@@ -1281,7 +1281,7 @@ export default function BusinessDashboard() {
                                   <input type="number" min="1" max="31" value={perk.limit}
                                     onChange={e => setNewTierPerkField(pi,'limit',e.target.value)}
                                     style={{width:44, padding:'3px 6px', border:'1.5px solid #C0442B', borderRadius:6, fontSize:12, textAlign:'center', fontFamily:'inherit', outline:'none', color:'#1A0A06'}} />
-                                  <span style={{fontSize:11, color:'#6B7280'}}>x</span>
+                                  <span style={{fontSize:11, color:'#6A5A50'}}>x</span>
                                 </div>
                               )}
                             </div>
@@ -1298,7 +1298,7 @@ export default function BusinessDashboard() {
                           style={{padding:'10px 20px', background: savingTier || !newTier.name.trim() || !newTier.price ? '#D1D5DB' : '#1A0A06', color:'white', border:'none', borderRadius:8, fontSize:13, fontWeight:600, cursor: savingTier ? 'not-allowed' : 'pointer', fontFamily:'inherit'}}>
                           {savingTier ? 'Submitting...' : 'Submit for Review'}
                         </button>
-                        <p style={{fontSize:11, color:'#9CA3AF'}}>New tiers are reviewed by the Regly team. We will activate it within 24 hours.</p>
+                        <p style={{fontSize:11, color:'#8A7A6A'}}>New tiers are reviewed by the Regly team. We will activate it within 24 hours.</p>
                       </div>
 
                       {/* Submission feedback */}
@@ -1337,7 +1337,7 @@ export default function BusinessDashboard() {
               <div style={S.card}>
                 <div style={{marginBottom:20}}>
                   <h2 style={S.h2}>Members by Tier</h2>
-                  <p style={{color:'#9CA3AF', fontSize:13, marginTop:4}}>{members.length} active member{members.length !== 1 ? 's' : ''}</p>
+                  <p style={{color:'#8A7A6A', fontSize:13, marginTop:4}}>{members.length} active member{members.length !== 1 ? 's' : ''}</p>
                 </div>
                 <div style={{display:'flex', flexDirection:'column', gap:14}}>
                   {stats.tierBreakdown.map(t => {
@@ -1345,10 +1345,10 @@ export default function BusinessDashboard() {
                     return (
                       <div key={t.name}>
                         <div style={{display:'flex', justifyContent:'space-between', marginBottom:6}}>
-                          <span style={{fontSize:14, color:'#374151', fontWeight:500}}>{t.name}</span>
-                          <span style={{fontSize:13, color:'#9CA3AF'}}>{t.count} member{t.count !== 1 ? 's' : ''} · {pct}%</span>
+                          <span style={{fontSize:14, color:'#2A1A10', fontWeight:500}}>{t.name}</span>
+                          <span style={{fontSize:13, color:'#8A7A6A'}}>{t.count} member{t.count !== 1 ? 's' : ''} · {pct}%</span>
                         </div>
-                        <div style={{height:6, background:'#F3F4F6', borderRadius:10, overflow:'hidden'}}>
+                        <div style={{height:6, background:'#F0EFEC', borderRadius:10, overflow:'hidden'}}>
                           <div style={{height:'100%', width:`${pct}%`, background:'linear-gradient(to right, #C0442B, #8A2A14)', borderRadius:10}} />
                         </div>
                       </div>
@@ -1362,15 +1362,15 @@ export default function BusinessDashboard() {
             <div style={S.card}>
               <div style={{marginBottom:20}}>
                 <h2 style={S.h2}>
-                  Active Members <span style={{fontSize:15, fontWeight:400, color:'#9CA3AF'}}>({members.length})</span>
+                  Active Members <span style={{fontSize:15, fontWeight:400, color:'#8A7A6A'}}>({members.length})</span>
                 </h2>
-                <p style={{color:'#9CA3AF', fontSize:13, marginTop:4}}>Sorted by most recent. All current Regly subscribers at {restaurant.name}.</p>
+                <p style={{color:'#8A7A6A', fontSize:13, marginTop:4}}>Sorted by most recent. All current Regly subscribers at {restaurant.name}.</p>
               </div>
 
               {members.length === 0 ? (
                 <div style={{textAlign:'center', padding:'40px 0'}}>
-                  <p style={{color:'#6B7280', fontSize:15, fontWeight:500, marginBottom:4}}>No members yet</p>
-                  <p style={{color:'#9CA3AF', fontSize:13}}>Share your Regly link to get your first subscriber.</p>
+                  <p style={{color:'#6A5A50', fontSize:15, fontWeight:500, marginBottom:4}}>No members yet</p>
+                  <p style={{color:'#8A7A6A', fontSize:13}}>Share your Regly link to get your first subscriber.</p>
                 </div>
               ) : (
                 <div style={{overflowX:'auto'}}>
@@ -1378,7 +1378,7 @@ export default function BusinessDashboard() {
                     <thead>
                       <tr style={{borderBottom:'2px solid #F3F4F6'}}>
                         {['Name','Phone','Tier','$/mo','Since','Renewal'].map(h => (
-                          <th key={h} style={{textAlign:'left', padding:'0 16px 12px 0', color:'#9CA3AF', fontSize:11, fontWeight:600, letterSpacing:'0.1em', textTransform:'uppercase', whiteSpace:'nowrap'}}>{h}</th>
+                          <th key={h} style={{textAlign:'left', padding:'0 16px 12px 0', color:'#8A7A6A', fontSize:11, fontWeight:600, letterSpacing:'0.1em', textTransform:'uppercase', whiteSpace:'nowrap'}}>{h}</th>
                         ))}
                       </tr>
                     </thead>
@@ -1388,14 +1388,14 @@ export default function BusinessDashboard() {
                         return (
                           <tr key={m.id} className="hover-row" style={{borderBottom:'1px solid #F9FAFB'}}>
                             <td style={{padding:'14px 16px 14px 0', color:'#1A0A06', fontWeight:500}}>{m.profile?.name || ', '}</td>
-                            <td style={{padding:'14px 16px 14px 0', color:'#6B7280'}}>{m.profile?.phone || ', '}</td>
+                            <td style={{padding:'14px 16px 14px 0', color:'#6A5A50'}}>{m.profile?.phone || ', '}</td>
                             <td style={{padding:'14px 16px 14px 0'}}>
                               <span style={{background:'rgba(192,68,43,0.1)', color:'#1A0A06', fontSize:12, fontWeight:600, padding:'4px 10px', borderRadius:20, whiteSpace:'nowrap'}}>
                                 {m.membership_tiers?.name}
                               </span>
                             </td>
                             <td style={{padding:'14px 16px 14px 0', color:'#1A0A06', fontWeight:600}}>${m.membership_tiers?.price_monthly}</td>
-                            <td style={{padding:'14px 16px 14px 0', color:'#9CA3AF', whiteSpace:'nowrap'}}>{new Date(m.start_date).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})}</td>
+                            <td style={{padding:'14px 16px 14px 0', color:'#8A7A6A', whiteSpace:'nowrap'}}>{new Date(m.start_date).toLocaleDateString('en-US', {month:'short', day:'numeric', year:'numeric'})}</td>
                             <td style={{padding:'14px 0 14px 0'}}>
                               {renewal ? (
                                 <span style={{background:renewal.bg, color:renewal.color, fontSize:12, fontWeight:600, padding:'4px 10px', borderRadius:20, whiteSpace:'nowrap'}}>
