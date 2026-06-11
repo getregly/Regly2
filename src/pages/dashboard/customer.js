@@ -56,6 +56,23 @@ function getCardAccent(type) {
   return map[type] || map.default
 }
 
+// Formats renewal date with smart relative language
+function formatRenewalDate(dateStr) {
+  if (!dateStr) return null
+  const date = new Date(dateStr)
+  if (isNaN(date.getTime())) return null
+  const now = new Date()
+  const diffMs = date.getTime() - now.getTime()
+  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24))
+  if (diffDays <= 0) return 'today'
+  if (diffDays === 1) return 'tomorrow'
+  if (diffDays <= 7) return `in ${diffDays} days`
+  if (date.getFullYear() !== now.getFullYear()) {
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  }
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+}
+
 export default function CustomerDashboard() {
   const router = useRouter()
   const [user, setUser]                   = useState(null)
@@ -427,7 +444,11 @@ export default function CustomerDashboard() {
                                       <span style={{fontSize:12, color: exhausted ? '#8A7A6A' : isRecord ? 'rgba(245,240,232,0.8)' : '#2A1A10', textDecoration: exhausted ? 'line-through' : 'none'}}>{perk.description}</span>
                                     </div>
                                     <span style={{fontSize:11, fontWeight:600, color: exhausted ? '#EF4444' : isLimited ? (isRecord ? '#C0442B' : '#6A5A50') : '#059669', whiteSpace:'nowrap', marginLeft:8}}>
-                                      {isLimited ? (exhausted ? `Used up (${limit} total)` : `${remaining} of ${limit} left`) : 'Unlimited'}
+                                      {isLimited
+                                        ? exhausted
+                                          ? `Used up (${limit} total)`
+                                          : `${remaining} of ${limit} left${sub.current_period_end && formatRenewalDate(sub.current_period_end) ? ` · resets ${formatRenewalDate(sub.current_period_end)}` : ''}`
+                                        : 'Unlimited'}
                                     </span>
                                   </div>
                                 )
@@ -450,10 +471,17 @@ export default function CustomerDashboard() {
                             </p>
                           </div>
                         ) : (
-                          <button onClick={() => handleCancel(sub)} className="cancel-btn"
-                            style={{color:'#D1D5DB', background:'none', border:'none', cursor:'pointer', fontSize:12, fontFamily:'inherit', padding:0}}>
-                            Cancel
-                          </button>
+                          <div style={{textAlign:'right'}}>
+                            {sub.status !== 'past_due' && sub.current_period_end && (
+                              <p style={{fontSize:11, color:'#8A7A6A', marginBottom:5, fontWeight:400}}>
+                                Renews {formatRenewalDate(sub.current_period_end)}
+                              </p>
+                            )}
+                            <button onClick={() => handleCancel(sub)} className="cancel-btn"
+                              style={{color:'#D1D5DB', background:'none', border:'none', cursor:'pointer', fontSize:12, fontFamily:'inherit', padding:0}}>
+                              Cancel
+                            </button>
+                          </div>
                         )}
                       </div>
                     </div>
