@@ -1005,7 +1005,6 @@ export default function BusinessDashboard() {
               {[
                 { label:'Active Members',        value: members.length,          prefix:'',  suffix:'',   sub: null },
                 { label:'Membership Revenue',     value: stats.revenue,           prefix:'$', suffix:'/mo', sub:'subscription income this month' },
-                { label:'Your Earnings',          value: ownerRevenue,            prefix:'$', suffix:'/mo', sub:'after 15% Regly fee' },
                 { label:'New This Month',         value: stats.newThisMonth,      prefix:'',  suffix:'',   sub: stats.newThisMonth === 1 ? 'new subscriber' : 'new subscribers' },
               ].map(s => (
                 <div key={s.label} style={{...S.card, textAlign:'center', padding:'22px'}}>
@@ -1022,29 +1021,12 @@ export default function BusinessDashboard() {
             <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(180px, 1fr))', gap:16}}>
               {[
                 {
-                  label:'Retention Rate',
-                  value: (stats.retentionRate !== null && stats.retentionRate !== undefined) ? `${stats.retentionRate}%` : 'N/A',
-                  sub: 'members who renewed last month',
-                  color: stats.retentionRate === null ? '#1A0A06' : stats.retentionRate >= 80 ? '#059669' : stats.retentionRate >= 60 ? '#F59E0B' : '#EF4444',
-                },
-                {
-                  label:'Avg Member Tenure',
-                  value: (stats.avgTenureMonths !== null && stats.avgTenureMonths !== undefined) ? `${stats.avgTenureMonths}mo` : 'N/A',
-                  sub: 'average months a member stays',
-                  color: '#1A0A06',
-                },
-                {
                   label:'Cancellations',
                   value: stats.cancelledThisMonth,
                   sub: 'cancelled this month',
                   color: stats.cancelledThisMonth === 0 ? '#059669' : stats.cancelledThisMonth <= 2 ? '#F59E0B' : '#EF4444',
                 },
-                {
-                  label:'Total MRR',
-                  value: `$${stats.revenue}`,
-                  sub: 'gross monthly recurring revenue',
-                  color: '#1A0A06',
-                },
+
               ].map(s => (
                 <div key={s.label} style={{...S.card, textAlign:'center', padding:'22px'}}>
                   <p style={{fontFamily:'Georgia, serif', fontSize:30, fontWeight:700, color: s.color, marginBottom:2}}>
