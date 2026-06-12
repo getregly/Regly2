@@ -1000,12 +1000,13 @@ export default function BusinessDashboard() {
 
 
             {/* Stats row */}
-            {/* Stats, row 1 */}
-            <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(180px, 1fr))', gap:16}}>
+            {/* Stats — single row */}
+            <div style={{display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:16}}>
               {[
-                { label:'Active Members',        value: members.length,          prefix:'',  suffix:'',   sub: null },
-                { label:'Membership Revenue',     value: stats.revenue,           prefix:'$', suffix:'/mo', sub:'subscription income this month' },
-                { label:'New This Month',         value: stats.newThisMonth,      prefix:'',  suffix:'',   sub: stats.newThisMonth === 1 ? 'new subscriber' : 'new subscribers' },
+                { label:'Active Members',    value: members.length,         prefix:'',  suffix:'',    sub: null },
+                { label:'Monthly Revenue',   value: stats.revenue,          prefix:'$', suffix:'/mo', sub:'subscription income' },
+                { label:'New This Month',    value: stats.newThisMonth,     prefix:'',  suffix:'',    sub: stats.newThisMonth === 1 ? 'new member' : 'new members' },
+                { label:'Cancellations',     value: stats.cancelledThisMonth, prefix:'', suffix:'',  sub: 'cancelled this month', color: stats.cancelledThisMonth === 0 ? '#059669' : stats.cancelledThisMonth <= 2 ? '#F59E0B' : '#EF4444' },
               ].map(s => (
                 <div key={s.label} style={{...S.card, textAlign:'center', padding:'22px'}}>
                   <p style={{fontFamily:'Georgia, serif', fontSize:30, fontWeight:700, color:'#1A0A06', marginBottom:2}}>
@@ -1017,28 +1018,7 @@ export default function BusinessDashboard() {
               ))}
             </div>
 
-            {/* Stats, row 2 */}
-            <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(180px, 1fr))', gap:16}}>
-              {[
-                {
-                  label:'Cancellations',
-                  value: stats.cancelledThisMonth,
-                  sub: 'cancelled this month',
-                  color: stats.cancelledThisMonth === 0 ? '#059669' : stats.cancelledThisMonth <= 2 ? '#F59E0B' : '#EF4444',
-                },
-
-              ].map(s => (
-                <div key={s.label} style={{...S.card, textAlign:'center', padding:'22px'}}>
-                  <p style={{fontFamily:'Georgia, serif', fontSize:30, fontWeight:700, color: s.color, marginBottom:2}}>
-                    {s.value}
-                  </p>
-                  <p style={{...S.label, fontSize:10, marginBottom:4}}>{s.label}</p>
-                  <p style={{fontSize:11, color:'#D1D5DB'}}>{s.sub}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* My Membership Tiers */}
+                        {/* My Membership Tiers */}
             {tiers.length > 0 && (
               <div style={S.card}>
                 <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:20}}>
