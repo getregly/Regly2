@@ -100,7 +100,7 @@ export default function Home() {
             every visit.
           </h1>
           <p className="fade-up-2" style={{fontSize:18, color:'rgba(255,255,255,0.75)', fontWeight:300, maxWidth:520, lineHeight:1.65, marginBottom:40}}>
-            Regly is the membership platform for local businesses. Subscribe to the spots you already love and get real perks every time you walk in. Not points. Not punch cards. Actual value, instantly.
+            Regly is the membership platform for local businesses. Join the local spots you already love and get real perks every time you walk in. Not points. Not punch cards. Actual value, instantly.
           </p>
           <div className="fade-up-3" style={{display:'flex', gap:12, flexWrap:'wrap'}}>
             <button onClick={() => router.push('/browse')}
@@ -155,8 +155,8 @@ export default function Home() {
                 dark: true,
               },
               {
-                n:'02', title:'Customer subscribes in two minutes',
-                body:'Customers browse local businesses on Regly, pick a membership tier, and subscribe with their credit card. They see exactly what they get before they pay a cent.',
+                n:'02', title:'Customers join in minutes,',
+                body:'Customers browse local businesses on Regly, pick a membership tier, and sign up with their credit card. They see exactly what they get before they pay a cent.',
                 img:'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&q=80&fit=crop',
                 dark: false,
               },
