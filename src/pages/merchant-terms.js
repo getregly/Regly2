@@ -4,7 +4,7 @@ export default function MerchantTerms() {
   const router = useRouter()
 
   return (
-    <div style={{minHeight:'100vh', background:'#F9FAFB', fontFamily:"'Inter', system-ui, sans-serif"}}>
+    <div style={{minHeight:'100vh', background:'#FAFAF8', fontFamily:"'DM Sans', system-ui, sans-serif"}}>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap'); *{box-sizing:border-box;}`}</style>
 
       <nav style={{background:'white', borderBottom:'1px solid #F3F4F6', padding:'0 24px'}}>
@@ -14,7 +14,7 @@ export default function MerchantTerms() {
             <span style={{fontFamily:"'Playfair Display',Georgia,serif",fontWeight:700,fontStyle:"italic",fontSize:"inherit",letterSpacing:"-0.01em"}}>Regly</span>
           </button>
           <button onClick={() => window.close()}
-            style={{display:'flex', alignItems:'center', gap:6, color:'#9CA3AF', background:'none', border:'none', cursor:'pointer', fontSize:14, fontFamily:'inherit'}}>
+            style={{display:'flex', alignItems:'center', gap:6, color:'#8A7A6A', background:'none', border:'none', cursor:'pointer', fontSize:14, fontFamily:'inherit'}}>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
@@ -27,7 +27,7 @@ export default function MerchantTerms() {
         <div style={{marginBottom:40}}>
           <p style={{fontSize:11, letterSpacing:'0.2em', textTransform:'uppercase', fontWeight:600, color:'#C0442B', marginBottom:8}}>Legal</p>
           <h1 style={{fontFamily:'Georgia, serif', fontSize:32, fontWeight:700, color:'#1A0A06', marginBottom:8}}>Merchant Agreement</h1>
-          <p style={{color:'#9CA3AF', fontSize:14}}>Last updated: April 2026</p>
+          <p style={{color:'#8A7A6A', fontSize:14}}>Last updated: April 2026</p>
         </div>
 
         <div style={{background:'#FFFBEB', border:'1px solid #FCD34D', borderRadius:12, padding:'16px 20px', marginBottom:40}}>
@@ -151,7 +151,7 @@ getregly.com`
               {section.body.split('\n').map((line, i) => (
                 <p key={i} style={{
                   fontSize:14,
-                  color: line.startsWith('•') ? '#374151' : '#4B5563',
+                  color: line.startsWith('•') ? '#2A1A10' : '#4B5563',
                   lineHeight:1.7,
                   margin: line === '' ? '0 0 8px' : '0 0 4px',
                   paddingLeft: line.startsWith('•') ? 8 : 0,
@@ -164,7 +164,7 @@ getregly.com`
         ))}
 
         <div style={{textAlign:'center', paddingTop:32, borderTop:'1px solid #F3F4F6'}}>
-          <p style={{color:'#9CA3AF', fontSize:13}}>Questions? Email us at <span style={{color:'#C0442B'}}>getregly@gmail.com</span></p>
+          <p style={{color:'#8A7A6A', fontSize:13}}>Questions? Email us at <span style={{color:'#C0442B'}}>getregly@gmail.com</span></p>
           <button onClick={() => router.push('/auth?role=business')}
             style={{marginTop:16, padding:'12px 32px', background:'#1A0A06', color:'white', border:'none', borderRadius:10, fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:'inherit'}}>
             Apply to Join Regly
