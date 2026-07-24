@@ -721,7 +721,7 @@ export default function BusinessDashboard() {
                         </svg>
                       </div>
                       <p style={{fontSize:13, fontWeight:600, color:'#1A0A06', marginBottom:6}}>Get paid regularly</p>
-                      <p style={{fontSize:12, color:'#8A7A6A', lineHeight:1.6}}>85% of every subscription goes directly to your bank account on a regular payout schedule.</p>
+                      <p style={{fontSize:12, color:'#8A7A6A', lineHeight:1.6}}>The majority of every subscription goes directly to your bank account on a regular payout schedule.</p>
                     </div>
                   </div>
                 </div>
