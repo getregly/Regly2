@@ -1,6 +1,7 @@
 import Head from 'next/head'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
+import { supabase } from '../lib/supabase'
 
 // ─── Responsive hook ──────────────────────────────────────────────
 function useWindowWidth() {
@@ -27,6 +28,29 @@ export default function Home() {
   const width = useWindowWidth()
   const isMobile = width < 768
   const [scrolled, setScrolled] = useState(false)
+  const [captureEmail, setCaptureEmail] = useState('')
+  const [captureStatus, setCaptureStatus] = useState(null) // null | 'loading' | 'success' | 'error'
+
+  async function handleEmailCapture(e) {
+    e.preventDefault()
+    if (!captureEmail || !captureEmail.includes('@')) return
+    setCaptureStatus('loading')
+    try {
+      const { error } = await supabase
+        .from('waitlist')
+        .insert({ email: captureEmail.toLowerCase().trim(), source: 'landing_page' })
+      if (error && error.code === '23505') {
+        setCaptureStatus('success')
+        return
+      }
+      if (error) throw error
+      setCaptureStatus('success')
+      setCaptureEmail('')
+    } catch (err) {
+      console.error('Waitlist error:', err)
+      setCaptureStatus('error')
+    }
+  }
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60)
@@ -68,6 +92,13 @@ export default function Home() {
           <img src="/favicon.svg" width="20" height="24" alt="Regly" style={{display:"inline-block",verticalAlign:"middle"}}/><span style={{fontFamily:"'Playfair Display',Georgia,serif",fontWeight:700,fontStyle:'italic',fontSize:20,color:'#1A0A06',letterSpacing:'-0.01em'}}>Regly</span>
         </button>
         <div style={{display:'flex', alignItems:'center', gap:8}}>
+          <button
+            onClick={() => document.getElementById('waitlist')?.scrollIntoView({ behavior:'smooth' })}
+            style={{padding:'10px 20px', background:'#C0442B', color:'#F5F0E8', border:'none', borderRadius:8, fontSize:14, fontWeight:700, cursor:'pointer', fontFamily:'inherit', letterSpacing:'0.02em', transition:'opacity 0.2s', marginRight:4}}
+            onMouseEnter={e => e.currentTarget.style.opacity='0.88'}
+            onMouseLeave={e => e.currentTarget.style.opacity='1'}>
+            Keep in touch!
+          </button>
           <button onClick={() => router.push('/browse')}
             style={{padding:'10px 20px', background:'none', color:'#1A0A06', border:'1.5px solid #E5E7EB', borderRadius:8, fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:'inherit', transition:'all 0.2s', marginRight:8}}
             onMouseEnter={e => { e.currentTarget.style.borderColor='#1A0A06' }}
@@ -346,6 +377,84 @@ export default function Home() {
               ))}
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ── BUSINESS EMAIL CAPTURE ────────────────────────────────── */}
+      <section id="waitlist" style={{background:'#1A0A06', padding: isMobile ? '64px 24px' : '96px 40px'}}>
+        <div style={{maxWidth:680, margin:'0 auto', textAlign:'center'}}>
+
+          {/* Eyebrow */}
+          <p style={{fontSize:10, fontWeight:700, color:'#C0442B', letterSpacing:'0.22em', textTransform:'uppercase', marginBottom:16}}>
+            For businesses
+          </p>
+
+          {/* Headline */}
+          <h2 style={{fontFamily:"'DM Serif Display',Georgia,serif", fontWeight:400, fontStyle:'italic', fontSize: isMobile ? 36 : 52, color:'#F5F0E8', lineHeight:1.1, letterSpacing:'-0.02em', marginBottom:16}}>
+            Interested in bringing<br/>Regly to your business?
+          </h2>
+
+          {/* Subline */}
+          <p style={{fontSize:16, color:'rgba(245,240,232,0.5)', fontWeight:300, lineHeight:1.7, marginBottom:48, maxWidth:440, margin:'0 auto 48px'}}>
+            Leave your email and we will reach out personally to get you set up.
+          </p>
+
+          {/* Email form */}
+          {captureStatus === 'success' ? (
+            <div style={{background:'rgba(192,68,43,0.12)', border:'1px solid rgba(192,68,43,0.3)', borderRadius:16, padding:'32px 40px'}}>
+              <div style={{width:48, height:48, borderRadius:'50%', background:'rgba(192,68,43,0.15)', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 16px'}}>
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                  <path d="M4 11L9 16L18 7" stroke="#C0442B" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              <p style={{fontSize:18, fontWeight:700, color:'#F5F0E8', marginBottom:6}}>You are on the list.</p>
+              <p style={{fontSize:14, color:'rgba(245,240,232,0.5)', fontWeight:300}}>We will be in touch soon to get your business set up on Regly.</p>
+            </div>
+          ) : (
+            <form onSubmit={handleEmailCapture} style={{display:'flex', gap:12, maxWidth:500, margin:'0 auto', flexDirection: isMobile ? 'column' : 'row'}}>
+              <input
+                type="email"
+                placeholder="Your business email"
+                value={captureEmail}
+                onChange={e => { setCaptureEmail(e.target.value); setCaptureStatus(null) }}
+                required
+                style={{
+                  flex:1, padding:'16px 20px',
+                  background:'rgba(255,255,255,0.07)',
+                  border: captureStatus === 'error' ? '1.5px solid #EF4444' : '1.5px solid rgba(255,255,255,0.12)',
+                  borderRadius:10, fontSize:15, color:'#F5F0E8',
+                  outline:'none', fontFamily:'inherit',
+                }}
+              />
+              <button
+                type="submit"
+                disabled={captureStatus === 'loading'}
+                style={{
+                  padding:'16px 32px',
+                  background: captureStatus === 'loading' ? 'rgba(192,68,43,0.6)' : '#C0442B',
+                  color:'#F5F0E8', border:'none', borderRadius:10,
+                  fontSize:15, fontWeight:700, cursor: captureStatus === 'loading' ? 'default' : 'pointer',
+                  fontFamily:'inherit', whiteSpace:'nowrap', letterSpacing:'0.02em',
+                  transition:'opacity 0.2s',
+                }}
+                onMouseEnter={e => { if (captureStatus !== 'loading') e.currentTarget.style.opacity='0.88' }}
+                onMouseLeave={e => { e.currentTarget.style.opacity='1' }}>
+                {captureStatus === 'loading' ? 'Sending...' : 'Get Early Access'}
+              </button>
+            </form>
+          )}
+
+          {captureStatus === 'error' && (
+            <p style={{fontSize:13, color:'#EF4444', marginTop:12, fontWeight:400}}>
+              Something went wrong. Please try again or email us at getregly@gmail.com
+            </p>
+          )}
+
+          {/* Trust line */}
+          <p style={{fontSize:11, color:'rgba(245,240,232,0.2)', marginTop:24, fontWeight:300}}>
+            No spam. No commitment. We will reach out personally.
+          </p>
+
         </div>
       </section>
 
